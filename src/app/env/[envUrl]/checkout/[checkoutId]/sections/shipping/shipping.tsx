@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,8 +14,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import { shippingAddressTypesFragment } from "./fragment";
 import { updateShippingAddress } from "./update-shipping-address";
 

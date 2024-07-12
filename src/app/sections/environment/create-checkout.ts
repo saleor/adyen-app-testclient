@@ -3,7 +3,8 @@ import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { EnvironmentConfigSchemaType } from "./components/environment";
+
+import { EnvironmentConfigSchemaType } from "./environment";
 
 const CreateCheckoutMutation = graphql(`
   mutation createCheckout($input: CheckoutCreateInput!) {
@@ -21,11 +22,17 @@ const CreateCheckoutMutation = graphql(`
 
 export const createCheckout = async (
   inputData: EnvironmentConfigSchemaType,
+  variantId: string,
 ) => {
   const data = await request(inputData.url, CreateCheckoutMutation, {
     input: {
       channel: inputData.channelSlug,
-      lines: [],
+      lines: [
+        {
+          variantId,
+          quantity: 1,
+        },
+      ],
     },
   });
   console.log(data);

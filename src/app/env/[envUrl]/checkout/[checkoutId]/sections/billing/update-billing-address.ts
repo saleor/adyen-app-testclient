@@ -2,6 +2,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
+
 import { BillingConfigSchemaType } from "./billing";
 
 const UpdateBillingAddressMutation = graphql(`

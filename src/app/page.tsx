@@ -1,4 +1,4 @@
-import { Environment } from "./components/environment";
+import { Environment } from "./sections/environment/environment";
 
 export default function Home() {
   return (
@@ -6,7 +6,7 @@ export default function Home() {
       <div className="grid gap-4 md:gap-8">
         <Environment />
       </div>
-      <div className="grid gap-4 md:gap-8">{/* <Cart /> */}</div>
+      <div className="grid gap-4 md:gap-8"></div>
     </main>
   );
 }
