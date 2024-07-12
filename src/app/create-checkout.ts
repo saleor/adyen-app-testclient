@@ -2,6 +2,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { EnvironmentConfigSchemaType } from "./components/environment";
 
 const CreateCheckoutMutation = graphql(`
@@ -27,6 +28,9 @@ export const createCheckout = async (
       lines: [],
     },
   });
+  console.log(data);
   revalidatePath("/");
-  return data;
+  redirect(
+    `/env/${encodeURIComponent(inputData.url)}/checkout/${data.checkoutCreate?.checkout?.id}`,
+  );
 };
