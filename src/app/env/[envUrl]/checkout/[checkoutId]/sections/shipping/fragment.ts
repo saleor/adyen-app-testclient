@@ -13,3 +13,14 @@ export const shippingAddressTypesFragment = graphql(`
     countryArea
   }
 `);
+
+export const shippingMethodTypesFragment = graphql(`
+  fragment ShippingMethod on ShippingMethod @_unmask {
+    id
+    name
+    price {
+      amount
+      currency
+    }
+  }
+`);

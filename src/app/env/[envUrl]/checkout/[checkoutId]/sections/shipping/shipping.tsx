@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf } from "gql.tada";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -17,7 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { shippingAddressTypesFragment } from "./fragment";
+import {
+  shippingAddressTypesFragment,
+  shippingMethodTypesFragment,
+} from "./fragment";
+import { ShippingMethods } from "./shipping-methods";
 import { updateShippingAddress } from "./update-shipping-address";
 
 type Props = {
@@ -39,6 +44,10 @@ const ShippingConfigSchema = z.object({
 export type ShippingConfigSchemaType = z.infer<typeof ShippingConfigSchema>;
 
 export const Shipping = ({ address, envUrl, checkoutId }: Props) => {
+  const [shippingMethods, setShippingMethods] = useState<
+    (typeof shippingMethodTypesFragment)[]
+  >([]);
+
   const form = useForm<ShippingConfigSchemaType>({
     resolver: zodResolver(ShippingConfigSchema),
     defaultValues: {
@@ -59,6 +68,12 @@ export const Shipping = ({ address, envUrl, checkoutId }: Props) => {
       checkoutId,
       shippingAddress: data,
     });
+
+    setShippingMethods(
+      // @ts-expect-error
+      response?.checkoutShippingAddressUpdate?.checkout?.shippingMethods ?? [],
+    );
+
     toast({
       title: "You submitted the following values:",
       description: (
@@ -194,6 +209,14 @@ export const Shipping = ({ address, envUrl, checkoutId }: Props) => {
           <Button type="submit">Save shipping address</Button>
         </form>
       </Form>
+
+      {shippingMethods.length > 0 && (
+        <ShippingMethods
+          shippingMethods={shippingMethods}
+          envUrl={envUrl}
+          checkoutId={checkoutId}
+        />
+      )}
     </div>
   );
 };

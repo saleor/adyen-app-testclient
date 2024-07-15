@@ -3,46 +3,45 @@ import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
 
+import { shippingMethodTypesFragment } from "./fragment";
 import { ShippingConfigSchemaType } from "./shipping";
 
-const UpdateShippingAddressMutation = graphql(`
-  mutation updateBillingAddress($checkoutId: ID!, $input: AddressInput!) {
-    checkoutShippingAddressUpdate(
-      checkoutId: $checkoutId
-      shippingAddress: $input
-    ) {
-      checkout {
-        id
-        shippingAddress {
-          firstName
-          lastName
-          companyName
-          streetAddress1
-          streetAddress2
-          city
-          postalCode
-          country {
-            code
-          }
-          countryArea
-          phone
-        }
-        shippingMethods {
+const UpdateShippingAddressMutation = graphql(
+  `
+    mutation updateBillingAddress($checkoutId: ID!, $input: AddressInput!) {
+      checkoutShippingAddressUpdate(
+        checkoutId: $checkoutId
+        shippingAddress: $input
+      ) {
+        checkout {
           id
-          name
-          price {
-            amount
-            currency
+          shippingAddress {
+            firstName
+            lastName
+            companyName
+            streetAddress1
+            streetAddress2
+            city
+            postalCode
+            country {
+              code
+            }
+            countryArea
+            phone
+          }
+          shippingMethods {
+            ...ShippingMethod
           }
         }
-      }
-      errors {
-        field
-        message
+        errors {
+          field
+          message
+        }
       }
     }
-  }
-`);
+  `,
+  [shippingMethodTypesFragment],
+);
 
 export const updateShippingAddress = async ({
   envUrl,
