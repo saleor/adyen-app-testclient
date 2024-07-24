@@ -27,6 +27,7 @@ export const createCheckout = async (
   const data = await request(inputData.url, CreateCheckoutMutation, {
     input: {
       channel: inputData.channelSlug,
+      email: "exmaple@com.co",
       lines: [
         {
           variantId,
