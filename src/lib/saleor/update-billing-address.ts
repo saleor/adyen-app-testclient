@@ -3,8 +3,6 @@ import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
 
-import { BillingConfigSchemaType } from "./billing";
-
 const UpdateBillingAddressMutation = graphql(`
   mutation updateBillingAddress($checkoutId: ID!, $input: AddressInput!) {
     checkoutBillingAddressUpdate(
@@ -43,7 +41,7 @@ export const updateBillingAddress = async ({
 }: {
   envUrl: string;
   checkoutId: string;
-  billingAddress: BillingConfigSchemaType;
+  billingAddress: any;
 }) => {
   const data = await request(envUrl, UpdateBillingAddressMutation, {
     checkoutId,

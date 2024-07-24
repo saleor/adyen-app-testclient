@@ -2,6 +2,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const UpdateDeliveryMethodMutation = graphql(`
   mutation checkoutDeliveryMethodUpdate($checkoutId: ID!, $input: ID!) {
@@ -33,5 +34,7 @@ export const updateDeliveryMethod = async ({
 
   revalidatePath(`/env/${encodeURIComponent(envUrl)}/checkout/${checkoutId}`);
 
-  return data;
+  redirect(
+    `/env/${encodeURIComponent(envUrl)}/checkout/${checkoutId}/payment-gateway`,
+  );
 };

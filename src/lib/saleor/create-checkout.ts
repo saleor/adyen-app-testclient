@@ -4,7 +4,7 @@ import request from "graphql-request";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { EnvironmentConfigSchemaType } from "./environment";
+import { EnvironmentConfigSchemaType } from "../../components/sections/environment/environment";
 
 const CreateCheckoutMutation = graphql(`
   mutation createCheckout($input: CheckoutCreateInput!) {
@@ -27,6 +27,7 @@ export const createCheckout = async (
   const data = await request(inputData.url, CreateCheckoutMutation, {
     input: {
       channel: inputData.channelSlug,
+      email: "exmaple@com.co",
       lines: [
         {
           variantId,

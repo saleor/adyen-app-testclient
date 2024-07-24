@@ -23,7 +23,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 
 import { shippingMethodTypesFragment } from "./fragment";
-import { updateDeliveryMethod } from "./update-delivery-method";
+import { updateDeliveryMethod } from "../../../lib/saleor/update-delivery-method";
 
 const FormSchema = z.object({
   deliveryMethod: z.string(),

@@ -1,8 +1,14 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-import { Billing, billingAddressTypesFragment } from "./sections/billing";
-import { Shipping, shippingAddressTypesFragment } from "./sections/shipping";
+import {
+  Billing,
+  billingAddressTypesFragment,
+} from "@/components/sections/billing";
+import {
+  Shipping,
+  shippingAddressTypesFragment,
+} from "@/components/sections/shipping";
 
 const GetCheckoutQuery = graphql(
   `
@@ -13,9 +19,6 @@ const GetCheckoutQuery = graphql(
         }
         shippingAddress {
           ...ShippingAddress
-        }
-        channel {
-          slug
         }
       }
     }
@@ -33,8 +36,6 @@ export default async function Page({
     checkoutId,
   });
 
-  console.log(data);
-
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       <div className="grid gap-4 md:gap-8">
@@ -44,16 +45,10 @@ export default async function Page({
           checkoutId={checkoutId}
         />
         <Shipping
-          address={data.checkout?.billingAddress}
+          address={data.checkout?.shippingAddress}
           envUrl={decodedEnvUrl}
           checkoutId={checkoutId}
         />
-      </div>
-      <div className="grid gap-4 md:gap-8">
-        {/* <Cart
-          channelSlug={data.checkout?.channel.slug}
-          envUrl={decodedEnvUrl}
-        /> */}
       </div>
     </main>
   );
