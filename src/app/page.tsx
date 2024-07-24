@@ -1,4 +1,4 @@
-import { Environment } from "../components/sections/environment/environment";
+import { Environment } from "@/components/sections/environment";
 
 export default function Home() {
   return (

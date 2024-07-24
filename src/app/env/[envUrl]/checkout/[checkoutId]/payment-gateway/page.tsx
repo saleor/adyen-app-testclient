@@ -1,7 +1,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-import { SelectPaymentMethod } from "../../../../../../components/sections/payment-gateway/select-payment-method";
+import { SelectPaymentMethod } from "@/components/sections/payment-gateway";
 
 const GetPaymentGateways = graphql(`
   query GetPaymentGateways($checkoutId: ID!) {
@@ -28,8 +28,6 @@ export default async function PaymentGatewayPage({
   const data = await request(decodedEnvUrl, GetPaymentGateways, {
     checkoutId,
   });
-
-  console.log(JSON.stringify(data, null, 2));
 
   return (
     <SelectPaymentMethod

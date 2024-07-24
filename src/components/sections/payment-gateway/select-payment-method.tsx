@@ -21,8 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-
-import { InitalizePaymentGateway } from "../../../lib/saleor/initalize-payment-gateway";
+import { InitalizePaymentGateway } from "@/lib/saleor/initalize-payment-gateway";
 
 const FormSchema = z.object({
   paymentGatewayId: z.string(),

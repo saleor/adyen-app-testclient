@@ -1,7 +1,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-import { AdyenDropin } from "@/components/sections/dropin/dropin";
+import { AdyenDropin } from "@/components/sections/dropin";
 
 const GetCheckoutTotalPriceQuery = graphql(`
   query GetCheckoutTotalPrice($checkoutId: ID!) {

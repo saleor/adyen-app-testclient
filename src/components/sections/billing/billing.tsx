@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { updateBillingAddress } from "@/lib/saleor/update-billing-address";
 
 import { billingAddressTypesFragment } from "./fragment";
-import { updateBillingAddress } from "./update-billing-address";
 
 const BillingConfigSchema = z.object({
   firstName: z.string().min(1),
