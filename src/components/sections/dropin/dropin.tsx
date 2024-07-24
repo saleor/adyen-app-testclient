@@ -4,7 +4,7 @@ import "@adyen/adyen-web/dist/adyen.css";
 import AdyenCheckout from "@adyen/adyen-web";
 import { useEffect, useRef } from "react";
 
-import { initalizeTransaction } from "./initalize-transaction";
+import { initalizeTransaction } from "@/lib/saleor/initalize-transaction";
 
 const wait = async (time: number) => {
   return new Promise((resolve) => {
@@ -62,7 +62,6 @@ export const AdyenDropin = ({
 
           console.log(JSON.stringify(transactionInitializeResponse, null, 2));
 
-          //   @ts-expect-error - type this
           const { transaction, data } =
             transactionInitializeResponse.transactionInitialize;
           const paymentResponse = data?.paymentResponse;

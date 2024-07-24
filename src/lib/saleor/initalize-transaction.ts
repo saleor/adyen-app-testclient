@@ -1,7 +1,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-const InitalizeTransactionMutation = graphql(`
+const initalizeTransactionMutation = graphql(`
   mutation InitalizeTransaction(
     $checkoutId: ID!
     $data: JSON
@@ -43,7 +43,7 @@ export const initalizeTransaction = async ({
   amount: number;
   idempotencyKey: string;
 }) => {
-  return await request(envUrl, InitalizeTransactionMutation, {
+  return await request(envUrl, initalizeTransactionMutation, {
     checkoutId,
     data,
     amount,
