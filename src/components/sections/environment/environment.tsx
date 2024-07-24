@@ -18,8 +18,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { createCheckout } from "./create-checkout";
-import { fetchProduct } from "./fetch-product";
+import { createCheckout } from "../../../lib/saleor/create-checkout";
+import { fetchProduct } from "../../../lib/saleor/fetch-product";
 
 const EnvironmentConfigSchema = z.object({
   url: z.string().url().min(1),

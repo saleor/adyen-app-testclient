@@ -1,8 +1,8 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-import { Billing, billingAddressTypesFragment } from "./sections/billing";
-import { Shipping, shippingAddressTypesFragment } from "./sections/shipping";
+import { Billing, billingAddressTypesFragment } from "../../../../../components/sections/billing";
+import { Shipping, shippingAddressTypesFragment } from "../../../../../components/sections/shipping";
 
 const GetCheckoutQuery = graphql(
   `

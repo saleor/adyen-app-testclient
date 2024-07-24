@@ -1,7 +1,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 
-import { SelectPaymentMethod } from "./_sections/select-payment-method";
+import { SelectPaymentMethod } from "../../../../../../components/sections/payment-gateway/select-payment-method";
 
 const GetPaymentGateways = graphql(`
   query GetPaymentGateways($checkoutId: ID!) {
@@ -18,8 +18,6 @@ const GetPaymentGateways = graphql(`
     }
   }
 `);
-
-
 
 export default async function PaymentGatewayPage({
   params: { envUrl, checkoutId },
