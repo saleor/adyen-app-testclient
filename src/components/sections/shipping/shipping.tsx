@@ -18,12 +18,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
+import { updateShippingAddress } from "@/lib/saleor/update-shipping-address";
 import {
   shippingAddressTypesFragment,
   shippingMethodTypesFragment,
 } from "./fragment";
 import { ShippingMethods } from "./shipping-methods";
-import { updateShippingAddress } from "./update-shipping-address";
 
 type Props = {
   address: FragmentOf<typeof shippingAddressTypesFragment> | null | undefined;
