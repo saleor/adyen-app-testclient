@@ -1,4 +1,8 @@
-import { Billing, getCheckoutDetails } from "@/modules/checkout-details";
+import {
+  Billing,
+  getCheckoutDetails,
+  Shipping,
+} from "@/modules/checkout-details";
 
 export default async function CheckoutDetailsPage(props: {
   params: { envUrl: string; checkoutId: string };
@@ -23,18 +27,11 @@ export default async function CheckoutDetailsPage(props: {
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
-      {/* <div className="grid gap-4 md:gap-8"> */}
-      {/* <Billing
-        address={data.checkout?.billingAddress}
+      <Shipping
+        data={checkoutDetails.value.checkout?.shippingAddress}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
-      <Shipping
-        address={data.checkout?.shippingAddress}
-        envUrl={decodedEnvUrl}
-        checkoutId={checkoutId}
-      /> */}
-      {/* </div> */}
     </main>
   );
 }

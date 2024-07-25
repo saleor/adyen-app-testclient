@@ -1,10 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FragmentOf } from "gql.tada";
+import { FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { ErrorToastDescription } from "@/components/sections/error-toast-description";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,58 +17,68 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { updateBillingAddress } from "@/lib/saleor/update-billing-address";
 
-import { billingAddressTypesFragment } from "./fragment";
+import {
+  convertStringToCountryCode,
+  countryCodes,
+  defaultAddress,
+} from "../const";
+import { BillingAddressFragment } from "./fragments";
+import { updateBillingAddress } from "./update-billing-address";
 
-const BillingConfigSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  streetAddress1: z.string().min(1),
-  city: z.string().min(1),
-  countryArea: z.string().min(1),
-  country: z.enum(["US", "CA"]),
-  postalCode: z.string().min(1),
+export const BillingAddressSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  streetAddress1: z.string(),
+  city: z.string(),
+  countryArea: z.string(),
+  country: z.enum(countryCodes),
+  postalCode: z.string(),
 });
 
-export type BillingConfigSchemaType = z.infer<typeof BillingConfigSchema>;
+export type BillingAddressSchemaType = z.infer<typeof BillingAddressSchema>;
 
-type Props = {
-  address: FragmentOf<typeof billingAddressTypesFragment> | null | undefined;
+export const Billing = (props: {
+  data: FragmentOf<typeof BillingAddressFragment> | undefined | null;
   envUrl: string;
   checkoutId: string;
-};
+}) => {
+  const { data, envUrl, checkoutId } = props;
 
-export const Billing = ({ address, envUrl, checkoutId }: Props) => {
-  const form = useForm<BillingConfigSchemaType>({
-    resolver: zodResolver(BillingConfigSchema),
+  const address = readFragment(BillingAddressFragment, data);
+
+  const form = useForm<BillingAddressSchemaType>({
+    resolver: zodResolver(BillingAddressSchema),
     defaultValues: {
-      firstName: address?.firstName ?? "John",
-      lastName: address?.lastName ?? "Snow",
-      streetAddress1: address?.streetAddress1 ?? "Tęczowa 7",
-      city: address?.city ?? "Wrocław",
-      countryArea: address?.countryArea ?? "NY",
-      // @ts-expect-error
-      country: address?.country.code ?? "US",
-      postalCode: address?.postalCode ?? "10001",
+      firstName: address?.firstName ?? defaultAddress.firstName,
+      lastName: address?.lastName ?? defaultAddress.lastName,
+      streetAddress1: address?.streetAddress1 ?? defaultAddress.streetAddress1,
+      city: address?.city ?? defaultAddress.city,
+      countryArea: address?.countryArea ?? defaultAddress.countryArea,
+      country:
+        convertStringToCountryCode(address?.country.code) ??
+        defaultAddress.country,
+      postalCode: address?.postalCode ?? defaultAddress.postalCode,
     },
   });
 
-  const onSubmit = async (data: BillingConfigSchemaType) => {
+  const onSubmit = async (data: BillingAddressSchemaType) => {
     const response = await updateBillingAddress({
       envUrl,
       checkoutId,
       billingAddress: data,
     });
+
+    if (response?.isErr()) {
+      return toast({
+        title: `${response.error.name}: ${response.error.message}`,
+        variant: "destructive",
+        description: <ErrorToastDescription details={response.error.errors} />,
+      });
+    }
+
     toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(response, null, 2)}
-          </code>
-        </pre>
-      ),
+      title: "Successfully updated billing address",
     });
   };
 

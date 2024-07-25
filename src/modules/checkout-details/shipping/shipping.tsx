@@ -1,11 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FragmentOf } from "gql.tada";
-import { useState } from "react";
+import { FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { ErrorToastDescription } from "@/components/sections/error-toast-description";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,71 +18,67 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { updateShippingAddress } from "@/lib/saleor/update-shipping-address";
 import {
-  shippingAddressTypesFragment,
-  shippingMethodTypesFragment,
-} from "./fragment";
-import { ShippingMethods } from "./shipping-methods";
+  convertStringToCountryCode,
+  countryCodes,
+  defaultAddress,
+} from "../const";
+import { ShippingAddressFragment } from "./fragments";
+import { updateShippingAddress } from "./update-shipping-address";
 
-type Props = {
-  address: FragmentOf<typeof shippingAddressTypesFragment> | null | undefined;
-  envUrl: string;
-  checkoutId: string;
-};
-
-const ShippingConfigSchema = z.object({
+export const ShippingAddressSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   streetAddress1: z.string().min(1),
   city: z.string().min(1),
   countryArea: z.string().min(1),
-  country: z.enum(["US", "CA"]),
+  country: z.enum(countryCodes),
   postalCode: z.string().min(1),
 });
 
-export type ShippingConfigSchemaType = z.infer<typeof ShippingConfigSchema>;
+export type ShippingAddressSchemaType = z.infer<typeof ShippingAddressSchema>;
 
-export const Shipping = ({ address, envUrl, checkoutId }: Props) => {
-  const [shippingMethods, setShippingMethods] = useState<
-    (typeof shippingMethodTypesFragment)[]
-  >([]);
+export const Shipping = (props: {
+  data: FragmentOf<typeof ShippingAddressFragment> | null | undefined;
+  envUrl: string;
+  checkoutId: string;
+}) => {
+  const { data, envUrl, checkoutId } = props;
 
-  const form = useForm<ShippingConfigSchemaType>({
-    resolver: zodResolver(ShippingConfigSchema),
+  const address = readFragment(ShippingAddressFragment, data);
+
+  const form = useForm<ShippingAddressSchemaType>({
+    resolver: zodResolver(ShippingAddressSchema),
     defaultValues: {
-      firstName: address?.firstName ?? "John",
-      lastName: address?.lastName ?? "Snow",
-      streetAddress1: address?.streetAddress1 ?? "Tęczowa 7",
-      city: address?.city ?? "Wrocław",
-      countryArea: address?.countryArea ?? "NY",
-      // @ts-expect-error
-      country: address?.country.code ?? "US",
-      postalCode: address?.postalCode ?? "10001",
+      firstName: address?.firstName ?? defaultAddress.firstName,
+      lastName: address?.lastName ?? defaultAddress.lastName,
+      streetAddress1: address?.streetAddress1 ?? defaultAddress.streetAddress1,
+      city: address?.city ?? defaultAddress.city,
+      countryArea: address?.countryArea ?? defaultAddress.countryArea,
+      country:
+        convertStringToCountryCode(address?.country.code) ??
+        defaultAddress.country,
+      postalCode: address?.postalCode ?? defaultAddress.postalCode,
     },
   });
 
-  const onSubmit = async (data: ShippingConfigSchemaType) => {
+  const onSubmit = async (data: ShippingAddressSchemaType) => {
     const response = await updateShippingAddress({
       envUrl,
       checkoutId,
       shippingAddress: data,
     });
 
-    setShippingMethods(
-      // @ts-expect-error
-      response?.checkoutShippingAddressUpdate?.checkout?.shippingMethods ?? [],
-    );
+    if (response?.isErr()) {
+      return toast({
+        title: `${response.error.name}: ${response.error.message}`,
+        variant: "destructive",
+        description: <ErrorToastDescription details={response.error.errors} />,
+      });
+    }
 
     toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] overflow-auto rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(response, null, 2)}
-          </code>
-        </pre>
-      ),
+      title: "Successfully updated shipping address",
     });
   };
 
@@ -210,13 +206,13 @@ export const Shipping = ({ address, envUrl, checkoutId }: Props) => {
         </form>
       </Form>
 
-      {shippingMethods.length > 0 && (
+      {/* {shippingMethods.length > 0 && (
         <ShippingMethods
           shippingMethods={shippingMethods}
           envUrl={envUrl}
           checkoutId={checkoutId}
         />
-      )}
+      )} */}
     </div>
   );
 };

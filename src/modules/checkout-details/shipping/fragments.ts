@@ -1,7 +1,7 @@
 import { graphql } from "gql.tada";
 
-export const shippingAddressTypesFragment = graphql(`
-  fragment ShippingAddress on Address @_unmask {
+export const ShippingAddressFragment = graphql(`
+  fragment ShippingAddress on Address {
     firstName
     lastName
     streetAddress1
@@ -14,8 +14,8 @@ export const shippingAddressTypesFragment = graphql(`
   }
 `);
 
-export const shippingMethodTypesFragment = graphql(`
-  fragment ShippingMethod on ShippingMethod @_unmask {
+export const ShippingMethodFragment = graphql(`
+  fragment ShippingMethod on ShippingMethod {
     id
     name
     price {

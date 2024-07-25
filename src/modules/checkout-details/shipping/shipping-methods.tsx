@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 
-import { shippingMethodTypesFragment } from "./fragment";
-import { updateDeliveryMethod } from "../../../lib/saleor/update-delivery-method";
+import { updateDeliveryMethod } from "./update-delivery-method";
+import { shippingMethodTypesFragment } from "./fragments";
 
 const FormSchema = z.object({
   deliveryMethod: z.string(),

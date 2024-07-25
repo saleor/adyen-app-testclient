@@ -1,9 +1,11 @@
 import { graphql } from "gql.tada";
-
-import { BaseError } from "@/lib/errors";
 import request from "graphql-request";
 import { err, ok, ResultAsync } from "neverthrow";
-import { BillingAddressFragment } from "./fragments";
+
+import { BaseError } from "@/lib/errors";
+
+import { BillingAddressFragment } from "./billing";
+import { ShippingAddressFragment, ShippingMethodFragment } from "./shipping";
 
 const GetCheckoutError = BaseError.subclass("GetCheckoutError");
 
@@ -14,10 +16,16 @@ const GetCheckoutQuery = graphql(
         billingAddress {
           ...BillingAddress
         }
+        shippingAddress {
+          ...ShippingAddress
+        }
+        shippingMethods {
+          ...ShippingMethod
+        }
       }
     }
   `,
-  [BillingAddressFragment],
+  [BillingAddressFragment, ShippingAddressFragment, ShippingMethodFragment],
 );
 
 export const getCheckoutDetails = async (props: {
