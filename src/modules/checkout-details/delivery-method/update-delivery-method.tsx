@@ -2,6 +2,7 @@
 import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { err, ResultAsync } from "neverthrow";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -74,15 +75,9 @@ export const updateDeliveryMethod = async (props: {
     );
   }
 
-  // revalidatePath(`/env/${encodeURIComponent(envUrl)}/checkout/${checkoutId}`);
-
-  redirect(
-    createPath(
-      "env",
-      encodeURIComponent(envUrl),
-      "checkout",
-      checkoutId,
-      "payment-gateway",
-    ),
+  revalidatePath(
+    createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
   );
+
+  redirect(createPath(checkoutId, "payment-gateway"));
 };

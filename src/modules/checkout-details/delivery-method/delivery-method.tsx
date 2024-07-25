@@ -107,6 +107,7 @@ export const DeliveryMethod = (props: {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={shippingMethods.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
