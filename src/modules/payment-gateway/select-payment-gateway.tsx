@@ -1,6 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FragmentOf, readFragment } from "gql.tada";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,52 +22,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
-import { InitalizePaymentGateway } from "@/lib/saleor/initalize-payment-gateway";
+import { createPath } from "@/lib/utils";
 
-const FormSchema = z.object({
+import { PaymentGatewayFragment } from "./fragments";
+
+export const PaymentGatewaySchema = z.object({
   paymentGatewayId: z.string(),
 });
 
-export const SelectPaymentMethod = ({
-  availablePaymentGateways,
-  envUrl,
-  checkoutId,
-  amount,
-}: {
-  availablePaymentGateways: { id: string; name: string }[];
-  envUrl: string;
-  checkoutId: string;
-  amount: number;
+export type PaymentGatewaySchemaType = z.infer<typeof PaymentGatewaySchema>;
+
+export const SelectPaymentMethod = (props: {
+  data: FragmentOf<typeof PaymentGatewayFragment>[] | null | undefined;
 }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const { data } = props;
+  const router = useRouter();
+
+  const availablePaymentGateways = readFragment(
+    PaymentGatewayFragment,
+    data?.map((method) => method) ?? [],
+  );
+
+  const form = useForm<PaymentGatewaySchemaType>({
+    resolver: zodResolver(PaymentGatewaySchema),
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const response = await InitalizePaymentGateway({
-      envUrl,
-      checkoutId,
-      paymentGatewayId: data.paymentGatewayId,
-      amount,
-    });
-
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(response, null, 2)}
-          </code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data: PaymentGatewaySchemaType) {
+    router.push(createPath("payment-gateway", data.paymentGatewayId));
   }
 
   return (
     <section className="mx-auto w-full max-w-md py-8">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Shipping Method</h2>
+        <h2 className="text-2xl font-bold">Payment Gateway Information</h2>
       </div>
       <div className="mt-6">
         <Form {...form}>
@@ -78,14 +67,14 @@ export const SelectPaymentMethod = ({
               name="paymentGatewayId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Delivery Method</FormLabel>
+                  <FormLabel>Payment Gateway</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a deliveryMethod" />
+                        <SelectValue placeholder="Select a payment gateway" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
