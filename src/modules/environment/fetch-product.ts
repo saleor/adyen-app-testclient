@@ -31,17 +31,17 @@ const FetchProductQuery = graphql(
   [ProductFragment],
 );
 
-export const fetchProduct = async ({
-  channelSlug,
-  envUrl,
-}: {
+export const fetchProduct = async (props: {
   channelSlug: string;
   envUrl: string;
-}) =>
-  ResultAsync.fromPromise(
+}) => {
+  const { envUrl, channelSlug } = props;
+
+  return ResultAsync.fromPromise(
     request(envUrl, FetchProductQuery, {
       channelSlug,
     }),
     (error) =>
       new FetchProductError("Failed to fetch products", { errors: [error] }),
   );
+};

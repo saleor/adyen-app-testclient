@@ -1,14 +1,13 @@
 "use server";
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err } from "neverthrow";
+import { err, ResultAsync } from "neverthrow";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { BaseError } from "@/lib/errors";
-import { createRedirectUrl } from "@/lib/utils";
-import { ResultAsync } from "neverthrow";
+import { createPath } from "@/lib/utils";
 
 const CreateCheckoutError = BaseError.subclass("CreateCheckoutError");
 
@@ -40,15 +39,12 @@ const CreateCheckoutMutation = graphql(`
   }
 `);
 
-export const createCheckout = async ({
-  envUrl,
-  channelSlug,
-  variantId,
-}: {
+export const createCheckout = async (props: {
   envUrl: string;
   channelSlug: string;
   variantId: string;
 }) => {
+  const { envUrl, channelSlug, variantId } = props;
   const response = await ResultAsync.fromPromise(
     request(envUrl, CreateCheckoutMutation, {
       input: {
@@ -90,12 +86,11 @@ export const createCheckout = async ({
 
   revalidatePath("/");
   redirect(
-    createRedirectUrl(
+    createPath(
       "env",
       encodeURIComponent(envUrl),
       "checkout",
       parsedResponse.data.checkoutCreate.checkout.id,
     ),
-    // `/env/${encodeURIComponent(envUrl)}/checkout/${data.checkoutCreate?.checkout?.id}`,
   );
 };
