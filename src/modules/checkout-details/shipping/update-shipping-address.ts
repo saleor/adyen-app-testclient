@@ -61,11 +61,6 @@ export const updateShippingAddress = async (props: {
     return err(response.error);
   }
 
-  await request(envUrl, UpdateShippingAddressMutation, {
-    checkoutId,
-    input: shippingAddress,
-  });
-
   const parsedResponse = UpdateShippingAddressSchema.safeParse(response.value);
 
   if (parsedResponse.error) {

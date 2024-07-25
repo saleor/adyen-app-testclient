@@ -1,5 +1,6 @@
 import {
   Billing,
+  DeliveryMethod,
   getCheckoutDetails,
   Shipping,
 } from "@/modules/checkout-details";
@@ -29,6 +30,12 @@ export default async function CheckoutDetailsPage(props: {
       />
       <Shipping
         data={checkoutDetails.value.checkout?.shippingAddress}
+        envUrl={decodedEnvUrl}
+        checkoutId={checkoutId}
+      />
+      <DeliveryMethod
+        deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
+        shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />

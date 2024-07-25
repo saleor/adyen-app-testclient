@@ -5,7 +5,12 @@ import { err, ok, ResultAsync } from "neverthrow";
 import { BaseError } from "@/lib/errors";
 
 import { BillingAddressFragment } from "./billing";
-import { ShippingAddressFragment, ShippingMethodFragment } from "./shipping";
+import {
+  CollectionPointFragment,
+  DeliveryMethodFragment,
+  ShippingMethodFragment,
+} from "./delivery-method";
+import { ShippingAddressFragment } from "./shipping";
 
 const GetCheckoutError = BaseError.subclass("GetCheckoutError");
 
@@ -22,10 +27,20 @@ const GetCheckoutQuery = graphql(
         shippingMethods {
           ...ShippingMethod
         }
+        deliveryMethod {
+          ...DeliveryMethod
+          ...CollectionPoint
+        }
       }
     }
   `,
-  [BillingAddressFragment, ShippingAddressFragment, ShippingMethodFragment],
+  [
+    BillingAddressFragment,
+    ShippingAddressFragment,
+    ShippingMethodFragment,
+    DeliveryMethodFragment,
+    CollectionPointFragment,
+  ],
 );
 
 export const getCheckoutDetails = async (props: {
