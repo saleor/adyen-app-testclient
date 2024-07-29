@@ -13,14 +13,3 @@ export const ShippingAddressFragment = graphql(`
     countryArea
   }
 `);
-
-export const ShippingMethodFragment = graphql(`
-  fragment ShippingMethod on ShippingMethod {
-    id
-    name
-    price {
-      amount
-      currency
-    }
-  }
-`);

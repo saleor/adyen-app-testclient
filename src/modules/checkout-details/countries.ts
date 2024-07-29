@@ -254,14 +254,3 @@ export const countryCodes = [
 export const convertStringToCountryCode = (country: string | undefined) => {
   return countryCodes.find((code) => code === country);
 };
-
-export const defaultAddress = {
-  firstName: "John",
-  lastName: "Snow",
-  streetAddress1: "Tęczowa 7",
-  city: "Wrocław",
-  countryArea: "NY",
-  country: "US",
-  postalCode: "10001",
-} as const;
-// TODO:rename file

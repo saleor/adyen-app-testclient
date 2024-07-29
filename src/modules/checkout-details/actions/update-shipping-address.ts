@@ -8,7 +8,7 @@ import { z } from "zod";
 import { BaseError } from "@/lib/errors";
 import { createPath } from "@/lib/utils";
 
-import { ShippingAddressSchemaType } from "./shipping";
+import { ShippingAddressSchemaType } from "../components/shipping";
 
 const UpdateShippingAddressError = BaseError.subclass(
   "UpdateShippingAddressError",

@@ -18,13 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import {
-  convertStringToCountryCode,
-  countryCodes,
-  defaultAddress,
-} from "../const";
-import { ShippingAddressFragment } from "./fragments";
-import { updateShippingAddress } from "./update-shipping-address";
+import { updateShippingAddress } from "../actions/update-shipping-address";
+import { defaultAddress } from "../address";
+import { convertStringToCountryCode, countryCodes } from "../countries";
+import { ShippingAddressFragment } from "../fragments";
 
 export const ShippingAddressSchema = z.object({
   firstName: z.string().min(1),

@@ -4,13 +4,13 @@ import { err, ok, ResultAsync } from "neverthrow";
 
 import { BaseError } from "@/lib/errors";
 
-import { BillingAddressFragment } from "./billing";
 import {
+  BillingAddressFragment,
   CollectionPointFragment,
   DeliveryMethodFragment,
+  ShippingAddressFragment,
   ShippingMethodFragment,
-} from "./delivery-method";
-import { ShippingAddressFragment } from "./shipping";
+} from "../fragments";
 
 const GetCheckoutError = BaseError.subclass("GetCheckoutError");
 

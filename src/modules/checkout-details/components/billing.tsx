@@ -18,13 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import {
-  convertStringToCountryCode,
-  countryCodes,
-  defaultAddress,
-} from "../const";
-import { BillingAddressFragment } from "./fragments";
-import { updateBillingAddress } from "./update-billing-address";
+import { updateBillingAddress } from "../actions";
+import { defaultAddress } from "../address";
+import { convertStringToCountryCode, countryCodes } from "../countries";
+import { BillingAddressFragment } from "../fragments";
 
 export const BillingAddressSchema = z.object({
   firstName: z.string(),

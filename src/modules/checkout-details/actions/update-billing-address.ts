@@ -8,7 +8,7 @@ import { z } from "zod";
 import { BaseError } from "@/lib/errors";
 import { createPath } from "@/lib/utils";
 
-import { BillingAddressSchemaType } from "./billing";
+import { BillingAddressSchemaType } from "../components/billing";
 
 const UpdateBillingAddressError = BaseError.subclass(
   "UpdateBillingAddressError",
