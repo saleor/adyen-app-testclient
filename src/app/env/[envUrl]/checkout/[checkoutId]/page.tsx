@@ -1,55 +1,44 @@
-import { graphql } from "gql.tada";
-import request from "graphql-request";
-
 import {
   Billing,
-  billingAddressTypesFragment,
-} from "@/components/sections/billing";
-import {
+  DeliveryMethod,
+  getCheckoutDetails,
   Shipping,
-  shippingAddressTypesFragment,
-} from "@/components/sections/shipping";
+} from "@/modules/checkout-details";
 
-const GetCheckoutQuery = graphql(
-  `
-    query getCheckout($checkoutId: ID!) {
-      checkout(id: $checkoutId) {
-        billingAddress {
-          ...BillingAddress
-        }
-        shippingAddress {
-          ...ShippingAddress
-        }
-      }
-    }
-  `,
-  [billingAddressTypesFragment, shippingAddressTypesFragment],
-);
-
-export default async function Page({
-  params: { envUrl, checkoutId },
-}: {
+export default async function CheckoutDetailsPage(props: {
   params: { envUrl: string; checkoutId: string };
 }) {
+  const { envUrl, checkoutId } = props.params;
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const data = await request(decodedEnvUrl, GetCheckoutQuery, {
+
+  const checkoutDetails = await getCheckoutDetails({
+    envUrl: decodedEnvUrl,
     checkoutId,
   });
 
+  if (checkoutDetails.isErr()) {
+    // Sends the error to the error boundary
+    throw checkoutDetails.error;
+  }
+
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
-      <div className="grid gap-4 md:gap-8">
-        <Billing
-          address={data.checkout?.billingAddress}
-          envUrl={decodedEnvUrl}
-          checkoutId={checkoutId}
-        />
-        <Shipping
-          address={data.checkout?.shippingAddress}
-          envUrl={decodedEnvUrl}
-          checkoutId={checkoutId}
-        />
-      </div>
+      <Billing
+        data={checkoutDetails.value.checkout?.billingAddress}
+        envUrl={decodedEnvUrl}
+        checkoutId={checkoutId}
+      />
+      <Shipping
+        data={checkoutDetails.value.checkout?.shippingAddress}
+        envUrl={decodedEnvUrl}
+        checkoutId={checkoutId}
+      />
+      <DeliveryMethod
+        deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
+        shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
+        envUrl={decodedEnvUrl}
+        checkoutId={checkoutId}
+      />
     </main>
   );
 }

@@ -5,6 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function createRedirectUrl(...paths: string[]) {
+export function createPath(...paths: string[]) {
   return paths.join("/");
 }

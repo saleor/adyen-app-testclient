@@ -1,40 +1,30 @@
-import { graphql } from "gql.tada";
-import request from "graphql-request";
+import {
+  getPaymentGateways,
+  PaymentGatewaySelect,
+} from "@/modules/payment-gateway";
 
-import { SelectPaymentMethod } from "@/components/sections/payment-gateway";
-
-const GetPaymentGateways = graphql(`
-  query GetPaymentGateways($checkoutId: ID!) {
-    checkout(id: $checkoutId) {
-      totalPrice {
-        gross {
-          amount
-        }
-      }
-      availablePaymentGateways {
-        id
-        name
-      }
-    }
-  }
-`);
-
-export default async function PaymentGatewayPage({
-  params: { envUrl, checkoutId },
-}: {
+export default async function PaymentGatewaysPage(props: {
   params: { envUrl: string; checkoutId: string };
 }) {
+  const { envUrl, checkoutId } = props.params;
+
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const data = await request(decodedEnvUrl, GetPaymentGateways, {
+
+  const paymentGatewaysData = await getPaymentGateways({
+    envUrl: decodedEnvUrl,
     checkoutId,
   });
 
+  if (paymentGatewaysData.isErr()) {
+    // Sends the error to the error boundary
+    throw paymentGatewaysData.error;
+  }
+
   return (
-    <SelectPaymentMethod
-      availablePaymentGateways={data.checkout?.availablePaymentGateways ?? []}
-      envUrl={decodedEnvUrl}
-      checkoutId={checkoutId}
-      amount={data.checkout?.totalPrice?.gross?.amount ?? 0}
-    />
+    <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
+      <PaymentGatewaySelect
+        data={paymentGatewaysData.value.checkout?.availablePaymentGateways}
+      />
+    </main>
   );
 }
