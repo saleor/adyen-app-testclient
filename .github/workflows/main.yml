@@ -1,0 +1,21 @@
+name: QA
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PNPM
+        uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+        with:
+          run_install: |
+            - args: [--frozen-lockfile]
+      - name: Check linter
+        run: pnpm lint
+      - name: Check types
+        run: pnpm check-types
