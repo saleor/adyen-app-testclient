@@ -18,9 +18,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
-import { fetchProduct } from "@/modules/environment/fetch-product";
 
-import { ErrorToastDescription } from "../../components/sections/error-toast-description";
+import { ErrorToastDescription } from "../../../components/sections/error-toast-description";
+import { fetchProduct } from "../actions";
 import { Cart, ProductFragment } from "./cart";
 
 const EnvironmentConfigSchema = z.object({

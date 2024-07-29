@@ -18,8 +18,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 
-import { completeCheckout } from "./complete-checkout";
-import { CheckoutFragment } from "./fragments";
+import { completeCheckout } from "../actions/complete-checkout";
+import { CheckoutFragment } from "../fragments";
 
 const getDashboardUrl = (envUrl: string, orderId: string) => {
   const dashboardUrl = envUrl.replace("/graphql/", "/dashboard");

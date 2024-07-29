@@ -4,39 +4,42 @@ import { err, ok, ResultAsync } from "neverthrow";
 
 import { BaseError } from "@/lib/errors";
 
-import { TotalPriceFragment } from "./fragments";
+import { PaymentGatewayFragment, TotalPriceFragment } from "../fragments";
 
-const GetCheckoutTotalPriceError = BaseError.subclass(
-  "GetCheckoutTotalPriceError",
-);
+const GetPaymentGatewaysError = BaseError.subclass("GetPaymentGatewaysError");
 
-const GetCheckoutTotalPriceQuery = graphql(
+const GetPaymentGatewaysQuery = graphql(
   `
-    query GetCheckoutTotalPrice($checkoutId: ID!) {
+    query GetPaymentGateways($checkoutId: ID!) {
       checkout(id: $checkoutId) {
         totalPrice {
           ...TotalPrice
         }
+        availablePaymentGateways {
+          ...PaymentGateway
+        }
       }
     }
   `,
-  [TotalPriceFragment],
+  [TotalPriceFragment, PaymentGatewayFragment],
 );
 
-export const getCheckoutTotalPrice = async (props: {
+export const getPaymentGateways = async (props: {
   envUrl: string;
   checkoutId: string;
 }) => {
   const { envUrl, checkoutId } = props;
+
   const response = await ResultAsync.fromPromise(
-    request(envUrl, GetCheckoutTotalPriceQuery, {
+    request(envUrl, GetPaymentGatewaysQuery, {
       checkoutId,
     }),
     (error) =>
-      new GetCheckoutTotalPriceError("Failed to get checkout total price", {
+      new GetPaymentGatewaysError("Failed to get payment gateways", {
         errors: [error],
       }),
   );
+
   if (response.isErr()) {
     return err(response.error);
   }

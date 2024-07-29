@@ -4,7 +4,7 @@ import { ResultAsync } from "neverthrow";
 
 import { BaseError } from "@/lib/errors";
 
-import { ProductFragment } from "./cart";
+import { ProductFragment } from "../components/cart";
 
 const FetchProductError = BaseError.subclass("FetchProductError");
 

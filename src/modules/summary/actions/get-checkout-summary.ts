@@ -4,7 +4,7 @@ import { err, ok, ResultAsync } from "neverthrow";
 
 import { BaseError } from "@/lib/errors";
 
-import { CheckoutFragment } from "./fragments";
+import { CheckoutFragment } from "../fragments";
 
 const GetCheckoutSummaryError = BaseError.subclass("GetCheckoutSummaryError");
 

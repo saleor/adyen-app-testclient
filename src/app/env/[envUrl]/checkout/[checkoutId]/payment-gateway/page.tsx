@@ -1,5 +1,7 @@
-import { getPaymentGateways } from "@/modules/payment-gateway/get-payment-gateways";
-import { SelectPaymentMethod } from "@/modules/payment-gateway/select-payment-gateway";
+import {
+  getPaymentGateways,
+  SelectPaymentMethod,
+} from "@/modules/payment-gateway";
 
 export default async function PaymentGatewaysPage(props: {
   params: { envUrl: string; checkoutId: string };

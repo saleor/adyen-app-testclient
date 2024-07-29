@@ -8,10 +8,12 @@ import { useEffect, useRef } from "react";
 import { ErrorToastDescription } from "@/components/sections/error-toast-description";
 import { toast } from "@/components/ui/use-toast";
 
-import { TotalPriceFragment } from "./fragments";
-import { InitalizePaymentGatewaySchemaType } from "./initalize-payment-gateway";
-import { initalizeTransaction } from "./initalize-transaction";
-import { redirectToSummary } from "./redirect-to-summary";
+import {
+  InitalizePaymentGatewaySchemaType,
+  initalizeTransaction,
+  redirectToSummary,
+} from "../actions";
+import { TotalPriceFragment } from "../fragments";
 
 export const AdyenDropin = (props: {
   initalizePaymentGatewayData: InitalizePaymentGatewaySchemaType;

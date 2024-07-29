@@ -5,7 +5,7 @@ import { ErrorToastDescription } from "@/components/sections/error-toast-descrip
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
-import { createCheckout } from "./create-checkout";
+import { createCheckout } from "../actions/create-checkout";
 
 export const ProductFragment = graphql(`
   fragment Product on Product {

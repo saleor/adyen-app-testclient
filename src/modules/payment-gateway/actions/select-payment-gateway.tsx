@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { createPath } from "@/lib/utils";
 
-import { PaymentGatewayFragment } from "./fragments";
+import { PaymentGatewayFragment } from "../fragments";
 
 export const PaymentGatewaySchema = z.object({
   paymentGatewayId: z.string(),
