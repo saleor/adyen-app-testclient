@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf, readFragment } from "gql.tada";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,8 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createPath } from "@/lib/utils";
 
+import { redirectToPaymentGateway } from "../actions";
 import { PaymentGatewayFragment } from "../fragments";
 
 export const PaymentGatewaySchema = z.object({
@@ -32,11 +31,10 @@ export const PaymentGatewaySchema = z.object({
 
 export type PaymentGatewaySchemaType = z.infer<typeof PaymentGatewaySchema>;
 
-export const SelectPaymentMethod = (props: {
+export const PaymentGatewaySelect = (props: {
   data: FragmentOf<typeof PaymentGatewayFragment>[] | null | undefined;
 }) => {
   const { data } = props;
-  const router = useRouter();
 
   const availablePaymentGateways = readFragment(
     PaymentGatewayFragment,
@@ -48,7 +46,7 @@ export const SelectPaymentMethod = (props: {
   });
 
   async function onSubmit(data: PaymentGatewaySchemaType) {
-    router.push(createPath("payment-gateway", data.paymentGatewayId));
+    redirectToPaymentGateway(data.paymentGatewayId);
   }
 
   return (

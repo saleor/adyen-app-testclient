@@ -4,7 +4,10 @@ import { z } from "zod";
 
 export const env = createEnv({
   client: {
-    NEXT_PUBLIC_INITIAL_ENV_URL: z.string().url(),
+    NEXT_PUBLIC_INITIAL_ENV_URL: z
+      .string()
+      .url()
+      .refine((v) => v.endsWith("/graphql/"), "Must end with /graphql/"),
     NEXT_PUBLIC_INITIAL_CHANNEL_SLUG: z.string(),
   },
   runtimeEnv: {
@@ -13,4 +16,5 @@ export const env = createEnv({
     NEXT_PUBLIC_INITIAL_ENV_URL: process.env.NEXT_PUBLIC_INITIAL_ENV_URL,
   },
   extends: [vercel()],
+  isServer: typeof window === "undefined",
 });

@@ -4,8 +4,8 @@ import {
   AdyenDropin,
   getCheckoutTotalPrice,
   initalizePaymentGateway,
+  TotalPriceFragment,
 } from "@/modules/dropin";
-import { TotalPriceFragment } from "@/modules/dropin/fragments";
 
 export default async function PaymentGatewayPage({
   params: { envUrl, checkoutId, paymentGatewayId },

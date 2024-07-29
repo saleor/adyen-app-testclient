@@ -1,6 +1,6 @@
 import {
   getPaymentGateways,
-  SelectPaymentMethod,
+  PaymentGatewaySelect,
 } from "@/modules/payment-gateway";
 
 export default async function PaymentGatewaysPage(props: {
@@ -22,7 +22,7 @@ export default async function PaymentGatewaysPage(props: {
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
-      <SelectPaymentMethod
+      <PaymentGatewaySelect
         data={paymentGatewaysData.value.checkout?.availablePaymentGateways}
       />
     </main>
