@@ -48,7 +48,7 @@ export const Cart = (props: {
       variantId: products[0].defaultVariant?.id ?? "",
     });
 
-    if (checkout.isErr()) {
+    if (checkout?.isErr()) {
       return toast({
         title: `${checkout.error.name}: ${checkout.error.message}`,
         variant: "destructive",
@@ -92,9 +92,11 @@ export const Cart = (props: {
             </div>
           </div>
         ))}
-        <Button type="submit" onClick={onClick}>
-          Create checkout
-        </Button>
+        <div className="grid">
+          <Button type="submit" onClick={onClick} className="justify-self-end">
+            Create checkout
+          </Button>
+        </div>
       </div>
     </div>
   );

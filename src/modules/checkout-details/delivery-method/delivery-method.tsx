@@ -89,6 +89,10 @@ export const DeliveryMethod = (props: {
     });
   }
 
+  if (shippingMethods.length === 0) {
+    return null;
+  }
+
   return (
     <section>
       <h2 className="text-2xl font-bold">Delivery Method Information</h2>
@@ -107,7 +111,6 @@ export const DeliveryMethod = (props: {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    disabled={shippingMethods.length === 0}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -126,7 +129,11 @@ export const DeliveryMethod = (props: {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <div className="grid">
+              <Button type="submit" className="justify-self-end">
+                Submit
+              </Button>
+            </div>
           </form>
         </Form>
       </div>

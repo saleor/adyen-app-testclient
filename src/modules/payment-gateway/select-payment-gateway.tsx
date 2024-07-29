@@ -89,7 +89,11 @@ export const SelectPaymentMethod = (props: {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <div className="grid">
+              <Button type="submit" className="justify-self-end">
+                Submit
+              </Button>
+            </div>
           </form>
         </Form>
       </div>

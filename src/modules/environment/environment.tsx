@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FragmentOf } from "gql.tada";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 import { fetchProduct } from "@/modules/environment/fetch-product";
-import { FragmentOf } from "gql.tada";
+
 import { ErrorToastDescription } from "../../components/sections/error-toast-description";
 import { Cart, ProductFragment } from "./cart";
 
@@ -103,7 +104,15 @@ export const Environment = () => {
                 )}
               />
             </div>
-            <Button type="submit">Fetch products</Button>
+            <div className="grid">
+              <Button
+                type="submit"
+                variant="secondary"
+                className="justify-self-end"
+              >
+                Fetch products
+              </Button>
+            </div>
           </form>
         </Form>
       </div>

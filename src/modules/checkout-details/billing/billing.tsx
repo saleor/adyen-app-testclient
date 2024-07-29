@@ -201,8 +201,15 @@ export const Billing = (props: {
               />
             </div>
           </div>
-
-          <Button type="submit">Save billing address</Button>
+          <div className="grid">
+            <Button
+              type="submit"
+              variant="secondary"
+              className="justify-self-end"
+            >
+              Save billing address
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

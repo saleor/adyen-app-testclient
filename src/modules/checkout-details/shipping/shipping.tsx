@@ -201,8 +201,15 @@ export const Shipping = (props: {
               />
             </div>
           </div>
-
-          <Button type="submit">Save shipping address</Button>
+          <div className="grid">
+            <Button
+              type="submit"
+              variant="secondary"
+              className="justify-self-end"
+            >
+              Save shipping address
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
