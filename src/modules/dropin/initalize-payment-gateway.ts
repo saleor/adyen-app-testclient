@@ -1,9 +1,48 @@
-"use server";
-
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { err, ok, ResultAsync } from "neverthrow";
+import { z } from "zod";
+
+import { BaseError } from "@/lib/errors";
+
+const InitalizePaymentGatewayError = BaseError.subclass(
+  "InitalizePaymentGatewayError",
+);
+
+const InitalizePaymentGatewaySchema = z.object({
+  paymentGatewayInitialize: z.object({
+    gatewayConfigs: z.array(
+      z.object({
+        id: z.string(),
+        data: z.object({
+          clientKey: z.string(),
+          environment: z.string(),
+          paymentMethodsResponse: z.object({
+            paymentMethods: z.any(),
+          }),
+        }),
+        errors: z.array(
+          z.object({
+            field: z.string(),
+            message: z.string(),
+            code: z.string(),
+          }),
+        ),
+      }),
+    ),
+    errors: z.array(
+      z.object({
+        field: z.string(),
+        message: z.string(),
+        code: z.string(),
+      }),
+    ),
+  }),
+});
+
+export type InitalizePaymentGatewaySchemaType = z.infer<
+  typeof InitalizePaymentGatewaySchema
+>;
 
 const InitalizePaymentGatewayMutation = graphql(`
   mutation InitalizePaymentGateway(
@@ -34,29 +73,56 @@ const InitalizePaymentGatewayMutation = graphql(`
   }
 `);
 
-export const InitalizePaymentGateway = async ({
-  envUrl,
-  checkoutId,
-  paymentGatewayId,
-  amount,
-}: {
+export const initalizePaymentGateway = async (props: {
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
   amount: number;
 }) => {
-  const data = await request(envUrl, InitalizePaymentGatewayMutation, {
-    checkoutId,
-    paymentGatewayId,
-    amount,
-  });
-
-  // TODO: move to components
-  revalidatePath(
-    `/env/${encodeURIComponent(envUrl)}/checkout/${checkoutId}/payment-gateway`,
+  const { envUrl, checkoutId, paymentGatewayId, amount } = props;
+  const response = await ResultAsync.fromPromise(
+    request(envUrl, InitalizePaymentGatewayMutation, {
+      checkoutId,
+      paymentGatewayId,
+      amount,
+    }),
+    (error) =>
+      new InitalizePaymentGatewayError("Failed to initalize payment gateway", {
+        errors: [error],
+      }),
   );
 
-  redirect(
-    `/env/${encodeURIComponent(envUrl)}/checkout/${checkoutId}/payment-gateway/${encodeURIComponent(data.paymentGatewayInitialize?.gatewayConfigs?.[0]?.id ?? "")}`,
+  if (response.isErr()) {
+    return err(response.error);
+  }
+
+  const parsedResponse = InitalizePaymentGatewaySchema.safeParse(
+    response.value,
   );
+
+  if (parsedResponse.error) {
+    return err(
+      new InitalizePaymentGatewayError(
+        "Failed to parse initalize payment gateway response",
+        {
+          errors: [parsedResponse.error],
+        },
+      ),
+    );
+  }
+
+  if (
+    parsedResponse.data.paymentGatewayInitialize.errors.length > 0 ||
+    parsedResponse.data.paymentGatewayInitialize.gatewayConfigs.some(
+      (config) => config.errors.length > 0,
+    )
+  ) {
+    return err(
+      new InitalizePaymentGatewayError("Failed to initalize payment gateway", {
+        errors: parsedResponse.data.paymentGatewayInitialize.errors,
+      }),
+    );
+  }
+
+  return ok(parsedResponse.data);
 };

@@ -205,14 +205,6 @@ export const Shipping = (props: {
           <Button type="submit">Save shipping address</Button>
         </form>
       </Form>
-
-      {/* {shippingMethods.length > 0 && (
-        <ShippingMethods
-          shippingMethods={shippingMethods}
-          envUrl={envUrl}
-          checkoutId={checkoutId}
-        />
-      )} */}
     </div>
   );
 };
