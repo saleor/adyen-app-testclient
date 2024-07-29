@@ -19,7 +19,8 @@
       {
         "name": "gql.tada/ts-plugin",
         "schema": "./schema.graphql",
-        "tadaOutputLocation": "./src/graphql-env.d.ts"
+        "tadaOutputLocation": "./src/graphql-env.d.ts",
+        "tadaTurboLocation": "./src/graphql-cache.d.ts"
       }
     ],
     "paths": {

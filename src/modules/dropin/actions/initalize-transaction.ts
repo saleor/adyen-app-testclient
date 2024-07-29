@@ -37,10 +37,6 @@ const InitalizeTransactionSchema = z.object({
   }),
 });
 
-export type InitalizeTransactionSchemaType = z.infer<
-  typeof InitalizeTransactionSchema
->;
-
 const initalizeTransactionMutation = graphql(`
   mutation InitalizeTransaction(
     $checkoutId: ID!

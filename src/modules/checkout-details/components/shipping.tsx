@@ -23,7 +23,7 @@ import { defaultAddress } from "../address";
 import { convertStringToCountryCode, countryCodes } from "../countries";
 import { ShippingAddressFragment } from "../fragments";
 
-export const ShippingAddressSchema = z.object({
+const ShippingAddressSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   streetAddress1: z.string().min(1),
