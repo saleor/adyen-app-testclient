@@ -3,6 +3,7 @@ import request from "graphql-request";
 import { ResultAsync } from "neverthrow";
 
 import { BaseError } from "@/lib/errors";
+
 import { ProductFragment } from "./cart";
 
 const FetchProductError = BaseError.subclass("FetchProductError");
