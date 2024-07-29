@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Adyen app testclient
 
-## Getting Started
+This repository contains code for example testclient that should be used with [Adyen app](https://github.com/saleor/saleor-app-payment-adyen). It allows to create & complete checkout while paying with Adyen.
 
-First, run the development server:
+## How to get started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Install the dependencies by running the following command in the shell:
+
+```shell
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create `.env.local` file with:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_INITIAL_ENV_URL= # url of your env (must end with /graphql/)
+NEXT_PUBLIC_INITIAL_CHANNEL_SLUG= # in the most cases it will be default-channel
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Run dev server via:
 
-## Learn More
+```shell
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Using with other environments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Make sure you added deployment URL to allowed client hosts in Adyen app configuration & Adyen Dashboard
+2. Check url structure below on how to supply your own data:
+   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/` goes to details of checkout (shipping & billing sections)
+   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway` allows you to select payment gateway
+   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>` renders Adyen drop-in component
+   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>/summary` shows checkout summary and allows to create an order
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Variables used in point 2:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- `BASE_URL` is deployment or your local url e.g localhost:3000
+- `ENV_UR` is encoded url to your environment (must end with `/graphql/`)
+- `CHECKOUT_ID` is id of checkout you want to use
+- `GATEWAY_ID` is id of Adyen app e.g app.saleor.adyen
