@@ -25,16 +25,19 @@ pnpm dev
 
 ## Using with other environments
 
-1. Make sure you added deployment URL to allowed client hosts in Adyen app configuration & Adyen Dashboard
-2. Check url structure below on how to supply your own data:
-   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/` goes to details of checkout (shipping & billing sections)
-   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway` allows you to select payment gateway
-   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>` renders Adyen drop-in component
-   - `<BASE_URL>/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>/summary` shows checkout summary and allows to create an order
+Make sure you added deployment URL to `allowed client hosts` in Adyen app configuration & Adyen Dashboard
 
-Variables used in point 2:
+Check table below with possible URL paths and how you can supply your own data:
 
-- `BASE_URL` is deployment or your local url e.g localhost:3000
+| Path                                                                         | Location                                             |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `/env/<ENV_URL>/checkout/<CHECKOUT_ID>/`                                     | Details of checkout (shipping & billing sections)    |
+| `/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/`                     | Allows you to select payment gateway                 |
+| `/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>/`        | Renders Adyen drop-in component                      |
+| `/env/<ENV_URL>/checkout/<CHECKOUT_ID>/payment-gateway/<GATEWAY_ID>/summary` | Shows checkout summary and allows to create an order |
+
+Variables used in table:
+
 - `ENV_UR` is encoded url to your environment (must end with `/graphql/`)
 - `CHECKOUT_ID` is id of checkout you want to use
 - `GATEWAY_ID` is id of Adyen app e.g app.saleor.adyen
