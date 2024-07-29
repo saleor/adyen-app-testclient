@@ -1,8 +1,11 @@
 import { readFragment } from "gql.tada";
 import Link from "next/link";
 
-import { getCheckoutSummary, Summary } from "@/modules/summary";
-import { CheckoutFragment } from "@/modules/summary/fragments";
+import {
+  CheckoutFragment,
+  getCheckoutSummary,
+  Summary,
+} from "@/modules/summary";
 
 export default async function PaymentGatewayPage({
   params: { envUrl, checkoutId },

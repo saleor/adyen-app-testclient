@@ -5,7 +5,7 @@ import AdyenCheckout from "@adyen/adyen-web";
 import { FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
-import { ErrorToastDescription } from "@/components/sections/error-toast-description";
+import { ErrorToastDescription } from "@/components/error-toast-description";
 import { toast } from "@/components/ui/use-toast";
 
 import {

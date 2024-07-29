@@ -5,7 +5,7 @@ import { FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { ErrorToastDescription } from "@/components/sections/error-toast-description";
+import { ErrorToastDescription } from "@/components/error-toast-description";
 import { Button } from "@/components/ui/button";
 import {
   Form,

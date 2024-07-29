@@ -5,7 +5,7 @@ import { FragmentOf, readFragment } from "gql.tada";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 
-import { ErrorToastDescription } from "@/components/sections/error-toast-description";
+import { ErrorToastDescription } from "@/components/error-toast-description";
 import { Button } from "@/components/ui/button";
 import {
   Card,

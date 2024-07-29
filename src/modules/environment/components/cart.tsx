@@ -1,7 +1,7 @@
 import { FragmentOf, graphql, readFragment } from "gql.tada";
 import Image from "next/image";
 
-import { ErrorToastDescription } from "@/components/sections/error-toast-description";
+import { ErrorToastDescription } from "@/components/error-toast-description";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
