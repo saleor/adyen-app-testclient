@@ -28,9 +28,7 @@ const EnvironmentConfigSchema = z.object({
   channelSlug: z.string().min(1),
 });
 
-export type EnvironmentConfigSchemaType = z.infer<
-  typeof EnvironmentConfigSchema
->;
+type EnvironmentConfigSchemaType = z.infer<typeof EnvironmentConfigSchema>;
 
 export const Environment = () => {
   const [products, setProducts] = useState<

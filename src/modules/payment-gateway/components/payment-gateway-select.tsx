@@ -25,11 +25,11 @@ import {
 import { redirectToPaymentGateway } from "../actions";
 import { PaymentGatewayFragment } from "../fragments";
 
-export const PaymentGatewaySchema = z.object({
+const PaymentGatewaySchema = z.object({
   paymentGatewayId: z.string(),
 });
 
-export type PaymentGatewaySchemaType = z.infer<typeof PaymentGatewaySchema>;
+type PaymentGatewaySchemaType = z.infer<typeof PaymentGatewaySchema>;
 
 export const PaymentGatewaySelect = (props: {
   data: FragmentOf<typeof PaymentGatewayFragment>[] | null | undefined;

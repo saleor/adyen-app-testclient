@@ -30,11 +30,11 @@ import {
   ShippingMethodFragment,
 } from "../fragments";
 
-export const DeliveryMethodSchema = z.object({
+const DeliveryMethodSchema = z.object({
   deliveryMethodId: z.string(),
 });
 
-export type DeliveryMethodSchemaType = z.infer<typeof DeliveryMethodSchema>;
+type DeliveryMethodSchemaType = z.infer<typeof DeliveryMethodSchema>;
 
 export const DeliveryMethod = (props: {
   deliveryMethodData:

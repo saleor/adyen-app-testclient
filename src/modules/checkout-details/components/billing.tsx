@@ -23,7 +23,7 @@ import { defaultAddress } from "../address";
 import { convertStringToCountryCode, countryCodes } from "../countries";
 import { BillingAddressFragment } from "../fragments";
 
-export const BillingAddressSchema = z.object({
+const BillingAddressSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   streetAddress1: z.string(),

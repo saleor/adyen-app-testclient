@@ -19,3 +19,10 @@ jobs:
         run: pnpm lint
       - name: Check types
         run: pnpm check-types
+      - name: Check for not needed files
+        run: pnpm knip
+      - name: Check for changes in gql files
+        run: |
+          pnpm gql-generate
+          pnpm gql-turbo
+          git diff --name-status --exit-code .
