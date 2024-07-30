@@ -36,8 +36,6 @@ export const AdyenDropin = (props: {
 
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);
 
-  console.log("totalPrice", totalPrice);
-
   const getAdyenCoreOptions = () => {
     return {
       clientKey: gatewayConfig.data.clientKey,
