@@ -44,7 +44,7 @@ export const AdyenDropin = (props: {
       paymentMethodsResponse: gatewayConfig.data.paymentMethodsResponse,
       amount: {
         value: totalPrice ? totalPrice.gross.amount * 100 : 0,
-        currency: totalPrice?.gross.currency,
+        currency: totalPrice?.gross.currency ?? "",
       },
       onSubmit: async (state: any, dropin: any) => {
         dropin.setStatus("loading");
