@@ -23,6 +23,23 @@ Run dev server via:
 pnpm dev
 ```
 
+## Recommended VSCode settings
+
+Create `settings.json` under `.vscode` folder with:
+
+```json
+{
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
+```
+
 ## Using with other environments
 
 Make sure you added deployment URL to `allowed client hosts` in Adyen app configuration & Adyen Dashboard
