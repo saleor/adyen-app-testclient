@@ -36,6 +36,8 @@ export const AdyenDropin = (props: {
 
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);
 
+  console.log("totalPrice", totalPrice);
+
   const getAdyenCoreOptions = () => {
     return {
       clientKey: gatewayConfig.data.clientKey,
@@ -43,7 +45,7 @@ export const AdyenDropin = (props: {
       environment: gatewayConfig.data.environment,
       paymentMethodsResponse: gatewayConfig.data.paymentMethodsResponse,
       amount: {
-        value: totalPrice?.gross.amount ?? 0 * 100,
+        value: (totalPrice?.gross.amount ?? 0) * 100,
         currency: totalPrice?.gross.currency ?? "",
       },
       onSubmit: async (state: any, dropin: any) => {
