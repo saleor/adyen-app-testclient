@@ -43,7 +43,7 @@ export const AdyenDropin = (props: {
       environment: gatewayConfig.data.environment,
       paymentMethodsResponse: gatewayConfig.data.paymentMethodsResponse,
       amount: {
-        value: totalPrice?.gross.amount ?? 0 * 100,
+        value: totalPrice ? totalPrice.gross.amount * 100 : 0,
         currency: totalPrice?.gross.currency ?? "",
       },
       onSubmit: async (state: any, dropin: any) => {
