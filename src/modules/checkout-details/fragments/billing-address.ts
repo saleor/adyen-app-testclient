@@ -5,6 +5,7 @@ export const BillingAddressFragment = graphql(`
     firstName
     lastName
     streetAddress1
+    streetAddress2
     city
     postalCode
     country {

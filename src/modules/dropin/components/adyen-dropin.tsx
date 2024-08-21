@@ -42,6 +42,13 @@ export const AdyenDropin = (props: {
       locale: "en-US",
       environment: gatewayConfig.data.environment,
       paymentMethodsResponse: gatewayConfig.data.paymentMethodsResponse,
+      paymentMethodsConfiguration: {
+        applepay: {
+          value: totalPrice ? totalPrice.gross.amount * 100 : 0,
+          currency: totalPrice?.gross.currency ?? "",
+        },
+        countryCode: "US",
+      },
       amount: {
         value: totalPrice ? totalPrice.gross.amount * 100 : 0,
         currency: totalPrice?.gross.currency ?? "",
@@ -107,6 +114,7 @@ export const AdyenDropin = (props: {
 
   useEffect(() => {
     const initDropin = async () => {
+      // @ts-expect-error
       const adyenCheckout = await AdyenCheckout(getAdyenCoreOptions());
       adyenCheckout.create("dropin").mount(dropinContainerRef.current!);
     };
