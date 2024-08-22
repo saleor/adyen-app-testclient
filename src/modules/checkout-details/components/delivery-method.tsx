@@ -62,10 +62,23 @@ export const DeliveryMethod = (props: {
     deliveryMethodData,
   );
 
+  const getDefaultDeliveryMethodId = () => {
+    // if deliveryMethod is already set, return its id
+    if (deliveryMethod) {
+      return deliveryMethod.id;
+    }
+    // if there is only one shipping method, return its id
+    if (shippingMethods.length === 1) {
+      return shippingMethods[0].id;
+    }
+    // otherwise, return empty string
+    return "";
+  };
+
   const form = useForm<DeliveryMethodSchemaType>({
     resolver: zodResolver(DeliveryMethodSchema),
     defaultValues: {
-      deliveryMethodId: deliveryMethod?.id ?? "",
+      deliveryMethodId: getDefaultDeliveryMethodId(),
     },
   });
 
@@ -87,10 +100,6 @@ export const DeliveryMethod = (props: {
     toast({
       title: "Successfully updated delivery method",
     });
-  }
-
-  if (shippingMethods.length === 0) {
-    return null;
   }
 
   return (

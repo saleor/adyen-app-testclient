@@ -33,12 +33,14 @@ export default async function CheckoutDetailsPage(props: {
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
-      <DeliveryMethod
-        deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
-        shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
-        envUrl={decodedEnvUrl}
-        checkoutId={checkoutId}
-      />
+      {(checkoutDetails.value.checkout?.shippingMethods?.length ?? 0) > 0 && (
+        <DeliveryMethod
+          deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
+          shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
+          envUrl={decodedEnvUrl}
+          checkoutId={checkoutId}
+        />
+      )}
     </main>
   );
 }
