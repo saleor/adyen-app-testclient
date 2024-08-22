@@ -5,26 +5,29 @@ import { z } from "zod";
 
 import { BaseError } from "@/lib/errors";
 
+import { AdyenPaymentResponse } from "../adyen/payment-response";
+
 const InitalizeTransactionError = BaseError.subclass(
   "InitalizeTransactionError",
 );
 
-const InitalizeTransactionSchema = z.object({
+export const InitalizeTransactionSchema = z.object({
   transactionInitialize: z.object({
     transaction: z.object({
       id: z.string(),
     }),
     data: z.object({
       paymentResponse: z.object({
-        action: z.string().optional(),
-        resultCode: z.enum(["Authorised", "Pending", "Refused", "Received"]),
-        order: z
+        action: z
           .object({
-            remainingAmount: z.object({
-              value: z.number(),
-            }),
+            paymentMethodType: z.string(),
+            paymentData: z.string(),
+            url: z.string(),
+            type: z.string(),
+            qrCodeData: z.string().optional(),
           })
           .optional(),
+        resultCode: z.enum(["Authorised", "Pending", "Refused", "Received"]),
       }),
     }),
     errors: z.array(
@@ -113,7 +116,5 @@ export const initalizeTransaction = async (props: {
     );
   }
 
-  console.log(JSON.stringify(parsedResponse.data, null, 2));
-
-  return ok(parsedResponse.data);
+  return ok(new AdyenPaymentResponse(parsedResponse.data));
 };
