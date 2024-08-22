@@ -21,6 +21,9 @@ export default async function CheckoutDetailsPage(props: {
     throw checkoutDetails.error;
   }
 
+  const hasDeliveryMethodsToSelect =
+    checkoutDetails.value.checkout?.shippingMethods?.length ?? 0;
+
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       <Billing
@@ -33,14 +36,14 @@ export default async function CheckoutDetailsPage(props: {
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
-      {(checkoutDetails.value.checkout?.shippingMethods?.length ?? 0) > 0 && (
+      {hasDeliveryMethodsToSelect ? (
         <DeliveryMethod
           deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
           shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
           envUrl={decodedEnvUrl}
           checkoutId={checkoutId}
         />
-      )}
+      ) : null}
     </main>
   );
 }
