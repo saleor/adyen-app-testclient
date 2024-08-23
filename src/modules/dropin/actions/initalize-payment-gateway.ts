@@ -96,8 +96,6 @@ export const initalizePaymentGateway = async (props: {
     return err(response.error);
   }
 
-  console.log(JSON.stringify(response.value, null, 2));
-
   const parsedResponse = InitalizePaymentGatewaySchema.safeParse(
     response.value,
   );

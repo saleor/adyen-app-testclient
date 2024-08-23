@@ -36,12 +36,6 @@ export const getAdyenDropinConfig = (props: {
     locale: "en-US",
     environment,
     paymentMethodsResponse,
-    paymentMethodsConfiguration: {
-      paypal: {
-        merchantId: "Y237SNPH548U2",
-        intent: "capture",
-      },
-    },
     amount: {
       value: totalPriceAmount * 100,
       currency: totalPriceCurrency,
@@ -132,8 +126,6 @@ export const getAdyenDropinConfig = (props: {
 
         const adyenAction = adyenPaymentResponse.getAction();
 
-        console.log(adyenAction);
-
         if (adyenAction) {
           dropin.handleAction(adyenAction);
         }
@@ -142,7 +134,6 @@ export const getAdyenDropinConfig = (props: {
       }
 
       if (adyenPaymentResponse.isSuccessful()) {
-        console.log(adyenPaymentResponse);
         dropin.setStatus("success");
         await redirectToSummary(paymentGatewayId);
       }
