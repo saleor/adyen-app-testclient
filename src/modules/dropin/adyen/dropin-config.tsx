@@ -39,6 +39,12 @@ export const getAdyenDropinConfig = (props: {
     locale: "en-US",
     environment,
     paymentMethodsResponse,
+    paymentMethodsConfiguration: {
+      paypal: {
+        merchantId: "Y237SNPH548U2",
+        intent: "capture",
+      },
+    },
     amount: {
       value: totalPriceAmount * 100,
       currency: totalPriceCurrency,
