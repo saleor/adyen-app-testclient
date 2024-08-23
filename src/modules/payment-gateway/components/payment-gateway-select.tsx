@@ -41,8 +41,20 @@ export const PaymentGatewaySelect = (props: {
     data?.map((method) => method) ?? [],
   );
 
+  const getDefaultPaymentGatewayId = () => {
+    // if there is only one available payment gateway, return its id
+    if (availablePaymentGateways.length === 1) {
+      return availablePaymentGateways[0].id;
+    }
+    // otherwise, return empty string
+    return "";
+  };
+
   const form = useForm<PaymentGatewaySchemaType>({
     resolver: zodResolver(PaymentGatewaySchema),
+    defaultValues: {
+      paymentGatewayId: getDefaultPaymentGatewayId(),
+    },
   });
 
   async function onSubmit(data: PaymentGatewaySchemaType) {
