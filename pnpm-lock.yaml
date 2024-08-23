@@ -128,6 +128,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.4
+      tslog:
+        specifier: ^4.9.3
+        version: 4.9.3
       typescript:
         specifier: ^5.5.3
         version: 5.5.3
@@ -4100,6 +4103,13 @@ packages:
         integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==,
       }
 
+  tslog@4.9.3:
+    resolution:
+      {
+        integrity: sha512-oDWuGVONxhVEBtschLf2cs/Jy8i7h1T+CpdkTNWQgdAF7DhRo2G8vMCgILKe7ojdEkLhICWgI1LYSSKaJsRgcw==,
+      }
+    engines: { node: ">=16" }
+
   type-check@0.4.0:
     resolution:
       {
@@ -6873,6 +6883,8 @@ snapshots:
       strip-bom: 3.0.0
 
   tslib@2.6.3: {}
+
+  tslog@4.9.3: {}
 
   type-check@0.4.0:
     dependencies:
