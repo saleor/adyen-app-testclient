@@ -4,11 +4,12 @@ import type { TadaDocumentNode, $tada } from 'gql.tada';
 
 declare module "gql.tada" {
   interface setupCache {
-    "\n  fragment BillingAddress on Address {\n    firstName\n    lastName\n    streetAddress1\n    city\n    postalCode\n    country {\n      code\n    }\n    countryArea\n  }\n": TadaDocumentNode<
+    "\n  fragment BillingAddress on Address {\n    firstName\n    lastName\n    streetAddress1\n    streetAddress2\n    city\n    postalCode\n    country {\n      code\n    }\n    countryArea\n  }\n": TadaDocumentNode<
       {
         firstName: string;
         lastName: string;
         streetAddress1: string;
+        streetAddress2: string;
         city: string;
         postalCode: string;
         country: { code: string };
