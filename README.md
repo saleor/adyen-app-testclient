@@ -36,7 +36,13 @@ Create `settings.json` under `.vscode` folder with:
     "strings": "on"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} - page.tsx",
+    "**/app/**/layout.tsx": "${dirname} - layout.tsx",
+    "**/app/**/error.tsx": "${dirname} - error.tsx",
+    "**/app/**/loading.tsx": "${dirname} - loading.tsx"
+  }
 }
 ```
 
