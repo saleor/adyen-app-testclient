@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
-import { Button } from "@/components/ui/button";
+import { FormButton } from "@/components/form-button";
 import {
   Form,
   FormControl,
@@ -199,13 +199,14 @@ export const Billing = (props: {
             </div>
           </div>
           <div className="grid">
-            <Button
+            <FormButton
               type="submit"
               variant="secondary"
               className="justify-self-end"
+              loading={form.formState.isSubmitting}
             >
               Save billing address
-            </Button>
+            </FormButton>
           </div>
         </form>
       </Form>

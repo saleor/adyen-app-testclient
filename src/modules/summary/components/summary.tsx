@@ -4,8 +4,10 @@ import { lightFormat } from "date-fns";
 import { FragmentOf, readFragment } from "gql.tada";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
+import { FormButton } from "@/components/form-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +32,7 @@ export const Summary = (props: {
   data: FragmentOf<typeof CheckoutFragment> | null;
   envUrl: string;
 }) => {
+  const [loading, setLoading] = useState(false);
   const { data, envUrl } = props;
   const checkout = readFragment(CheckoutFragment, data);
 
@@ -38,12 +41,14 @@ export const Summary = (props: {
   }
 
   const onCompleteButtonClick = async () => {
+    setLoading(true);
     const response = await completeCheckout({
       envUrl,
       checkoutId: checkout.id,
     });
 
     if (response.isErr()) {
+      setLoading(false);
       return toast({
         title: `${response.error.name}: ${response.error.message}`,
         variant: "destructive",
@@ -51,6 +56,7 @@ export const Summary = (props: {
       });
     }
 
+    setLoading(false);
     toast({
       title: "Successfully completed checkout",
       description: (
@@ -199,7 +205,9 @@ export const Summary = (props: {
         <Link href="/">
           <Button variant="link">Go to home page</Button>
         </Link>
-        <Button onClick={onCompleteButtonClick}>Complete checkout</Button>
+        <FormButton onClick={onCompleteButtonClick} loading={loading}>
+          Complete checkout
+        </FormButton>
       </CardFooter>
     </Card>
   );
