@@ -5,7 +5,7 @@ import { FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { FormButton } from "@/components/form-button";
 import {
   Form,
   FormControl,
@@ -100,9 +100,13 @@ export const PaymentGatewaySelect = (props: {
               )}
             />
             <div className="grid">
-              <Button type="submit" className="justify-self-end">
+              <FormButton
+                type="submit"
+                className="justify-self-end"
+                loading={form.formState.isSubmitting}
+              >
                 Submit
-              </Button>
+              </FormButton>
             </div>
           </form>
         </Form>

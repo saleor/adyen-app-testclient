@@ -1,8 +1,11 @@
+"use client";
+
 import { FragmentOf, graphql, readFragment } from "gql.tada";
 import Image from "next/image";
+import { useState } from "react";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
-import { Button } from "@/components/ui/button";
+import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
 
 import { createCheckout } from "../actions/create-checkout";
@@ -36,12 +39,14 @@ export const Cart = (props: {
   envUrl: string;
   channelSlug: string;
 }) => {
+  const [loading, setLoading] = useState(false);
   const { envUrl, channelSlug, data } = props;
   const products = data.map((product) =>
     readFragment(ProductFragment, product),
   );
 
   const onClick = async () => {
+    setLoading(true);
     const checkout = await createCheckout({
       envUrl,
       channelSlug,
@@ -49,6 +54,7 @@ export const Cart = (props: {
     });
 
     if (checkout?.isErr()) {
+      setLoading(false);
       return toast({
         title: `${checkout.error.name}: ${checkout.error.message}`,
         variant: "destructive",
@@ -56,6 +62,7 @@ export const Cart = (props: {
       });
     }
 
+    setLoading(false);
     toast({
       title: "Successfully created checkout",
     });
@@ -93,9 +100,14 @@ export const Cart = (props: {
           </div>
         ))}
         <div className="grid">
-          <Button type="submit" onClick={onClick} className="justify-self-end">
+          <FormButton
+            type="submit"
+            onClick={onClick}
+            className="justify-self-end"
+            loading={loading}
+          >
             Create checkout
-          </Button>
+          </FormButton>
         </div>
       </div>
     </div>

@@ -6,7 +6,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { ErrorToastDescription } from "@/components/error-toast-description";
+import { FormButton } from "@/components/form-button";
 import {
   Form,
   FormControl,
@@ -19,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 
-import { ErrorToastDescription } from "../../../components/error-toast-description";
 import { fetchProduct } from "../actions";
 import { Cart, ProductFragment } from "./cart";
 
@@ -103,13 +103,14 @@ export const Environment = () => {
               />
             </div>
             <div className="grid">
-              <Button
+              <FormButton
                 type="submit"
                 variant="secondary"
                 className="justify-self-end"
+                loading={form.formState.isSubmitting}
               >
                 Fetch products
-              </Button>
+              </FormButton>
             </div>
           </form>
         </Form>
