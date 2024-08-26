@@ -136,12 +136,11 @@ export const initalizePaymentGateway = async (props: {
     return err(response.error);
   }
 
-  const parsedResponse = InitalizePaymentGatewaySchema.passthrough().safeParse(
+  const parsedResponse = InitalizePaymentGatewaySchema.safeParse(
     response.value,
   );
 
   if (parsedResponse.error) {
-    // console.error(parsedResponse.error,response.value);
     return err(
       new InitalizePaymentGatewayError(
         "Failed to parse initalize payment gateway response",
