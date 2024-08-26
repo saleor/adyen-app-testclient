@@ -127,6 +127,7 @@ export const getAdyenDropinConfig = (props: {
         });
 
         const adyenAction = adyenPaymentResponse.getAction();
+
         if (adyenAction) {
           dropin.handleAction(adyenAction);
         }

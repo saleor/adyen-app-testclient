@@ -22,7 +22,6 @@ export const InitalizeTransactionSchema = z.object({
           .object({
             paymentMethodType: z.string(),
             paymentData: z.string(),
-            url: z.string(),
             type: z.string(),
             qrCodeData: z.string().optional(),
           })
