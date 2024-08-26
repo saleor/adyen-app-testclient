@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
 import { updateShippingAddress } from "../actions/update-shipping-address";
-import { defaultAddress } from "../address";
+import { getDefaultAddressByCountryCode } from "../address";
 import { convertStringToCountryCode, countryCodes } from "../countries";
 import { ShippingAddressFragment } from "../fragments";
 
@@ -43,6 +43,7 @@ export const Shipping = (props: {
   const { data, envUrl, checkoutId } = props;
 
   const address = readFragment(ShippingAddressFragment, data);
+  const defaultAddress = getDefaultAddressByCountryCode();
 
   const form = useForm<ShippingAddressSchemaType>({
     resolver: zodResolver(ShippingAddressSchema),

@@ -9,6 +9,10 @@ export const env = createEnv({
       .url()
       .refine((v) => v.endsWith("/graphql/"), "Must end with /graphql/"),
     NEXT_PUBLIC_INITIAL_CHANNEL_SLUG: z.string(),
+    NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE: z
+      .enum(["PL", "SE", "US"])
+      .optional()
+      .default("US"),
     NEXT_PUBLIC_LOG_LEVEL: z
       .enum(["info", "warn", "error"])
       .optional()
@@ -19,6 +23,8 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_INITIAL_CHANNEL_SLUG,
     NEXT_PUBLIC_INITIAL_ENV_URL: process.env.NEXT_PUBLIC_INITIAL_ENV_URL,
     NEXT_PUBLIC_LOG_LEVEL: process.env.NEXT_PUBLIC_LOG_LEVEL,
+    NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE:
+      process.env.NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE,
   },
   extends: [vercel()],
   isServer: typeof window === "undefined",

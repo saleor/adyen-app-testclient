@@ -44,7 +44,23 @@ export const PaymentMethodsResponseSchema = z.object({
         name: z.string(),
       }),
       z.object({
+        type: z.literal("klarna_paynow"),
+        name: z.string(),
+      }),
+      z.object({
         type: z.literal("paysafecard"),
+        name: z.string(),
+      }),
+      z.object({
+        type: z.literal("blik"),
+        name: z.string(),
+      }),
+      z.object({
+        type: z.literal("swish"),
+        name: z.string(),
+      }),
+      z.object({
+        type: z.literal("trustly"),
         name: z.string(),
       }),
     ]),

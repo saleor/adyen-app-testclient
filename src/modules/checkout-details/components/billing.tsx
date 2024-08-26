@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
 import { updateBillingAddress } from "../actions";
-import { defaultAddress } from "../address";
+import { getDefaultAddressByCountryCode } from "../address";
 import { convertStringToCountryCode, countryCodes } from "../countries";
 import { BillingAddressFragment } from "../fragments";
 
@@ -43,6 +43,7 @@ export const Billing = (props: {
   const { data, envUrl, checkoutId } = props;
 
   const address = readFragment(BillingAddressFragment, data);
+  const defaultAddress = getDefaultAddressByCountryCode();
 
   const form = useForm<BillingAddressSchemaType>({
     resolver: zodResolver(BillingAddressSchema),
