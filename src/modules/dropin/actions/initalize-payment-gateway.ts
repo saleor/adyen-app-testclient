@@ -9,6 +9,48 @@ const InitalizePaymentGatewayError = BaseError.subclass(
   "InitalizePaymentGatewayError",
 );
 
+export const PaymentMethodsResponseSchema = z.object({
+  paymentMethods: z.array(
+    z.discriminatedUnion("type", [
+      z.object({
+        type: z.literal("paypal"),
+        name: z.string(),
+        configuration: z.object({
+          merchantId: z.string().optional(),
+          intent: z.enum(["sale", "capture", "authorize", "order", "tokenize"]),
+        }),
+      }),
+      z.object({
+        type: z.literal("scheme"),
+        name: z.string(),
+        brands: z.array(z.string()),
+      }),
+      z.object({
+        type: z.literal("applepay"),
+        name: z.string(),
+        brands: z.array(z.string()),
+      }),
+      z.object({
+        type: z.literal("giftcard"),
+        name: z.string(),
+        brand: z.string(),
+      }),
+      z.object({
+        type: z.literal("klarna"),
+        name: z.string(),
+      }),
+      z.object({
+        type: z.literal("klarna_account"),
+        name: z.string(),
+      }),
+      z.object({
+        type: z.literal("paysafecard"),
+        name: z.string(),
+      }),
+    ]),
+  ),
+});
+
 const InitalizePaymentGatewaySchema = z.object({
   paymentGatewayInitialize: z.object({
     gatewayConfigs: z.array(
@@ -17,9 +59,7 @@ const InitalizePaymentGatewaySchema = z.object({
         data: z.object({
           clientKey: z.string(),
           environment: z.string(),
-          paymentMethodsResponse: z.object({
-            paymentMethods: z.any(),
-          }),
+          paymentMethodsResponse: PaymentMethodsResponseSchema,
         }),
         errors: z.array(
           z.object({
@@ -96,11 +136,12 @@ export const initalizePaymentGateway = async (props: {
     return err(response.error);
   }
 
-  const parsedResponse = InitalizePaymentGatewaySchema.safeParse(
+  const parsedResponse = InitalizePaymentGatewaySchema.passthrough().safeParse(
     response.value,
   );
 
   if (parsedResponse.error) {
+    // console.error(parsedResponse.error,response.value);
     return err(
       new InitalizePaymentGatewayError(
         "Failed to parse initalize payment gateway response",
