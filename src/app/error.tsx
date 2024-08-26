@@ -4,16 +4,18 @@ import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("ErrorPage");
+
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    logger.error("Error caught by error boundary", { error });
   }, [error]);
 
   return (

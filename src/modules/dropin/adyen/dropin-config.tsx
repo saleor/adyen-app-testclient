@@ -2,12 +2,15 @@ import AdyenCheckout from "@adyen/adyen-web";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
 import { toast } from "@/components/ui/use-toast";
+import { createLogger } from "@/lib/logger";
 
 import {
   initalizeTransaction,
   processTransaction,
   redirectToSummary,
 } from "../actions";
+
+const logger = createLogger("AdyenDropinConfig");
 
 type CoreConfiguration = Parameters<typeof AdyenCheckout>[0];
 
@@ -46,8 +49,7 @@ export const getAdyenDropinConfig = (props: {
         description: error.message,
         variant: "destructive",
       });
-
-      console.error(error.name, error.message, error.stack);
+      logger.error("Adyen Dropin error", { error });
     },
     onAdditionalDetails: async (state, dropin) => {
       dropin?.setStatus("loading");

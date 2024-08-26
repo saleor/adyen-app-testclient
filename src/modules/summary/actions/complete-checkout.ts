@@ -31,7 +31,6 @@ export const completeCheckout = async (props: {
       checkoutId,
     }),
     (error) => {
-      console.log(error);
       return new CompleteCheckoutError("Failed to complete checkout", {
         errors: [error],
       });
@@ -43,7 +42,6 @@ export const completeCheckout = async (props: {
   }
 
   if ((response.value.checkoutComplete?.errors ?? []).length > 0) {
-    console.log(response.value.checkoutComplete?.errors);
     return err(
       new CompleteCheckoutError("Failed to complete checkout", {
         errors: response.value.checkoutComplete?.errors,
