@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { InitalizeTransactionSchema } from "../actions";
+import { InitalizeTransactionSchema } from "../schemas";
 
 export class AdyenPaymentResponse {
   constructor(public data: z.infer<typeof InitalizeTransactionSchema>) {}

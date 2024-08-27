@@ -1,34 +1,17 @@
+"use server";
+
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err, ok, ResultAsync } from "neverthrow";
 import { z } from "zod";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 
-import { AdyenPaymentDetailResponse } from "../adyen/payment-detail-reponse";
+import { TransactionProcessSchema } from "../schemas/transaction-process";
 
-const ProcessTransactionError = BaseError.subclass("ProcessTransactionError");
-
-export const TransactionProcessSchema = z.object({
-  transactionProcess: z.object({
-    data: z.object({
-      paymentDetailsResponse: z.object({
-        resultCode: z.enum(["Authorised", "Pending", "Refused", "Received"]),
-        refusalReason: z.string().optional(),
-      }),
-    }),
-    errors: z.array(
-      z.object({
-        field: z.string(),
-        message: z.string(),
-        code: z.string(),
-      }),
-    ),
-  }),
-});
+const logger = createLogger("processTransaction");
 
 const processTransactionMutation = graphql(`
-  mutation TransactionProcess($transactionId: ID!, $data: JSON) {
+  mutation transactionProcess($transactionId: ID!, $data: JSON) {
     transactionProcess(id: $transactionId, data: $data) {
       transaction {
         id
@@ -57,43 +40,51 @@ export const processTransaction = async (props: {
   envUrl: string;
   transactionId: string;
   data: unknown;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: z.infer<typeof TransactionProcessSchema> }
+> => {
   const { envUrl, transactionId, data } = props;
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, processTransactionMutation, {
+  try {
+    const response = await request(envUrl, processTransactionMutation, {
       transactionId,
       data,
-    }),
-    (error) =>
-      new ProcessTransactionError("Failed to process transaction", {
-        errors: [error],
-      }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
-  }
+    const parsedResponse = TransactionProcessSchema.safeParse(response);
 
-  const parsedResponse = TransactionProcessSchema.safeParse(response.value);
+    if (parsedResponse.error) {
+      logger.error("Failed to parse process transaction response", {
+        error: parsedResponse.error,
+      });
+      return {
+        type: "error",
+        name: "ParsingProcessTransactionResponseError",
+        message: parsedResponse.error.message,
+      };
+    }
 
-  if (parsedResponse.error) {
-    return err(
-      new ProcessTransactionError(
-        "Failed to parse process transaction response",
-        {
-          errors: [parsedResponse.error],
-        },
-      ),
-    );
-  }
-
-  if (parsedResponse.data.transactionProcess.errors.length > 0) {
-    return err(
-      new ProcessTransactionError("Failed to process transaction", {
+    if (parsedResponse.data.transactionProcess.errors.length > 0) {
+      logger.error("Failed to process transaction - errors in mutation", {
         errors: parsedResponse.data.transactionProcess.errors,
-      }),
-    );
-  }
+      });
+      return {
+        type: "error",
+        name: "ProcessTransactionError",
+        message: "Failed to process transaction - errors in mutation",
+      };
+    }
 
-  return ok(new AdyenPaymentDetailResponse(parsedResponse.data));
+    return {
+      type: "success",
+      value: parsedResponse.data,
+    };
+  } catch (error) {
+    logger.error("Failed to process transaction", { error });
+    return {
+      type: "error",
+      name: "ProcessTransactionError",
+      message: "Failed to process transaction",
+    };
+  }
 };

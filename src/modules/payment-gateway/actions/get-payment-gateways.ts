@@ -1,3 +1,4 @@
+"use server";
 import { graphql, ResultOf } from "gql.tada";
 import request from "graphql-request";
 

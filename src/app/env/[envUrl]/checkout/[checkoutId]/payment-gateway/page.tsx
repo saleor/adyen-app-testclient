@@ -4,7 +4,7 @@ import {
   PaymentGatewaySelect,
 } from "@/modules/payment-gateway";
 
-const PaymentGatewayError = BaseError.subclass("PaymentGatewayError");
+const PaymentGatewaysError = BaseError.subclass("PaymentGatewaysError");
 
 export default async function PaymentGatewaysPage(props: {
   params: { envUrl: string; checkoutId: string };
@@ -20,7 +20,7 @@ export default async function PaymentGatewaysPage(props: {
 
   if (paymentGatewaysResponse.type === "error") {
     // Sends the error to the error boundary
-    throw new PaymentGatewayError(paymentGatewaysResponse.message);
+    throw new PaymentGatewaysError(paymentGatewaysResponse.message);
   }
 
   return (

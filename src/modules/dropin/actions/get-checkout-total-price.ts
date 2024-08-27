@@ -1,14 +1,12 @@
-import { graphql } from "gql.tada";
+"use server";
+import { graphql, ResultOf } from "gql.tada";
 import request from "graphql-request";
-import { err, ok, ResultAsync } from "neverthrow";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 
 import { TotalPriceFragment } from "../fragments";
 
-const GetCheckoutTotalPriceError = BaseError.subclass(
-  "GetCheckoutTotalPriceError",
-);
+const logger = createLogger("getCheckoutTotalPrice");
 
 const GetCheckoutTotalPriceQuery = graphql(
   `
@@ -26,20 +24,24 @@ const GetCheckoutTotalPriceQuery = graphql(
 export const getCheckoutTotalPrice = async (props: {
   envUrl: string;
   checkoutId: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: ResultOf<typeof GetCheckoutTotalPriceQuery> }
+> => {
   const { envUrl, checkoutId } = props;
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, GetCheckoutTotalPriceQuery, {
-      checkoutId,
-    }),
-    (error) =>
-      new GetCheckoutTotalPriceError("Failed to get checkout total price", {
-        errors: [error],
-      }),
-  );
-  if (response.isErr()) {
-    return err(response.error);
-  }
 
-  return ok(response.value);
+  try {
+    const response = await request(envUrl, GetCheckoutTotalPriceQuery, {
+      checkoutId,
+    });
+
+    return { type: "success", value: response };
+  } catch (error) {
+    logger.error("Failed to get checkout total price", { error });
+    return {
+      type: "error",
+      name: "GetCheckoutTotalPriceError",
+      message: "Failed to get checkout total price",
+    };
+  }
 };
