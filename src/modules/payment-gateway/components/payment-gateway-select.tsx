@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 import { createPath } from "@/lib/utils";
 
 import { PaymentGatewayFragment } from "../fragments";
@@ -60,6 +61,10 @@ export const PaymentGatewaySelect = (props: {
   });
 
   async function onSubmit(data: PaymentGatewaySchemaType) {
+    toast({
+      title: "Payment gateway selected",
+      description: "Redirecting to dropin",
+    });
     router.replace(createPath("payment-gateway", data.paymentGatewayId));
   }
 
