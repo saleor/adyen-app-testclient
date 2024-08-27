@@ -1,6 +1,6 @@
 "use server";
 
-import { graphql, readFragment } from "gql.tada";
+import { graphql, readFragment, ResultOf } from "gql.tada";
 import request from "graphql-request";
 
 import { createLogger } from "@/lib/logger";
@@ -36,7 +36,10 @@ const FetchProductQuery = graphql(
 export const fetchProduct = async (props: {
   channelSlug: string;
   envUrl: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: ResultOf<typeof FetchProductQuery> }
+> => {
   const { envUrl, channelSlug } = props;
 
   try {

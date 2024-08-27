@@ -40,7 +40,10 @@ export const createCheckout = async (props: {
   envUrl: string;
   channelSlug: string;
   variantId: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: z.infer<typeof CreateCheckoutSchema> }
+> => {
   const { envUrl, channelSlug, variantId } = props;
   try {
     const response = await request(envUrl, CreateCheckoutMutation, {

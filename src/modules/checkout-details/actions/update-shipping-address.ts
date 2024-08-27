@@ -1,18 +1,15 @@
 "use server";
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err, ResultAsync } from "neverthrow";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 import { createPath } from "@/lib/utils";
 
 import { ShippingAddressSchemaType } from "../components/shipping";
 
-const UpdateShippingAddressError = BaseError.subclass(
-  "UpdateShippingAddressError",
-);
+const logger = createLogger("updateShippingAddress");
 
 const UpdateShippingAddressSchema = z.object({
   checkoutShippingAddressUpdate: z.object({
@@ -26,7 +23,7 @@ const UpdateShippingAddressSchema = z.object({
 });
 
 const UpdateShippingAddressMutation = graphql(`
-  mutation updateBillingAddress($checkoutId: ID!, $input: AddressInput!) {
+  mutation updateShippingAddress($checkoutId: ID!, $input: AddressInput!) {
     checkoutShippingAddressUpdate(
       checkoutId: $checkoutId
       shippingAddress: $input
@@ -43,43 +40,61 @@ export const updateShippingAddress = async (props: {
   envUrl: string;
   checkoutId: string;
   shippingAddress: ShippingAddressSchemaType;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | {
+      type: "success";
+      value: z.infer<typeof UpdateShippingAddressSchema>;
+    }
+> => {
   const { envUrl, checkoutId, shippingAddress } = props;
 
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, UpdateShippingAddressMutation, {
+  try {
+    const response = await request(envUrl, UpdateShippingAddressMutation, {
       checkoutId,
       input: shippingAddress,
-    }),
-    (error) =>
-      new UpdateShippingAddressError("Failed to update shipping address", {
-        errors: [error],
-      }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
-  }
+    const parsedResponse = UpdateShippingAddressSchema.safeParse(response);
 
-  const parsedResponse = UpdateShippingAddressSchema.safeParse(response.value);
+    if (parsedResponse.error) {
+      logger.error("Failed to parse updateShippingAddress response", {
+        error: parsedResponse.error,
+      });
+      return {
+        type: "error",
+        name: "ParsingUpdateShippingAddressError",
+        message: parsedResponse.error.message,
+      };
+    }
 
-  if (parsedResponse.error) {
-    return err(
-      new UpdateShippingAddressError("Failed to parse checkout response", {
-        errors: [parsedResponse.error],
-      }),
-    );
-  }
-
-  if (parsedResponse.data.checkoutShippingAddressUpdate.errors.length > 0) {
-    return err(
-      new UpdateShippingAddressError("Failed to create checkout", {
+    if (parsedResponse.data.checkoutShippingAddressUpdate.errors.length > 0) {
+      logger.error("Failed to update shipping address of checkout", {
         errors: parsedResponse.data.checkoutShippingAddressUpdate.errors,
-      }),
-    );
-  }
+      });
 
-  revalidatePath(
-    createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
-  );
+      return {
+        type: "error",
+        name: "UpdateShippingAddressError",
+        message:
+          "Failed to update billing address - errors in updateShippingAddress mutation",
+      };
+    }
+
+    revalidatePath(
+      createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
+    );
+
+    return {
+      type: "success",
+      value: parsedResponse.data,
+    };
+  } catch (error) {
+    logger.error("Failed to update shipping address", { error });
+    return {
+      type: "error",
+      name: "UpdateShippingAddressError",
+      message: "Failed to update shipping address",
+    };
+  }
 };

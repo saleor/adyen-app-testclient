@@ -1,10 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf, readFragment } from "gql.tada";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { FormButton } from "@/components/form-button";
 import {
   Form,
@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import { createPath } from "@/lib/utils";
 
 import { updateDeliveryMethod } from "../actions/update-delivery-method";
 import {
@@ -49,6 +50,8 @@ export const DeliveryMethod = (props: {
   envUrl: string;
   checkoutId: string;
 }) => {
+  const router = useRouter();
+
   const { deliveryMethodData, shippingMethodData, envUrl, checkoutId } = props;
 
   const shippingMethods = readFragment(
@@ -89,17 +92,20 @@ export const DeliveryMethod = (props: {
       deliveryMethod: data.deliveryMethodId,
     });
 
-    if (response?.isErr()) {
-      return toast({
-        title: `${response.error.name}: ${response.error.message}`,
+    if (response.type === "error") {
+      toast({
+        title: response.name,
         variant: "destructive",
-        description: <ErrorToastDescription details={response.error.errors} />,
+        description: response.message,
       });
     }
 
-    toast({
-      title: "Successfully updated delivery method",
-    });
+    if (response.type === "success") {
+      toast({
+        title: "Successfully updated delivery method",
+      });
+      router.push(createPath(checkoutId, "payment-gateway"));
+    }
   }
 
   return (

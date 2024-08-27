@@ -50,7 +50,7 @@ export const Environment = () => {
     });
 
     if (response.type === "success") {
-      setProducts(response.value?.products?.edges.map((e) => e.node) ?? []);
+      setProducts(response.value.products?.edges.map((e) => e.node) ?? []);
       toast({
         title: "Successfully fetched products",
       });

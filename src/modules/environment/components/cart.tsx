@@ -52,7 +52,7 @@ export const Cart = (props: {
             "env",
             encodeURIComponent(envUrl),
             "checkout",
-            response.value?.checkoutCreate.checkout.id ?? "",
+            response.value.checkoutCreate.checkout.id ?? "",
           ),
         );
       }
