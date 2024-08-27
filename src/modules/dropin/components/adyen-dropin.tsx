@@ -5,9 +5,9 @@ import AdyenCheckout from "@adyen/adyen-web";
 import { FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
-import { InitalizePaymentGatewaySchemaType } from "../actions";
 import { getAdyenDropinConfig } from "../adyen";
 import { TotalPriceFragment } from "../fragments";
+import { InitalizePaymentGatewaySchemaType } from "../schemas";
 
 export const AdyenDropin = (props: {
   initalizePaymentGatewayData: InitalizePaymentGatewaySchemaType;
