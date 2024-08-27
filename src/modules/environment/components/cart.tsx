@@ -39,7 +39,6 @@ export const Cart = (props: {
           variant: "destructive",
           description: response.message,
         });
-        return;
       }
 
       if (response.type === "success") {
