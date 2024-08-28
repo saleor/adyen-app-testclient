@@ -19,7 +19,7 @@ const FetchProductQuery = graphql(
           stockAvailability: IN_STOCK
           giftCard: false
         }
-        sortBy: { field: PRICE, direction: DESC }
+        sortBy: { field: PRICE, direction: ASC }
       ) {
         edges {
           node {

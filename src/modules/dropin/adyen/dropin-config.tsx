@@ -48,6 +48,13 @@ export const getAdyenDropinConfig = (props: {
     paymentMethodsResponse,
     paymentMethodsConfiguration: {
       paypal: paypalPaymentMethod?.configuration,
+      applepay: {
+        amount: {
+          value: totalPriceAmount * 100,
+          currency: totalPriceCurrency,
+        },
+        countryCode: "US",
+      },
     },
     amount: {
       value: totalPriceAmount * 100,

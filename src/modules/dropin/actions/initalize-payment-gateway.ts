@@ -29,6 +29,10 @@ export const PaymentMethodsResponseSchema = z.object({
         type: z.literal("applepay"),
         name: z.string(),
         brands: z.array(z.string()),
+        configuration: z.object({
+          merchantId: z.string(),
+          merchantName: z.string(),
+        }),
       }),
       z.object({
         type: z.literal("giftcard"),
