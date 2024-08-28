@@ -15,6 +15,8 @@ Create `.env.local` file with:
 ```
 NEXT_PUBLIC_INITIAL_ENV_URL= # url of your env (must end with /graphql/)
 NEXT_PUBLIC_INITIAL_CHANNEL_SLUG= # in the most cases it will be default-channel
+NEXT_PUBLIC_LOG_LEVEL= # one of info, warn or error. Defaults to info
+NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE= # one of PL, US, SE - defaults to US
 ```
 
 Run dev server via:

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
-import { Button } from "@/components/ui/button";
+import { FormButton } from "@/components/form-button";
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
 import { updateBillingAddress } from "../actions";
-import { defaultAddress } from "../address";
+import { getDefaultAddressByCountryCode } from "../address";
 import { convertStringToCountryCode, countryCodes } from "../countries";
 import { BillingAddressFragment } from "../fragments";
 
@@ -43,6 +43,7 @@ export const Billing = (props: {
   const { data, envUrl, checkoutId } = props;
 
   const address = readFragment(BillingAddressFragment, data);
+  const defaultAddress = getDefaultAddressByCountryCode();
 
   const form = useForm<BillingAddressSchemaType>({
     resolver: zodResolver(BillingAddressSchema),
@@ -199,13 +200,14 @@ export const Billing = (props: {
             </div>
           </div>
           <div className="grid">
-            <Button
+            <FormButton
               type="submit"
               variant="secondary"
               className="justify-self-end"
+              loading={form.formState.isSubmitting}
             >
               Save billing address
-            </Button>
+            </FormButton>
           </div>
         </form>
       </Form>

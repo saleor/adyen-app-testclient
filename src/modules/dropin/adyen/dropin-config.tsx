@@ -1,19 +1,24 @@
 import AdyenCheckout from "@adyen/adyen-web";
+import { z } from "zod";
 
 import { ErrorToastDescription } from "@/components/error-toast-description";
 import { toast } from "@/components/ui/use-toast";
+import { createLogger } from "@/lib/logger";
 
 import {
   initalizeTransaction,
+  PaymentMethodsResponseSchema,
   processTransaction,
   redirectToSummary,
 } from "../actions";
+
+const logger = createLogger("AdyenDropinConfig");
 
 type CoreConfiguration = Parameters<typeof AdyenCheckout>[0];
 
 export const getAdyenDropinConfig = (props: {
   clientKey: string;
-  paymentMethodsResponse: any;
+  paymentMethodsResponse: z.infer<typeof PaymentMethodsResponseSchema>;
   totalPriceAmount: number;
   totalPriceCurrency: string;
   envUrl: string;
@@ -31,19 +36,18 @@ export const getAdyenDropinConfig = (props: {
     paymentGatewayId,
     environment,
   } = props;
+
+  const paypalPaymentMethod = paymentMethodsResponse.paymentMethods.find(
+    (method) => method.type === "paypal",
+  );
+
   return {
     clientKey,
     locale: "en-US",
     environment,
     paymentMethodsResponse,
     paymentMethodsConfiguration: {
-      applepay: {
-        amount: {
-          value: totalPriceAmount,
-          currency: totalPriceCurrency,
-        },
-      },
-      countryCode: "US",
+      paypal: paypalPaymentMethod?.configuration,
     },
     amount: {
       value: totalPriceAmount * 100,
@@ -55,8 +59,7 @@ export const getAdyenDropinConfig = (props: {
         description: error.message,
         variant: "destructive",
       });
-
-      console.error(error.name, error.message, error.stack);
+      logger.error("Adyen Dropin error", { error });
     },
     onAdditionalDetails: async (state, dropin) => {
       dropin?.setStatus("loading");
@@ -134,6 +137,7 @@ export const getAdyenDropinConfig = (props: {
         });
 
         const adyenAction = adyenPaymentResponse.getAction();
+
         if (adyenAction) {
           dropin.handleAction(adyenAction);
         }
