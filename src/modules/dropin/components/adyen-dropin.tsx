@@ -26,27 +26,35 @@ export const AdyenDropin = (props: {
     paymentGatewayId,
   } = props;
   const gatewayConfig = gatewayConfigs[0];
+  const { clientKey, environment, paymentMethodsResponse } = gatewayConfig.data;
   const totalPrice = readFragment(TotalPriceFragment, totalPriceData);
-
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const initDropin = async () => {
-      const adyenCheckoutConfig = getAdyenDropinConfig({
-        clientKey: gatewayConfig.data.clientKey,
-        environment: gatewayConfig.data.environment,
-        paymentMethodsResponse: gatewayConfig.data.paymentMethodsResponse,
-        totalPriceAmount: totalPrice?.gross.amount ?? 0,
-        totalPriceCurrency: totalPrice?.gross.currency ?? "",
+  const initDropin = async () => {
+    // We first need to create the Checkout instance, to later pass it into the config
+    // this is required for onOrderCancel handler
+    const adyenCheckout = await AdyenCheckout({
+      clientKey,
+      environment,
+    });
+
+    await adyenCheckout.update(
+      getAdyenDropinConfig({
+        paymentMethodsResponse,
+        totalPriceAmount: totalPrice?.gross.amount,
+        totalPriceCurrency: totalPrice?.gross.currency,
         envUrl,
         checkoutId,
         paymentGatewayId,
-      });
-      const adyenCheckout = await AdyenCheckout(adyenCheckoutConfig);
-      if (dropinContainerRef.current) {
-        adyenCheckout.create("dropin").mount(dropinContainerRef.current);
-      }
-    };
+        checkout: adyenCheckout,
+      }),
+    );
+    if (dropinContainerRef.current) {
+      adyenCheckout.create("dropin").mount(dropinContainerRef.current);
+    }
+  };
+
+  useEffect(() => {
     initDropin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

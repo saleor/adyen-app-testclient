@@ -10,7 +10,7 @@ export class AdyenPaymentResponse {
   }
 
   getAction() {
-    return this.data.transactionInitialize.data.paymentResponse.action;
+    return this.getPaymentResponse().action;
   }
 
   isRedirectOrAdditionalActionFlow() {
@@ -19,7 +19,27 @@ export class AdyenPaymentResponse {
 
   isSuccessful() {
     return ["Authorised", "Pending", "Received"].includes(
-      this.data.transactionInitialize.data.paymentResponse.resultCode,
+      this.getPaymentResponse().resultCode,
     );
+  }
+
+  isCancelled() {
+    return this.getPaymentResponse().resultCode === "Cancelled";
+  }
+
+  isError() {
+    return this.getPaymentResponse().resultCode === "Error";
+  }
+
+  isRefused() {
+    return this.getPaymentResponse().resultCode === "Refused";
+  }
+
+  getPaymentResponse() {
+    return this.data.transactionInitialize.data.paymentResponse;
+  }
+
+  hasOrderWithRemainingAmount() {
+    return this.getPaymentResponse().order;
   }
 }

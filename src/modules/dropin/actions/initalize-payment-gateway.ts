@@ -15,11 +15,12 @@ const InitalizePaymentGatewayMutation = graphql(`
   mutation initalizePaymentGateway(
     $checkoutId: ID!
     $paymentGatewayId: String!
-    $amount: PositiveDecimal!
+    $amount: PositiveDecimal
+    $data: JSON
   ) {
     paymentGatewayInitialize(
       id: $checkoutId
-      paymentGateways: [{ id: $paymentGatewayId }]
+      paymentGateways: [{ id: $paymentGatewayId, data: $data }]
       amount: $amount
     ) {
       gatewayConfigs {
@@ -40,24 +41,44 @@ const InitalizePaymentGatewayMutation = graphql(`
   }
 `);
 
+type InitalizePaymentGatewayDataInput =
+  | {
+      action: "checkBalance";
+      paymentMethod: {
+        type: "giftcard";
+        brand: string;
+        encryptedCardNumber: string;
+        encryptedSecurityCode: string;
+      };
+    }
+  | { action: "createOrder" }
+  | {
+      action: "cancelOrder";
+      pspReference: string;
+      orderData: string;
+    };
+
 export const initalizePaymentGateway = async (props: {
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
-  amount: number;
+  amount?: number;
+  data?: InitalizePaymentGatewayDataInput;
 }): Promise<
   | { type: "error"; name: string; message: string }
   | { type: "success"; value: InitalizePaymentGatewaySchemaType }
 > => {
-  const { envUrl, checkoutId, paymentGatewayId, amount } = props;
+  const { envUrl, checkoutId, paymentGatewayId, amount, data } = props;
   try {
     const response = await request(envUrl, InitalizePaymentGatewayMutation, {
       checkoutId,
       paymentGatewayId,
       amount,
+      data,
     });
 
-    const parsedResponse = InitalizePaymentGatewaySchema.safeParse(response);
+    const parsedResponse =
+      InitalizePaymentGatewaySchema.passthrough().safeParse(response);
 
     if (parsedResponse.error) {
       logger.error("Failed to parse initalize payment gateway response", {
