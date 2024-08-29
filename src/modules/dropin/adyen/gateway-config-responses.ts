@@ -1,69 +1,81 @@
+import { z } from "zod";
+
 import { createLogger } from "@/lib/logger";
 
-import { InitalizePaymentGatewaySchemaType } from "../schemas";
+import {
+  GiftCardBalanceResponseSchema,
+  InitalizePaymentGatewaySchemaType,
+  OrderCancelResponseSchema,
+  OrderCreateResponseSchema,
+} from "../schemas";
 
 const logger = createLogger("AdyenGatewayConfigResponse");
 
 export class AdyenGiftCardBalanceResponse {
   private constructor(
-    private gatewayConfig: InitalizePaymentGatewaySchemaType["paymentGatewayInitialize"]["gatewayConfigs"][number],
+    private response: z.infer<typeof GiftCardBalanceResponseSchema>,
   ) {}
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
   ) {
     if (data.paymentGatewayInitialize.gatewayConfigs.length > 1) {
-      logger.warn("More than one gateway config found");
+      logger.warn(
+        "More than one gateway config found - initializing AdyenGiftCardBalanceResponse with the",
+      );
     }
     return new AdyenGiftCardBalanceResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0],
+      data.paymentGatewayInitialize.gatewayConfigs[0].data.giftCardBalanceResponse,
     );
   }
 
   getResponse() {
-    return this.gatewayConfig.data.giftCardBalanceResponse;
+    return this.response;
   }
 }
 
 export class AdyenOrderCreateResponse {
   private constructor(
-    private gatewayConfig: InitalizePaymentGatewaySchemaType["paymentGatewayInitialize"]["gatewayConfigs"][number],
+    private response: z.infer<typeof OrderCreateResponseSchema>,
   ) {}
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
   ) {
     if (data.paymentGatewayInitialize.gatewayConfigs.length > 1) {
-      logger.warn("More than one gateway config found");
+      logger.warn(
+        "More than one gateway config found - initializing AdyenOrderCreateResponse with the first one",
+      );
     }
     return new AdyenOrderCreateResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0],
+      data.paymentGatewayInitialize.gatewayConfigs[0].data.orderCreateResponse,
     );
   }
 
   getResponse() {
-    return this.gatewayConfig.data.orderCreateResponse;
+    return this.response;
   }
 }
 
 export class AdyenOrderCancelledResponse {
   private constructor(
-    private gatewayConfig: InitalizePaymentGatewaySchemaType["paymentGatewayInitialize"]["gatewayConfigs"][number],
+    private response: z.infer<typeof OrderCancelResponseSchema>,
   ) {}
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
   ) {
     if (data.paymentGatewayInitialize.gatewayConfigs.length > 1) {
-      logger.warn("More than one gateway config found");
+      logger.warn(
+        "More than one gateway config found - initializing AdyenOrderCancelledResponse with the first one",
+      );
     }
     return new AdyenOrderCancelledResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0],
+      data.paymentGatewayInitialize.gatewayConfigs[0].data.orderCancelResponse,
     );
   }
 
   isOrderNotCancelled() {
-    const response = this.gatewayConfig.data.orderCancelResponse;
-    return !response || response.resultCode !== "Cancelled";
+    return !this.response || this.response.resultCode !== "Cancelled";
   }
 }

@@ -2,6 +2,14 @@ import { z } from "zod";
 
 import { PaymentMethodsResponseSchema } from "./payment-method-response";
 
+export const GiftCardBalanceResponseSchema = z.any({}).optional();
+export const OrderCreateResponseSchema = z.any({}).optional();
+export const OrderCancelResponseSchema = z
+  .object({
+    resultCode: z.string(),
+  })
+  .optional();
+
 export const InitalizePaymentGatewaySchema = z.object({
   paymentGatewayInitialize: z.object({
     gatewayConfigs: z.array(
@@ -11,13 +19,9 @@ export const InitalizePaymentGatewaySchema = z.object({
           clientKey: z.string().optional(),
           environment: z.string().optional(),
           paymentMethodsResponse: PaymentMethodsResponseSchema.optional(),
-          giftCardBalanceResponse: z.any({}).optional(),
-          orderCreateResponse: z.any({}).optional(),
-          orderCancelResponse: z
-            .object({
-              resultCode: z.string(),
-            })
-            .optional(),
+          giftCardBalanceResponse: GiftCardBalanceResponseSchema,
+          orderCreateResponse: OrderCreateResponseSchema,
+          orderCancelResponse: OrderCancelResponseSchema,
         }),
         errors: z.array(
           z.object({
