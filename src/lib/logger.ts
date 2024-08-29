@@ -61,7 +61,7 @@ logger.attachTransport((log) => {
 
   // eslint-disable-next-line no-console
   console.log(
-    `\x1b[2m ${formattedDate} ${formattedName}\x1b[0m ${message}`,
+    `${formattedDate} ${formattedName} ${message}`,
     JSON.stringify(attributes, null, 2),
   );
 });
