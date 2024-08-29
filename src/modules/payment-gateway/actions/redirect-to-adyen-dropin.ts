@@ -4,10 +4,10 @@ import { redirect } from "next/navigation";
 
 import { createPath } from "@/lib/utils";
 
-export async function redirectToCheckoutSummary({
-  paymentGatewayId,
+export async function redirectToAdyenDropin({
+  paymentGatewayId = "",
 }: {
   paymentGatewayId: string;
 }) {
-  redirect(createPath(paymentGatewayId, "summary"));
+  redirect(createPath("payment-gateway", paymentGatewayId));
 }
