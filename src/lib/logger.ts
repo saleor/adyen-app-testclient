@@ -49,21 +49,15 @@ logger.attachTransport((log) => {
   const {
     message,
     attributes,
-    _meta: { date, name, parentNames },
+    _meta: { name },
   } = log as ILogObj &
     ILogObjMeta & {
       message: string;
       attributes: Record<string, unknown>;
     };
 
-  const formattedName = `${(parentNames ?? []).join(":")}:${name}`;
-  const formattedDate = date.toISOString();
-
   // eslint-disable-next-line no-console
-  console.log(
-    `${formattedDate} ${formattedName} ${message}`,
-    JSON.stringify(attributes, null, 2),
-  );
+  console.log(`${name} ${message}`, JSON.stringify(attributes, null, 2));
 });
 
 export const createLogger = (name: string, params?: Record<string, unknown>) =>
