@@ -48,8 +48,8 @@ export const fetchProduct = async (props: {
     });
 
     // eslint-disable-next-line no-console
-    console.log("Fetching products", JSON.stringify(response));
-    logger.info("Fetching products", { response });
+    console.log("Fetching products - console.log", JSON.stringify(response));
+    logger.info("Fetching products - tslog", { response });
 
     const products = response.products?.edges.map((edge) =>
       readFragment(ProductFragment, edge.node),
