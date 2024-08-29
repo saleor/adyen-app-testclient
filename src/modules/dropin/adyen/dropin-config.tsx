@@ -1,16 +1,17 @@
 import AdyenCheckout from "@adyen/adyen-web";
 import { z } from "zod";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { toast } from "@/components/ui/use-toast";
 import { createLogger } from "@/lib/logger";
 
 import {
   initalizeTransaction,
-  PaymentMethodsResponseSchema,
   processTransaction,
   redirectToSummary,
 } from "../actions";
+import { PaymentMethodsResponseSchema } from "../schemas";
+import { AdyenPaymentDetailResponse } from "./payment-detail-response";
+import { AdyenPaymentResponse } from "./payment-response";
 
 const logger = createLogger("AdyenDropinConfig");
 
@@ -70,20 +71,19 @@ export const getAdyenDropinConfig = (props: {
         data: state.data,
       });
 
-      if (transactionProcessResponse.isErr()) {
+      if (transactionProcessResponse.type === "error") {
         dropin?.setStatus("error");
-        return toast({
-          title: `${transactionProcessResponse.error.name}: ${transactionProcessResponse.error.message}`,
+        toast({
+          title: transactionProcessResponse.name,
           variant: "destructive",
-          description: (
-            <ErrorToastDescription
-              details={transactionProcessResponse.error.errors}
-            />
-          ),
+          description: transactionProcessResponse.message,
         });
+        return;
       }
 
-      const adyenPaymentDetailResponse = transactionProcessResponse.value;
+      const adyenPaymentDetailResponse = new AdyenPaymentDetailResponse(
+        transactionProcessResponse.value,
+      );
 
       if (adyenPaymentDetailResponse.isRefused()) {
         toast({
@@ -116,20 +116,19 @@ export const getAdyenDropinConfig = (props: {
         idempotencyKey: window.crypto.randomUUID(),
       });
 
-      if (transactionInitializeResponse.isErr()) {
+      if (transactionInitializeResponse.type === "error") {
         dropin.setStatus("error");
-        return toast({
-          title: `${transactionInitializeResponse.error.name}: ${transactionInitializeResponse.error.message}`,
+        toast({
+          title: transactionInitializeResponse.name,
           variant: "destructive",
-          description: (
-            <ErrorToastDescription
-              details={transactionInitializeResponse.error.errors}
-            />
-          ),
+          description: transactionInitializeResponse.message,
         });
+        return;
       }
 
-      const adyenPaymentResponse = transactionInitializeResponse.value;
+      const adyenPaymentResponse = new AdyenPaymentResponse(
+        transactionInitializeResponse.value,
+      );
 
       if (adyenPaymentResponse.isRedirectOrAdditionalActionFlow()) {
         dropin.setState({

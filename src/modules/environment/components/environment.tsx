@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { FormButton } from "@/components/form-button";
 import {
   Form,
@@ -21,7 +20,8 @@ import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 
 import { fetchProduct } from "../actions";
-import { Cart, ProductFragment } from "./cart";
+import { ProductFragment } from "../fragments";
+import { Cart } from "./cart";
 
 const EnvironmentConfigSchema = z.object({
   url: z.string().url().min(1),
@@ -49,21 +49,20 @@ export const Environment = () => {
       envUrl: data.url,
     });
 
-    response.match(
-      (result) => {
-        setProducts(result.products?.edges.map((e) => e.node) ?? []);
-        toast({
-          title: "Successfully fetched products",
-        });
-      },
-      (error) => {
-        toast({
-          title: `${error.name}: ${error.message}`,
-          variant: "destructive",
-          description: <ErrorToastDescription details={error.errors} />,
-        });
-      },
-    );
+    if (response.type === "success") {
+      setProducts(response.value.products?.edges.map((e) => e.node) ?? []);
+      toast({
+        title: "Successfully fetched products",
+      });
+    }
+
+    if (response.type === "error") {
+      toast({
+        title: response.name,
+        variant: "destructive",
+        description: response.message,
+      });
+    }
   };
 
   return (

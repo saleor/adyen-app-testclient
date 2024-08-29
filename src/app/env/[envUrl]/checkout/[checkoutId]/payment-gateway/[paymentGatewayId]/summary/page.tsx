@@ -1,38 +1,41 @@
 import { readFragment } from "gql.tada";
 import Link from "next/link";
 
+import { BaseError } from "@/lib/errors";
 import {
   CheckoutFragment,
   getCheckoutSummary,
   Summary,
 } from "@/modules/summary";
 
-export default async function PaymentGatewayPage({
+const CheckoutSummaryPageError = BaseError.subclass("CheckoutSummaryPageError");
+
+export default async function CheckoutSummaryPage({
   params: { envUrl, checkoutId },
 }: {
   params: { envUrl: string; checkoutId: string };
 }) {
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const checkoutSummaryData = await getCheckoutSummary({
+  const checkoutSummaryDataResponse = await getCheckoutSummary({
     envUrl: decodedEnvUrl,
     checkoutId,
   });
 
-  if (checkoutSummaryData.isErr()) {
+  if (checkoutSummaryDataResponse.type === "error") {
     // Sends the error to the error boundary
-    throw checkoutSummaryData.error;
+    throw new CheckoutSummaryPageError(checkoutSummaryDataResponse.message);
   }
 
   const checkout = readFragment(
     CheckoutFragment,
-    checkoutSummaryData.value.checkout,
+    checkoutSummaryDataResponse.value.checkout,
   );
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       {checkout?.id ? (
         <Summary
-          data={checkoutSummaryData.value.checkout}
+          data={checkoutSummaryDataResponse.value.checkout}
           envUrl={decodedEnvUrl}
         />
       ) : (

@@ -5,7 +5,6 @@ import { FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { FormButton } from "@/components/form-button";
 import {
   Form,
@@ -67,17 +66,19 @@ export const Shipping = (props: {
       shippingAddress: data,
     });
 
-    if (response?.isErr()) {
-      return toast({
-        title: `${response.error.name}: ${response.error.message}`,
+    if (response.type === "error") {
+      toast({
+        title: response.name,
         variant: "destructive",
-        description: <ErrorToastDescription details={response.error.errors} />,
+        description: response.message,
       });
     }
 
-    toast({
-      title: "Successfully updated shipping address",
-    });
+    if (response.type === "success") {
+      toast({
+        title: "Successfully updated shipping address",
+      });
+    }
   };
 
   return (

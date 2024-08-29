@@ -1,107 +1,18 @@
+"use server";
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err, ok, ResultAsync } from "neverthrow";
-import { z } from "zod";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 
-const InitalizePaymentGatewayError = BaseError.subclass(
-  "InitalizePaymentGatewayError",
-);
+import {
+  InitalizePaymentGatewaySchema,
+  InitalizePaymentGatewaySchemaType,
+} from "../schemas";
 
-export const PaymentMethodsResponseSchema = z.object({
-  paymentMethods: z.array(
-    z.discriminatedUnion("type", [
-      z.object({
-        type: z.literal("paypal"),
-        name: z.string(),
-        configuration: z.object({
-          merchantId: z.string().optional(),
-          intent: z.enum(["sale", "capture", "authorize", "order", "tokenize"]),
-        }),
-      }),
-      z.object({
-        type: z.literal("scheme"),
-        name: z.string(),
-        brands: z.array(z.string()),
-      }),
-      z.object({
-        type: z.literal("applepay"),
-        name: z.string(),
-        brands: z.array(z.string()),
-      }),
-      z.object({
-        type: z.literal("giftcard"),
-        name: z.string(),
-        brand: z.string(),
-      }),
-      z.object({
-        type: z.literal("klarna"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("klarna_account"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("klarna_paynow"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("paysafecard"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("blik"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("swish"),
-        name: z.string(),
-      }),
-      z.object({
-        type: z.literal("trustly"),
-        name: z.string(),
-      }),
-    ]),
-  ),
-});
-
-const InitalizePaymentGatewaySchema = z.object({
-  paymentGatewayInitialize: z.object({
-    gatewayConfigs: z.array(
-      z.object({
-        id: z.string(),
-        data: z.object({
-          clientKey: z.string(),
-          environment: z.string(),
-          paymentMethodsResponse: PaymentMethodsResponseSchema,
-        }),
-        errors: z.array(
-          z.object({
-            field: z.string(),
-            message: z.string(),
-            code: z.string(),
-          }),
-        ),
-      }),
-    ),
-    errors: z.array(
-      z.object({
-        field: z.string(),
-        message: z.string(),
-        code: z.string(),
-      }),
-    ),
-  }),
-});
-
-export type InitalizePaymentGatewaySchemaType = z.infer<
-  typeof InitalizePaymentGatewaySchema
->;
+const logger = createLogger("initalizePaymentGateway");
 
 const InitalizePaymentGatewayMutation = graphql(`
-  mutation InitalizePaymentGateway(
+  mutation initalizePaymentGateway(
     $checkoutId: ID!
     $paymentGatewayId: String!
     $amount: PositiveDecimal!
@@ -134,51 +45,66 @@ export const initalizePaymentGateway = async (props: {
   checkoutId: string;
   paymentGatewayId: string;
   amount: number;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: InitalizePaymentGatewaySchemaType }
+> => {
   const { envUrl, checkoutId, paymentGatewayId, amount } = props;
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, InitalizePaymentGatewayMutation, {
+  try {
+    const response = await request(envUrl, InitalizePaymentGatewayMutation, {
       checkoutId,
       paymentGatewayId,
       amount,
-    }),
-    (error) =>
-      new InitalizePaymentGatewayError("Failed to initalize payment gateway", {
-        errors: [error],
-      }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
-  }
+    const parsedResponse = InitalizePaymentGatewaySchema.safeParse(response);
 
-  const parsedResponse = InitalizePaymentGatewaySchema.safeParse(
-    response.value,
-  );
+    if (parsedResponse.error) {
+      logger.error("Failed to parse initalize payment gateway response", {
+        error: parsedResponse.error,
+      });
+      return {
+        type: "error",
+        name: "ParsingInitalizePaymentGatewayResponseError",
+        message: parsedResponse.error.message,
+      };
+    }
 
-  if (parsedResponse.error) {
-    return err(
-      new InitalizePaymentGatewayError(
-        "Failed to parse initalize payment gateway response",
-        {
-          errors: [parsedResponse.error],
-        },
-      ),
-    );
-  }
-
-  if (
-    parsedResponse.data.paymentGatewayInitialize.errors.length > 0 ||
-    parsedResponse.data.paymentGatewayInitialize.gatewayConfigs.some(
-      (config) => config.errors.length > 0,
-    )
-  ) {
-    return err(
-      new InitalizePaymentGatewayError("Failed to initalize payment gateway", {
+    if (parsedResponse.data.paymentGatewayInitialize.errors.length > 0) {
+      logger.error("Failed to initalize payment gateway - errors in mutation", {
         errors: parsedResponse.data.paymentGatewayInitialize.errors,
-      }),
-    );
-  }
+      });
+      return {
+        type: "error",
+        name: "InitalizePaymentGatewayError",
+        message:
+          "Failed to initalize payment gateway - errors in initalizePaymentGateway mutation",
+      };
+    }
 
-  return ok(parsedResponse.data);
+    if (
+      parsedResponse.data.paymentGatewayInitialize.gatewayConfigs.some(
+        (config) => config.errors.length > 0,
+      )
+    ) {
+      logger.error("Failed to initalize payment gateway - errors in configs", {
+        errors: parsedResponse.data.paymentGatewayInitialize.gatewayConfigs,
+      });
+      return {
+        type: "error",
+        name: "InitalizePaymentGatewayError",
+        message:
+          "Failed to initalize payment gateway - errors in initalizePaymentGateway configurations",
+      };
+    }
+
+    return { type: "success", value: parsedResponse.data };
+  } catch (error) {
+    logger.error("Failed to initalize payment gateway", { error });
+    return {
+      type: "error",
+      name: "InitalizePaymentGatewayError",
+      message: "Failed to initalize payment gateway",
+    };
+  }
 };

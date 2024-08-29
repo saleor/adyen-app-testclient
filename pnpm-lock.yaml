@@ -55,9 +55,6 @@ importers:
       modern-errors:
         specifier: ^7.0.1
         version: 7.0.1
-      neverthrow:
-        specifier: ^7.0.0
-        version: 7.0.0
       next:
         specifier: 14.2.5
         version: 14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2984,13 +2981,6 @@ packages:
       {
         integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==,
       }
-
-  neverthrow@7.0.0:
-    resolution:
-      {
-        integrity: sha512-GDDz+SQGGZWIGYk3cL2Jf+RX7QYRJOsQltrbpBiSQiNVN4QJi3/YJhaZY4pRlDou+W3YSHk8DYBKMt4CDPBglg==,
-      }
-    engines: { node: ">=18" }
 
   next@14.2.5:
     resolution:
@@ -6227,8 +6217,6 @@ snapshots:
   nanoid@3.3.7: {}
 
   natural-compare@1.4.0: {}
-
-  neverthrow@7.0.0: {}
 
   next@14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:

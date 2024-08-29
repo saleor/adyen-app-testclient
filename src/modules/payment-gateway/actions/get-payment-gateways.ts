@@ -1,12 +1,12 @@
-import { graphql } from "gql.tada";
+"use server";
+import { graphql, ResultOf } from "gql.tada";
 import request from "graphql-request";
-import { err, ok, ResultAsync } from "neverthrow";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 
 import { PaymentGatewayFragment, TotalPriceFragment } from "../fragments";
 
-const GetPaymentGatewaysError = BaseError.subclass("GetPaymentGatewaysError");
+const logger = createLogger("getPaymentGateways");
 
 const GetPaymentGatewaysQuery = graphql(
   `
@@ -27,22 +27,24 @@ const GetPaymentGatewaysQuery = graphql(
 export const getPaymentGateways = async (props: {
   envUrl: string;
   checkoutId: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: ResultOf<typeof GetPaymentGatewaysQuery> }
+> => {
   const { envUrl, checkoutId } = props;
 
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, GetPaymentGatewaysQuery, {
+  try {
+    const response = await request(envUrl, GetPaymentGatewaysQuery, {
       checkoutId,
-    }),
-    (error) =>
-      new GetPaymentGatewaysError("Failed to get payment gateways", {
-        errors: [error],
-      }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
+    return { type: "success", value: response };
+  } catch (error) {
+    logger.error("Failed to get payment gateways", { error });
+    return {
+      type: "error",
+      name: "GetPaymentGatewaysError",
+      message: "Failed to get payment gateways",
+    };
   }
-
-  return ok(response.value);
 };

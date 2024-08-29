@@ -1,13 +1,12 @@
 "use server";
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err, ResultAsync } from "neverthrow";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { BaseError } from "@/lib/errors";
-import { createPath } from "@/lib/utils";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("updateDeliveryMethod");
 
 const UpdateDeliveryMethodError = BaseError.subclass(
   "UpdateDeliveryMethodError",
@@ -39,45 +38,54 @@ export const updateDeliveryMethod = async (props: {
   envUrl: string;
   checkoutId: string;
   deliveryMethod: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | {
+      type: "success";
+      value: z.infer<typeof UpdateDeliveryMethodSchema>;
+    }
+> => {
   const { envUrl, checkoutId, deliveryMethod } = props;
 
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, UpdateDeliveryMethodMutation, {
+  try {
+    const response = await request(envUrl, UpdateDeliveryMethodMutation, {
       checkoutId,
       input: deliveryMethod,
-    }),
-    (error) =>
-      new UpdateDeliveryMethodError("Failed to update delivery method", {
-        errors: [error],
-      }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
-  }
+    const parsedResponse = UpdateDeliveryMethodSchema.safeParse(response);
 
-  const parsedResponse = UpdateDeliveryMethodSchema.safeParse(response.value);
+    if (parsedResponse.error) {
+      logger.error("Failed to parse checkoutDeliveryMethodUpdate response", {
+        error: parsedResponse.error,
+      });
+      return {
+        type: "error",
+        name: "ParsingUpdateDeliveryMethodError",
+        message: parsedResponse.error.message,
+      };
+    }
 
-  if (parsedResponse.error) {
-    return err(
-      new UpdateDeliveryMethodError("Failed to parse checkout response", {
-        errors: [parsedResponse.error],
-      }),
-    );
-  }
-
-  if (parsedResponse.data.checkoutDeliveryMethodUpdate.errors.length > 0) {
-    return err(
-      new UpdateDeliveryMethodError("Failed to update delivery method", {
+    if (parsedResponse.data.checkoutDeliveryMethodUpdate.errors.length > 0) {
+      logger.error("Failed to update delivery method of checkout", {
         errors: parsedResponse.data.checkoutDeliveryMethodUpdate.errors,
-      }),
-    );
+      });
+
+      return {
+        type: "error",
+        name: "UpdateDeliveryMethodError",
+        message:
+          "Failed to update delivery method - errors in updateBillingAddress mutation",
+      };
+    }
+
+    return { type: "success", value: parsedResponse.data };
+  } catch (error) {
+    logger.error("Failed to update delivery method", { error });
+    return {
+      type: "error",
+      name: "UpdateDeliveryMethodError",
+      message: "Failed to update delivery method",
+    };
   }
-
-  revalidatePath(
-    createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
-  );
-
-  redirect(createPath(checkoutId, "payment-gateway"));
 };

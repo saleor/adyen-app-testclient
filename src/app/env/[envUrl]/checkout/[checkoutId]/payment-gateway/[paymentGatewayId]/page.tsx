@@ -1,11 +1,14 @@
 import { readFragment } from "gql.tada";
 
+import { BaseError } from "@/lib/errors";
 import {
   AdyenDropin,
   getCheckoutTotalPrice,
   initalizePaymentGateway,
   TotalPriceFragment,
 } from "@/modules/dropin";
+
+const PaymentGatewayError = BaseError.subclass("PaymentGatewayError");
 
 export default async function PaymentGatewayPage({
   params: { envUrl, checkoutId, paymentGatewayId },
@@ -15,37 +18,37 @@ export default async function PaymentGatewayPage({
   const decodedEnvUrl = decodeURIComponent(envUrl);
   const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
 
-  const checkoutTotalPriceData = await getCheckoutTotalPrice({
+  const checkoutTotalPriceDataResponse = await getCheckoutTotalPrice({
     envUrl: decodedEnvUrl,
     checkoutId,
   });
 
-  if (checkoutTotalPriceData.isErr()) {
+  if (checkoutTotalPriceDataResponse.type === "error") {
     // Sends the error to the error boundary
-    throw checkoutTotalPriceData.error;
+    throw new PaymentGatewayError(checkoutTotalPriceDataResponse.message);
   }
 
   const totalPrice = readFragment(
     TotalPriceFragment,
-    checkoutTotalPriceData.value.checkout?.totalPrice,
+    checkoutTotalPriceDataResponse.value.checkout?.totalPrice,
   );
 
-  const initalizePaymentGatewayData = await initalizePaymentGateway({
+  const initalizePaymentGatewayDataResponse = await initalizePaymentGateway({
     envUrl: decodedEnvUrl,
     checkoutId,
     paymentGatewayId: decodedPaymentGatewayId,
     amount: totalPrice?.gross.amount ?? 0,
   });
 
-  if (initalizePaymentGatewayData.isErr()) {
+  if (initalizePaymentGatewayDataResponse.type === "error") {
     // Sends the error to the error boundary
-    throw initalizePaymentGatewayData.error;
+    throw new PaymentGatewayError(initalizePaymentGatewayDataResponse.message);
   }
 
   return (
     <AdyenDropin
-      initalizePaymentGatewayData={initalizePaymentGatewayData.value}
-      totalPriceData={checkoutTotalPriceData.value.checkout?.totalPrice}
+      initalizePaymentGatewayData={initalizePaymentGatewayDataResponse.value}
+      totalPriceData={checkoutTotalPriceDataResponse.value.checkout?.totalPrice}
       envUrl={decodedEnvUrl}
       checkoutId={checkoutId}
       paymentGatewayId={decodedPaymentGatewayId}

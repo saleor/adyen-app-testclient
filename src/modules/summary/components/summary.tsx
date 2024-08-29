@@ -4,9 +4,8 @@ import { lightFormat } from "date-fns";
 import { FragmentOf, readFragment } from "gql.tada";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useTransition } from "react";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { FormButton } from "@/components/form-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +31,8 @@ export const Summary = (props: {
   data: FragmentOf<typeof CheckoutFragment> | null;
   envUrl: string;
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
   const { data, envUrl } = props;
   const checkout = readFragment(CheckoutFragment, data);
 
@@ -41,45 +41,51 @@ export const Summary = (props: {
   }
 
   const onCompleteButtonClick = async () => {
-    setLoading(true);
-    const response = await completeCheckout({
-      envUrl,
-      checkoutId: checkout.id,
-    });
-
-    if (response.isErr()) {
-      setLoading(false);
-      return toast({
-        title: `${response.error.name}: ${response.error.message}`,
-        variant: "destructive",
-        description: <ErrorToastDescription details={response.error.errors} />,
+    startTransition(async () => {
+      const response = await completeCheckout({
+        envUrl,
+        checkoutId: checkout.id,
       });
-    }
 
-    setLoading(false);
-    toast({
-      title: "Successfully completed checkout",
-      description: (
-        <div className="flex items-center justify-around gap-3">
-          <Button
-            onClick={() => {
-              navigator.clipboard.writeText(response.value?.order?.id ?? "");
-            }}
-            variant="secondary"
-          >
-            Copy order id
-          </Button>
-          <Link
-            href={getDashboardUrl(envUrl, response.value?.order?.id ?? "")}
-            target="_blank"
-          >
-            <Button variant="link" className="flex gap-1">
-              <span>Go to order page</span>
-              <SquareArrowOutUpRight className="h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
-      ),
+      if (response.type === "error") {
+        toast({
+          title: response.name,
+          variant: "destructive",
+          description: response.message,
+        });
+      }
+
+      if (response.type === "success") {
+        toast({
+          title: "Successfully completed checkout",
+          description: (
+            <div className="flex items-center justify-around gap-3">
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    response.value?.checkoutComplete?.order?.id ?? "",
+                  );
+                }}
+                variant="secondary"
+              >
+                Copy order id
+              </Button>
+              <Link
+                href={getDashboardUrl(
+                  envUrl,
+                  response.value?.checkoutComplete?.order?.id ?? "",
+                )}
+                target="_blank"
+              >
+                <Button variant="link" className="flex gap-1">
+                  <span>Go to order page</span>
+                  <SquareArrowOutUpRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          ),
+        });
+      }
     });
   };
 
@@ -205,7 +211,7 @@ export const Summary = (props: {
         <Link href="/">
           <Button variant="link">Go to home page</Button>
         </Link>
-        <FormButton onClick={onCompleteButtonClick} loading={loading}>
+        <FormButton onClick={onCompleteButtonClick} loading={isPending}>
           Complete checkout
         </FormButton>
       </CardFooter>

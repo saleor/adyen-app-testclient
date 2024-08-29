@@ -1,3 +1,4 @@
+import { BaseError } from "@/lib/errors";
 import {
   Billing,
   DeliveryMethod,
@@ -5,41 +6,47 @@ import {
   Shipping,
 } from "@/modules/checkout-details";
 
+const CheckoutDetailsPageError = BaseError.subclass("CheckoutDetailsPageError");
+
 export default async function CheckoutDetailsPage(props: {
   params: { envUrl: string; checkoutId: string };
 }) {
   const { envUrl, checkoutId } = props.params;
   const decodedEnvUrl = decodeURIComponent(envUrl);
 
-  const checkoutDetails = await getCheckoutDetails({
+  const checkoutDetailsResponse = await getCheckoutDetails({
     envUrl: decodedEnvUrl,
     checkoutId,
   });
 
-  if (checkoutDetails.isErr()) {
+  if (checkoutDetailsResponse.type === "error") {
     // Sends the error to the error boundary
-    throw checkoutDetails.error;
+    throw new CheckoutDetailsPageError(checkoutDetailsResponse.message);
   }
 
   const hasDeliveryMethodsToSelect =
-    checkoutDetails.value.checkout?.shippingMethods?.length ?? 0;
+    checkoutDetailsResponse.value.checkout?.shippingMethods?.length ?? 0;
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       <Billing
-        data={checkoutDetails.value.checkout?.billingAddress}
+        data={checkoutDetailsResponse.value.checkout?.billingAddress}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
       <Shipping
-        data={checkoutDetails.value.checkout?.shippingAddress}
+        data={checkoutDetailsResponse.value.checkout?.shippingAddress}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
       {hasDeliveryMethodsToSelect ? (
         <DeliveryMethod
-          deliveryMethodData={checkoutDetails.value.checkout?.deliveryMethod}
-          shippingMethodData={checkoutDetails.value.checkout?.shippingMethods}
+          deliveryMethodData={
+            checkoutDetailsResponse.value.checkout?.deliveryMethod
+          }
+          shippingMethodData={
+            checkoutDetailsResponse.value.checkout?.shippingMethods
+          }
           envUrl={decodedEnvUrl}
           checkoutId={checkoutId}
         />

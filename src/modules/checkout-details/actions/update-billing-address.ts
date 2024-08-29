@@ -1,18 +1,15 @@
 "use server";
 import { graphql } from "gql.tada";
 import request from "graphql-request";
-import { err, ResultAsync } from "neverthrow";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 import { createPath } from "@/lib/utils";
 
 import { BillingAddressSchemaType } from "../components/billing";
 
-const UpdateBillingAddressError = BaseError.subclass(
-  "UpdateBillingAddressError",
-);
+const logger = createLogger("updateBillingAddress");
 
 const UpdateBillingAddressSchema = z.object({
   checkoutBillingAddressUpdate: z.object({
@@ -43,41 +40,56 @@ export const updateBillingAddress = async (props: {
   envUrl: string;
   checkoutId: string;
   billingAddress: BillingAddressSchemaType;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | {
+      type: "success";
+      value: z.infer<typeof UpdateBillingAddressSchema>;
+    }
+> => {
   const { envUrl, checkoutId, billingAddress } = props;
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, UpdateBillingAddressMutation, {
+
+  try {
+    const response = await request(envUrl, UpdateBillingAddressMutation, {
       checkoutId,
       input: billingAddress,
-    }),
-    (error) =>
-      new UpdateBillingAddressError("Failed to update billing address", {
-        errors: [error],
-      }),
-  );
-  if (response.isErr()) {
-    return err(response.error);
-  }
+    });
+    const parsedResponse = UpdateBillingAddressSchema.safeParse(response);
 
-  const parsedResponse = UpdateBillingAddressSchema.safeParse(response.value);
+    if (parsedResponse.error) {
+      logger.error("Failed to parse updateBillingAddress response", {
+        error: parsedResponse.error,
+      });
+      return {
+        type: "error",
+        name: "ParsingUpdateBillingAddressError",
+        message: parsedResponse.error.message,
+      };
+    }
 
-  if (parsedResponse.error) {
-    return err(
-      new UpdateBillingAddressError("Failed to parse checkout response", {
-        errors: [parsedResponse.error],
-      }),
-    );
-  }
-
-  if (parsedResponse.data.checkoutBillingAddressUpdate.errors.length > 0) {
-    return err(
-      new UpdateBillingAddressError("Failed to create checkout", {
+    if (parsedResponse.data.checkoutBillingAddressUpdate.errors.length > 0) {
+      logger.error("Failed to update billing address of checkout", {
         errors: parsedResponse.data.checkoutBillingAddressUpdate.errors,
-      }),
-    );
-  }
+      });
+      return {
+        type: "error",
+        name: "UpdateBillingAddressError",
+        message:
+          "Failed to update billing address - errors in updateBillingAddress mutation",
+      };
+    }
 
-  revalidatePath(
-    createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
-  );
+    revalidatePath(
+      createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
+    );
+
+    return { type: "success", value: parsedResponse.data };
+  } catch (error) {
+    logger.error("Failed to update billing address", { error });
+    return {
+      type: "error",
+      name: "UpdateBillingAddressError",
+      message: "Failed to update billing address",
+    };
+  }
 };

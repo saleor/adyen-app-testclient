@@ -1,12 +1,13 @@
-import { graphql, readFragment } from "gql.tada";
+"use server";
+
+import { graphql, readFragment, ResultOf } from "gql.tada";
 import request from "graphql-request";
-import { err, ok, ResultAsync } from "neverthrow";
 
-import { BaseError } from "@/lib/errors";
+import { createLogger } from "@/lib/logger";
 
-import { ProductFragment } from "../components/cart";
+import { ProductFragment } from "../fragments";
 
-const FetchProductError = BaseError.subclass("FetchProductError");
+const logger = createLogger("fetchProduct");
 
 const FetchProductQuery = graphql(
   `
@@ -35,38 +36,44 @@ const FetchProductQuery = graphql(
 export const fetchProduct = async (props: {
   channelSlug: string;
   envUrl: string;
-}) => {
+}): Promise<
+  | { type: "error"; name: string; message: string }
+  | { type: "success"; value: ResultOf<typeof FetchProductQuery> }
+> => {
   const { envUrl, channelSlug } = props;
 
-  const response = await ResultAsync.fromPromise(
-    request(envUrl, FetchProductQuery, {
+  try {
+    const response = await request(envUrl, FetchProductQuery, {
       channelSlug,
-    }),
-    (error) =>
-      new FetchProductError("Failed to fetch products", { errors: [error] }),
-  );
+    });
 
-  if (response.isErr()) {
-    return err(response.error);
-  }
-
-  const products = response.value.products?.edges.map((edge) =>
-    readFragment(ProductFragment, edge.node),
-  );
-
-  if (products?.length === 0) {
-    return err(
-      new FetchProductError("No products found for selected channel."),
+    const products = response.products?.edges.map((edge) =>
+      readFragment(ProductFragment, edge.node),
     );
-  }
 
-  if (products?.some((product) => product.defaultVariant?.pricing === null)) {
-    return err(
-      new FetchProductError(
-        "Default variant not available for selected channel.",
-      ),
-    );
-  }
+    if (products?.length === 0) {
+      return {
+        type: "error",
+        name: "FetchProductError",
+        message: "No products found for selected channel.",
+      };
+    }
 
-  return ok(response.value);
+    if (products?.some((product) => product.defaultVariant?.pricing === null)) {
+      return {
+        type: "error",
+        name: "FetchProductError",
+        message: "Default variant not available for selected channel.",
+      };
+    }
+
+    return { type: "success", value: response };
+  } catch (error) {
+    logger.error("Failed to fetch products", { error });
+    return {
+      type: "error",
+      name: "FetchProductError",
+      message: "Failed to fetch products",
+    };
+  }
 };

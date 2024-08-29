@@ -1,70 +1,60 @@
 "use client";
 
-import { FragmentOf, graphql, readFragment } from "gql.tada";
+import { FragmentOf, readFragment } from "gql.tada";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
-import { ErrorToastDescription } from "@/components/error-toast-description";
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
+import { createPath } from "@/lib/utils";
 
 import { createCheckout } from "../actions/create-checkout";
-
-export const ProductFragment = graphql(`
-  fragment Product on Product {
-    id
-    name
-    thumbnail(size: 2048) {
-      url
-    }
-    category {
-      name
-    }
-    defaultVariant {
-      id
-      pricing {
-        price {
-          gross {
-            amount
-            currency
-          }
-        }
-      }
-    }
-  }
-`);
+import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {
   data: FragmentOf<typeof ProductFragment>[];
   envUrl: string;
   channelSlug: string;
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
   const { envUrl, channelSlug, data } = props;
   const products = data.map((product) =>
     readFragment(ProductFragment, product),
   );
 
   const onClick = async () => {
-    setLoading(true);
-    const checkout = await createCheckout({
-      envUrl,
-      channelSlug,
-      variantId: products[0].defaultVariant?.id ?? "",
-    });
-
-    if (checkout?.isErr()) {
-      setLoading(false);
-      return toast({
-        title: `${checkout.error.name}: ${checkout.error.message}`,
-        variant: "destructive",
-        description: <ErrorToastDescription details={checkout.error.errors} />,
+    startTransition(async () => {
+      const response = await createCheckout({
+        envUrl,
+        channelSlug,
+        variantId: products[0].defaultVariant?.id ?? "",
       });
-    }
 
-    setLoading(false);
-    toast({
-      title: "Successfully created checkout",
+      if (response.type === "error") {
+        toast({
+          title: response.name,
+          variant: "destructive",
+          description: response.message,
+        });
+      }
+
+      if (response.type === "success") {
+        toast({
+          title: "Successfully created checkout",
+        });
+
+        router.push(
+          createPath(
+            "env",
+            encodeURIComponent(envUrl),
+            "checkout",
+            response.value.checkoutCreate.checkout.id ?? "",
+          ),
+        );
+      }
     });
   };
 
@@ -104,7 +94,7 @@ export const Cart = (props: {
             type="submit"
             onClick={onClick}
             className="justify-self-end"
-            loading={loading}
+            loading={isPending}
           >
             Create checkout
           </FormButton>
