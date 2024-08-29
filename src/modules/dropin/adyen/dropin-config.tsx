@@ -8,7 +8,7 @@ import {
   initalizePaymentGateway,
   initalizeTransaction,
   processTransaction,
-  redirectToSummary,
+  redirectToCheckoutSummary,
 } from "../actions";
 import { PaymentMethodsResponseSchema } from "../schemas";
 import { AdyenGatewayConfigResponse } from "./gateway-config";
@@ -101,7 +101,7 @@ export const getAdyenDropinConfig = (props: {
 
       if (adyenPaymentDetailResponse.isSuccessful()) {
         dropin?.setStatus("success");
-        await redirectToSummary(paymentGatewayId);
+        await redirectToCheckoutSummary({ paymentGatewayId });
       }
     },
     onSubmit: async (state, dropin) => {
@@ -158,9 +158,7 @@ export const getAdyenDropinConfig = (props: {
 
       if (adyenPaymentResponse.isSuccessful()) {
         dropin.setStatus("success");
-        await redirectToSummary(paymentGatewayId);
-
-        return;
+        await redirectToCheckoutSummary({ paymentGatewayId });
       }
 
       if (adyenPaymentResponse.isCancelled()) {

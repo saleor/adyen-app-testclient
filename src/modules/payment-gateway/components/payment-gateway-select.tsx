@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf, readFragment } from "gql.tada";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,8 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { createPath } from "@/lib/utils";
 
+import { redirectToAdyenDropin } from "../actions";
 import { PaymentGatewayFragment } from "../fragments";
 
 const PaymentGatewaySchema = z.object({
@@ -36,7 +35,6 @@ type PaymentGatewaySchemaType = z.infer<typeof PaymentGatewaySchema>;
 export const PaymentGatewaySelect = (props: {
   data: FragmentOf<typeof PaymentGatewayFragment>[] | null | undefined;
 }) => {
-  const router = useRouter();
   const { data } = props;
 
   const availablePaymentGateways = readFragment(
@@ -65,7 +63,10 @@ export const PaymentGatewaySelect = (props: {
       title: "Payment gateway selected",
       description: "Redirecting to dropin",
     });
-    router.replace(createPath("payment-gateway", data.paymentGatewayId));
+
+    await redirectToAdyenDropin({
+      paymentGatewayId: data.paymentGatewayId,
+    });
   }
 
   return (
@@ -97,7 +98,12 @@ export const PaymentGatewaySelect = (props: {
                     <SelectContent>
                       {availablePaymentGateways.map((method) => (
                         <SelectItem key={method.id} value={method.id}>
-                          {method.name}
+                          <div className="flex items-center justify-around gap-1">
+                            <span>{method.name}</span>
+                            <span className="text-sm text-gray-500">
+                              ({method.id})
+                            </span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
