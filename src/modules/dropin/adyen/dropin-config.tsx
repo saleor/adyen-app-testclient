@@ -11,7 +11,11 @@ import {
   redirectToCheckoutSummary,
 } from "../actions";
 import { PaymentMethodsResponseSchema } from "../schemas";
-import { AdyenGatewayConfigResponse } from "./gateway-config";
+import {
+  AdyenGiftCardBalanceResponse,
+  AdyenOrderCancelledResponse,
+  AdyenOrderCreateResponse,
+} from "./gateway-config";
 import { AdyenPaymentDetailResponse } from "./payment-detail-response";
 import { AdyenPaymentResponse } from "./payment-response";
 
@@ -224,11 +228,11 @@ export const getAdyenDropinConfig = (props: {
       }
 
       const adyenBallanceCheckResponse =
-        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+        AdyenGiftCardBalanceResponse.createFromInitializePaymentGateway(
           initalizePaymentGatewayDataResponse.value,
         );
 
-      void resolve(adyenBallanceCheckResponse.getGiftCardBalanceResponse());
+      void resolve(adyenBallanceCheckResponse.getResponse());
     },
     onOrderRequest: async (resolve) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onorderrequest
@@ -252,11 +256,11 @@ export const getAdyenDropinConfig = (props: {
       }
 
       const adyenOrderCreateResponse =
-        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+        AdyenOrderCreateResponse.createFromInitializePaymentGateway(
           initalizePaymentGatewayDataResponse.value,
         );
 
-      void resolve(adyenOrderCreateResponse.getOrderCreateResponse());
+      void resolve(adyenOrderCreateResponse.getResponse());
     },
     // @ts-expect-error - onOrderCancel is not wrongly defined in the types
     onOrderCancel: async ({ order }: { order: Order }) => {
@@ -285,7 +289,7 @@ export const getAdyenDropinConfig = (props: {
       }
 
       const adyenOrderCancelledResponse =
-        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+        AdyenOrderCancelledResponse.createFromInitializePaymentGateway(
           initalizePaymentGatewayDataResponse.value,
         );
 
