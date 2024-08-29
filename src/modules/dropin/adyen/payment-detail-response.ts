@@ -3,29 +3,38 @@ import { z } from "zod";
 import { TransactionProcessSchema } from "../schemas/transaction-process";
 
 export class AdyenPaymentDetailResponse {
-  constructor(public data: z.infer<typeof TransactionProcessSchema>) {}
+  private constructor(
+    private paymentDetailsResponse: z.infer<
+      typeof TransactionProcessSchema
+    >["transactionProcess"]["data"]["paymentDetailsResponse"],
+  ) {}
+
+  static createFromTransactionProcess(
+    data: z.infer<typeof TransactionProcessSchema>,
+  ) {
+    return new AdyenPaymentDetailResponse(
+      data.transactionProcess.data.paymentDetailsResponse,
+    );
+  }
 
   isRefused() {
-    return (
-      this.data.transactionProcess.data.paymentDetailsResponse.resultCode ===
-      "Refused"
-    );
+    return this.paymentDetailsResponse.resultCode === "Refused";
   }
 
   getRefusalReason() {
     return (
-      this.data.transactionProcess.data.paymentDetailsResponse.refusalReason ??
+      this.paymentDetailsResponse.refusalReason ??
       "Payment was refused by issuer"
     );
   }
 
   getRawResponse() {
-    return this.data.transactionProcess.data.paymentDetailsResponse;
+    return this.paymentDetailsResponse;
   }
 
   isSuccessful() {
     return ["Authorised", "Pending", "Received"].includes(
-      this.data.transactionProcess.data.paymentDetailsResponse.resultCode,
+      this.paymentDetailsResponse.resultCode,
     );
   }
 }

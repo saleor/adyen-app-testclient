@@ -7,6 +7,18 @@ export const InitalizeTransactionSchema = z.object({
     }),
     data: z.object({
       paymentResponse: z.object({
+        order: z
+          .object({
+            orderData: z.string().optional(),
+            pspReference: z.string().optional(),
+            remainingAmount: z
+              .object({
+                value: z.number(),
+                currency: z.string(),
+              })
+              .optional(),
+          })
+          .optional(),
         action: z
           .object({
             paymentMethodType: z.string(),
@@ -21,7 +33,14 @@ export const InitalizeTransactionSchema = z.object({
               .optional(),
           })
           .optional(),
-        resultCode: z.enum(["Authorised", "Pending", "Refused", "Received"]),
+        resultCode: z.enum([
+          "Authorised",
+          "Pending",
+          "Refused",
+          "Received",
+          "Cancelled",
+          "Error",
+        ]),
       }),
     }),
     errors: z.array(
