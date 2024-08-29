@@ -16,7 +16,7 @@ function getMinLevel() {
 export const logger = new Logger<ILogObj>({
   minLevel: getMinLevel(),
   hideLogPositionForProduction: true,
-  type: "pretty",
+  type: "json",
 });
 
 export const createLogger = (name: string, params?: Record<string, unknown>) =>
