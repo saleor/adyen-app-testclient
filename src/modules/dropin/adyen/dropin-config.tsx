@@ -15,7 +15,7 @@ import {
   AdyenGiftCardBalanceResponse,
   AdyenOrderCancelledResponse,
   AdyenOrderCreateResponse,
-} from "./gateway-config";
+} from "./gateway-config-responses";
 import { AdyenPaymentDetailResponse } from "./payment-detail-response";
 import { AdyenPaymentResponse } from "./payment-response";
 
