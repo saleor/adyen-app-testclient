@@ -11,7 +11,7 @@ import {
   redirectToSummary,
 } from "../actions";
 import { PaymentMethodsResponseSchema } from "../schemas";
-import { extractGatewayConfigData } from "./extract-gateway-config";
+import { AdyenGatewayConfigResponse } from "./gateway-config";
 import { AdyenPaymentDetailResponse } from "./payment-detail-response";
 import { AdyenPaymentResponse } from "./payment-response";
 
@@ -83,9 +83,10 @@ export const getAdyenDropinConfig = (props: {
         return;
       }
 
-      const adyenPaymentDetailResponse = new AdyenPaymentDetailResponse(
-        transactionProcessResponse.value,
-      );
+      const adyenPaymentDetailResponse =
+        AdyenPaymentDetailResponse.createFromTransactionProcess(
+          transactionProcessResponse.value,
+        );
 
       if (adyenPaymentDetailResponse.isRefused()) {
         toast({
@@ -129,9 +130,10 @@ export const getAdyenDropinConfig = (props: {
         return;
       }
 
-      const adyenPaymentResponse = new AdyenPaymentResponse(
-        transactionInitializeResponse.value,
-      );
+      const adyenPaymentResponse =
+        AdyenPaymentResponse.createFromTransactionInitalize(
+          transactionInitializeResponse.value,
+        );
 
       if (adyenPaymentResponse.isRedirectOrAdditionalActionFlow()) {
         dropin.setState({
@@ -223,11 +225,12 @@ export const getAdyenDropinConfig = (props: {
         return;
       }
 
-      const response = extractGatewayConfigData(
-        initalizePaymentGatewayDataResponse.value,
-      ).giftCardBalanceResponse;
+      const adyenBallanceCheckResponse =
+        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+          initalizePaymentGatewayDataResponse.value,
+        );
 
-      void resolve(response);
+      void resolve(adyenBallanceCheckResponse.getGiftCardBalanceResponse());
     },
     onOrderRequest: async (resolve) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onorderrequest
@@ -250,13 +253,14 @@ export const getAdyenDropinConfig = (props: {
         return;
       }
 
-      const response = extractGatewayConfigData(
-        initalizePaymentGatewayDataResponse.value,
-      ).orderCreateResponse;
+      const adyenOrderCreateResponse =
+        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+          initalizePaymentGatewayDataResponse.value,
+        );
 
-      void resolve(response);
+      void resolve(adyenOrderCreateResponse.getOrderCreateResponse());
     },
-    // @ts-expect-error - onOrderCancel is not defined in the types
+    // @ts-expect-error - onOrderCancel is not wrongly defined in the types
     onOrderCancel: async ({ order }: { order: Order }) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onordercancel
       const initalizePaymentGatewayDataResponse = await initalizePaymentGateway(
@@ -282,11 +286,12 @@ export const getAdyenDropinConfig = (props: {
         return;
       }
 
-      const response = extractGatewayConfigData(
-        initalizePaymentGatewayDataResponse.value,
-      ).orderCancelResponse;
+      const adyenOrderCancelledResponse =
+        AdyenGatewayConfigResponse.createFromInitializePaymentGateway(
+          initalizePaymentGatewayDataResponse.value,
+        );
 
-      if (!response || response.resultCode !== "Received") {
+      if (adyenOrderCancelledResponse.isOrderNotCancelled()) {
         toast({
           title: "Error while cancelling order",
           description: "Order couldn't be cancelled",

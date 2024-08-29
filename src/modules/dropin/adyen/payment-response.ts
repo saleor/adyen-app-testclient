@@ -3,14 +3,30 @@ import { z } from "zod";
 import { InitalizeTransactionSchema } from "../schemas";
 
 export class AdyenPaymentResponse {
-  constructor(public data: z.infer<typeof InitalizeTransactionSchema>) {}
+  private constructor(
+    private transaction: z.infer<
+      typeof InitalizeTransactionSchema
+    >["transactionInitialize"]["transaction"],
+    private paymentResponse: z.infer<
+      typeof InitalizeTransactionSchema
+    >["transactionInitialize"]["data"]["paymentResponse"],
+  ) {}
+
+  static createFromTransactionInitalize(
+    data: z.infer<typeof InitalizeTransactionSchema>,
+  ) {
+    return new AdyenPaymentResponse(
+      data.transactionInitialize.transaction,
+      data.transactionInitialize.data.paymentResponse,
+    );
+  }
 
   getSaleorTransactionId() {
-    return this.data.transactionInitialize.transaction.id;
+    return this.transaction.id;
   }
 
   getAction() {
-    return this.getPaymentResponse().action;
+    return this.paymentResponse.action;
   }
 
   isRedirectOrAdditionalActionFlow() {
@@ -19,27 +35,30 @@ export class AdyenPaymentResponse {
 
   isSuccessful() {
     return ["Authorised", "Pending", "Received"].includes(
-      this.getPaymentResponse().resultCode,
+      this.paymentResponse.resultCode,
     );
   }
 
   isCancelled() {
-    return this.getPaymentResponse().resultCode === "Cancelled";
+    return this.paymentResponse.resultCode === "Cancelled";
   }
 
   isError() {
-    return this.getPaymentResponse().resultCode === "Error";
+    return this.paymentResponse.resultCode === "Error";
   }
 
   isRefused() {
-    return this.getPaymentResponse().resultCode === "Refused";
+    return this.paymentResponse.resultCode === "Refused";
   }
 
   getPaymentResponse() {
-    return this.data.transactionInitialize.data.paymentResponse;
+    return this.paymentResponse;
   }
 
   hasOrderWithRemainingAmount() {
-    return this.getPaymentResponse().order;
+    return (
+      this.paymentResponse.order?.remainingAmount &&
+      this.paymentResponse.order?.remainingAmount?.value !== 0
+    );
   }
 }
