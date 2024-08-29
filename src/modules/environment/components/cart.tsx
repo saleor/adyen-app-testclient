@@ -2,14 +2,12 @@
 
 import { FragmentOf, readFragment } from "gql.tada";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
-import { createPath } from "@/lib/utils";
 
-import { createCheckout } from "../actions/create-checkout";
+import { createCheckout, redirectToCheckoutDetails } from "../actions";
 import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {
@@ -18,7 +16,6 @@ export const Cart = (props: {
   channelSlug: string;
 }) => {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const { envUrl, channelSlug, data } = props;
   const products = data.map((product) =>
@@ -46,14 +43,10 @@ export const Cart = (props: {
           title: "Successfully created checkout",
         });
 
-        router.push(
-          createPath(
-            "env",
-            encodeURIComponent(envUrl),
-            "checkout",
-            response.value.checkoutCreate.checkout.id ?? "",
-          ),
-        );
+        await redirectToCheckoutDetails({
+          envUrl,
+          checkoutId: response.value.checkoutCreate.checkout.id,
+        });
       }
     });
   };

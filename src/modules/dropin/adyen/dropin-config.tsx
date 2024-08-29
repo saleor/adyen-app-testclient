@@ -7,7 +7,7 @@ import { createLogger } from "@/lib/logger";
 import {
   initalizeTransaction,
   processTransaction,
-  redirectToSummary,
+  redirectToCheckoutSummary,
 } from "../actions";
 import { PaymentMethodsResponseSchema } from "../schemas";
 import { AdyenPaymentDetailResponse } from "./payment-detail-response";
@@ -98,7 +98,7 @@ export const getAdyenDropinConfig = (props: {
 
       if (adyenPaymentDetailResponse.isSuccessful()) {
         dropin?.setStatus("success");
-        await redirectToSummary(paymentGatewayId);
+        await redirectToCheckoutSummary({ paymentGatewayId });
       }
     },
     onSubmit: async (state, dropin) => {
@@ -146,7 +146,7 @@ export const getAdyenDropinConfig = (props: {
 
       if (adyenPaymentResponse.isSuccessful()) {
         dropin.setStatus("success");
-        await redirectToSummary(paymentGatewayId);
+        await redirectToCheckoutSummary({ paymentGatewayId });
       }
     },
   };

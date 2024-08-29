@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FragmentOf, readFragment } from "gql.tada";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -22,8 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
-import { createPath } from "@/lib/utils";
 
+import { redirectToPaymentGatewaySelect } from "../actions";
 import { updateDeliveryMethod } from "../actions/update-delivery-method";
 import {
   CollectionPointFragment,
@@ -50,8 +49,6 @@ export const DeliveryMethod = (props: {
   envUrl: string;
   checkoutId: string;
 }) => {
-  const router = useRouter();
-
   const { deliveryMethodData, shippingMethodData, envUrl, checkoutId } = props;
 
   const shippingMethods = readFragment(
@@ -104,7 +101,9 @@ export const DeliveryMethod = (props: {
       toast({
         title: "Successfully updated delivery method",
       });
-      router.push(createPath(checkoutId, "payment-gateway"));
+      await redirectToPaymentGatewaySelect({
+        checkoutId,
+      });
     }
   }
 
