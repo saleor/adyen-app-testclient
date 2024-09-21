@@ -15,11 +15,16 @@ export const actionClient = createSafeActionClient({
       actionName: z.string(),
     });
   },
-  handleReturnedServerError(e) {
-    if (e instanceof BaseError) {
+  handleServerError(error, utils) {
+    logger.error(`Error during ${utils.metadata.actionName} action handling:`, {
+      error: error,
+      actionName: utils.metadata.actionName,
+    });
+
+    if (error instanceof BaseError) {
       return {
-        message: e.message,
-        name: e.name,
+        message: error.message,
+        name: error.name,
       };
     }
 
@@ -27,11 +32,5 @@ export const actionClient = createSafeActionClient({
       message: DEFAULT_SERVER_ERROR_MESSAGE,
       name: "Adyen testclient error",
     };
-  },
-  handleServerErrorLog(originalError, utils) {
-    logger.error(`Error during ${utils.metadata.actionName} action handling:`, {
-      error: originalError,
-      actionName: utils.metadata.actionName,
-    });
   },
 });
