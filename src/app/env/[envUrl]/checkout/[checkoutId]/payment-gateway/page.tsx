@@ -18,15 +18,17 @@ export default async function PaymentGatewaysPage(props: {
     checkoutId,
   });
 
-  if (paymentGatewaysResponse.type === "error") {
+  if (paymentGatewaysResponse?.serverError) {
     // Sends the error to the error boundary
-    throw new PaymentGatewaysError(paymentGatewaysResponse.message);
+    throw new PaymentGatewaysError(
+      paymentGatewaysResponse?.serverError.message,
+    );
   }
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       <PaymentGatewaySelect
-        data={paymentGatewaysResponse.value.checkout?.availablePaymentGateways}
+        data={paymentGatewaysResponse?.data?.checkout?.availablePaymentGateways}
       />
     </main>
   );

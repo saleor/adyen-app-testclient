@@ -7,7 +7,7 @@ import { useTransition } from "react";
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
 
-import { createCheckout, redirectToCheckoutDetails } from "../actions";
+import { createCheckout } from "../actions";
 import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {
@@ -30,22 +30,17 @@ export const Cart = (props: {
         variantId: products[0].defaultVariant?.id ?? "",
       });
 
-      if (response.type === "error") {
+      if (response?.serverError) {
         toast({
-          title: response.name,
+          title: response.serverError.name,
           variant: "destructive",
-          description: response.message,
+          description: response.serverError.message,
         });
       }
 
-      if (response.type === "success") {
+      if (response?.data) {
         toast({
           title: "Successfully created checkout",
-        });
-
-        await redirectToCheckoutDetails({
-          envUrl,
-          checkoutId: response.value.checkoutCreate.checkout.id,
         });
       }
     });

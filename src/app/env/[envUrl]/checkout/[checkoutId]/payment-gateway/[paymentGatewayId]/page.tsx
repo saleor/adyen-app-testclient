@@ -23,32 +23,43 @@ export default async function PaymentGatewayPage({
     checkoutId,
   });
 
-  if (checkoutTotalPriceDataResponse.type === "error") {
+  if (checkoutTotalPriceDataResponse?.serverError) {
     // Sends the error to the error boundary
-    throw new PaymentGatewayError(checkoutTotalPriceDataResponse.message);
+    throw new PaymentGatewayError(
+      checkoutTotalPriceDataResponse.serverError.message,
+    );
   }
 
   const totalPrice = readFragment(
     TotalPriceFragment,
-    checkoutTotalPriceDataResponse.value.checkout?.totalPrice,
+    checkoutTotalPriceDataResponse?.data?.checkout?.totalPrice,
   );
 
   const initalizePaymentGatewayDataResponse = await initalizePaymentGateway({
     envUrl: decodedEnvUrl,
     checkoutId,
     paymentGatewayId: decodedPaymentGatewayId,
-    amount: totalPrice?.gross.amount ?? 0,
+    amount: totalPrice?.gross.amount,
   });
 
-  if (initalizePaymentGatewayDataResponse.type === "error") {
+  if (initalizePaymentGatewayDataResponse?.serverError) {
     // Sends the error to the error boundary
-    throw new PaymentGatewayError(initalizePaymentGatewayDataResponse.message);
+    throw new PaymentGatewayError(
+      initalizePaymentGatewayDataResponse.serverError.message,
+    );
+  }
+
+  if (!initalizePaymentGatewayDataResponse?.data) {
+    // Sends the error to the error boundary
+    throw new PaymentGatewayError("No data returned from the server");
   }
 
   return (
     <AdyenDropin
-      initalizePaymentGatewayData={initalizePaymentGatewayDataResponse.value}
-      totalPriceData={checkoutTotalPriceDataResponse.value.checkout?.totalPrice}
+      initalizePaymentGatewayData={initalizePaymentGatewayDataResponse?.data}
+      totalPriceData={
+        checkoutTotalPriceDataResponse?.data?.checkout?.totalPrice
+      }
       envUrl={decodedEnvUrl}
       checkoutId={checkoutId}
       paymentGatewayId={decodedPaymentGatewayId}

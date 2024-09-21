@@ -19,18 +19,9 @@ import { toast } from "@/components/ui/use-toast";
 
 import { updateBillingAddress } from "../actions";
 import { getDefaultAddressByCountryCode } from "../address";
-import { convertStringToCountryCode, countryCodes } from "../countries";
+import { convertStringToCountryCode } from "../countries";
 import { BillingAddressFragment } from "../fragments";
-
-const BillingAddressSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  streetAddress1: z.string(),
-  city: z.string(),
-  countryArea: z.string().optional(),
-  country: z.enum(countryCodes),
-  postalCode: z.string(),
-});
+import { BillingAddressSchema } from "../schemas";
 
 export type BillingAddressSchemaType = z.infer<typeof BillingAddressSchema>;
 
@@ -66,15 +57,22 @@ export const Billing = (props: {
       billingAddress: data,
     });
 
-    if (response.type === "error") {
+    if (response?.validationErrors) {
       toast({
-        title: response.name,
+        title: "Validation error",
         variant: "destructive",
-        description: response.message,
       });
     }
 
-    if (response.type === "success") {
+    if (response?.serverError) {
+      toast({
+        title: response.serverError.name,
+        variant: "destructive",
+        description: response.serverError.message,
+      });
+    }
+
+    if (response?.data) {
       toast({
         title: "Successfully updated billing address",
       });

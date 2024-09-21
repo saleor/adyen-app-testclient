@@ -1,8 +1,12 @@
 "use server";
-import { graphql, ResultOf } from "gql.tada";
+import { graphql } from "gql.tada";
 import request from "graphql-request";
+import { z } from "zod";
 
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
 import { createLogger } from "@/lib/logger";
+import { actionClient } from "@/lib/safe-action";
 
 import { CheckoutFragment } from "../fragments";
 
@@ -19,28 +23,20 @@ const GetCheckoutSummaryQuery = graphql(
   [CheckoutFragment],
 );
 
-export const getCheckoutSummary = async (props: {
-  envUrl: string;
-  checkoutId: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: ResultOf<typeof GetCheckoutSummaryQuery> }
-> => {
-  const { envUrl, checkoutId } = props;
-  try {
+export const getCheckoutSummary = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      checkoutId: z.string(),
+    }),
+  )
+  .metadata({ actionName: "getCheckoutSummary" })
+  .action(async ({ parsedInput: { envUrl, checkoutId } }) => {
     const response = await request(envUrl, GetCheckoutSummaryQuery, {
       checkoutId,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
-    return { type: "success", value: response };
-  } catch (error) {
-    logger.error("Failed to get checkout summary", {
-      error,
-    });
-    return {
-      type: "error",
-      name: "GetCheckoutSummaryError",
-      message: "Failed to get checkout summary",
-    };
-  }
-};
+    return response;
+  });

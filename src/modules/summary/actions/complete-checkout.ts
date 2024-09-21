@@ -1,13 +1,11 @@
 "use server";
-import { graphql, ResultOf } from "gql.tada";
+import { graphql } from "gql.tada";
 import request from "graphql-request";
+import { z } from "zod";
 
-import { BaseError } from "@/lib/errors";
-import { createLogger } from "@/lib/logger";
-
-const CompleteCheckoutError = BaseError.subclass("CompleteCheckoutError");
-
-const logger = createLogger("completeCheckout");
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 
 const CompleteCheckoutMutation = graphql(`
   mutation CompleteCheckout($checkoutId: ID!) {
@@ -24,39 +22,35 @@ const CompleteCheckoutMutation = graphql(`
   }
 `);
 
-export const completeCheckout = async (props: {
-  envUrl: string;
-  checkoutId: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: ResultOf<typeof CompleteCheckoutMutation> }
-> => {
-  const { envUrl, checkoutId } = props;
-  try {
+const CreateCheckoutMutationError = BaseError.subclass(
+  "CreateCheckoutMutationError",
+);
+
+export const completeCheckout = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      checkoutId: z.string(),
+    }),
+  )
+  .metadata({ actionName: "completeCheckout" })
+  .action(async ({ parsedInput: { envUrl, checkoutId } }) => {
     const response = await request(envUrl, CompleteCheckoutMutation, {
       checkoutId,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
     if ((response.checkoutComplete?.errors ?? []).length > 0) {
-      logger.error("Failed to complete checkout", {
-        errors: response.checkoutComplete?.errors,
-      });
-      return {
-        type: "error",
-        name: "CompleteCheckoutError",
-        message: "Failed to complete checkout - errors in mutation response",
-      };
+      throw new CreateCheckoutMutationError(
+        "Failed to create checkout - errors in completeCheckout mutation.",
+        {
+          errors: response.checkoutComplete?.errors.map((e) =>
+            CreateCheckoutMutationError.normalize(e),
+          ),
+        },
+      );
     }
 
-    return { type: "success", value: response };
-  } catch (error) {
-    logger.error("Failed to complete checkout", {
-      error,
-    });
-    return {
-      type: "error",
-      name: "CompleteCheckoutError",
-      message: "Failed to complete checkout",
-    };
-  }
-};
+    return response;
+  });

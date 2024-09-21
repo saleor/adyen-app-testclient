@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 
-import { redirectToPaymentGatewaySelect } from "../actions";
 import { updateDeliveryMethod } from "../actions/update-delivery-method";
 import {
   CollectionPointFragment,
@@ -89,20 +88,17 @@ export const DeliveryMethod = (props: {
       deliveryMethod: data.deliveryMethodId,
     });
 
-    if (response.type === "error") {
+    if (response?.serverError) {
       toast({
-        title: response.name,
+        title: response.serverError.name,
         variant: "destructive",
-        description: response.message,
+        description: response.serverError.message,
       });
     }
 
-    if (response.type === "success") {
+    if (response?.data) {
       toast({
         title: "Successfully updated delivery method",
-      });
-      await redirectToPaymentGatewaySelect({
-        checkoutId,
       });
     }
   }

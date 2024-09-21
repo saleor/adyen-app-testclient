@@ -57,7 +57,7 @@ logger.attachTransport((log) => {
     };
 
   // eslint-disable-next-line no-console
-  console.log(`${name} ${message}`, JSON.stringify(attributes, null, 2));
+  console.log(`${name}: ${message}`, JSON.stringify(attributes, null, 2));
 });
 
 export const createLogger = (name: string, params?: Record<string, unknown>) =>

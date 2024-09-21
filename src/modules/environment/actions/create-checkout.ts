@@ -4,15 +4,19 @@ import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { z } from "zod";
 
-import { createLogger } from "@/lib/logger";
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 
-const logger = createLogger("createCheckout");
+import { redirectToCheckoutDetails } from "./redirect-to-checkout-details";
 
 const CreateCheckoutSchema = z.object({
   checkoutCreate: z.object({
-    checkout: z.object({
-      id: z.string(),
-    }),
+    checkout: z
+      .object({
+        id: z.string(),
+      })
+      .nullable(),
     errors: z.array(
       z.object({
         field: z.string(),
@@ -36,63 +40,66 @@ const CreateCheckoutMutation = graphql(`
   }
 `);
 
-export const createCheckout = async (props: {
-  envUrl: string;
-  channelSlug: string;
-  variantId: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: z.infer<typeof CreateCheckoutSchema> }
-> => {
-  const { envUrl, channelSlug, variantId } = props;
-  try {
-    const response = await request(envUrl, CreateCheckoutMutation, {
-      input: {
-        channel: channelSlug,
-        email: "adyen-testclient@saleor.io",
-        lines: [
+const CreateCheckoutParsingResponseError = BaseError.subclass(
+  "CreateCheckoutParsingResponseError",
+);
+const CreateCheckoutMutationError = BaseError.subclass(
+  "CreateCheckoutMutationError",
+);
+
+export const createCheckout = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      channelSlug: z.string(),
+      variantId: z.string(),
+    }),
+  )
+  .metadata({ actionName: "createCheckout" })
+  .action(
+    async ({ parsedInput: { channelSlug, envUrl, variantId } }) => {
+      const response = await request(envUrl, CreateCheckoutMutation, {
+        input: {
+          channel: channelSlug,
+          email: "adyen-testclient@saleor.io",
+          lines: [
+            {
+              variantId,
+              quantity: 1,
+            },
+          ],
+        },
+      }).catch((error) => {
+        throw BaseError.normalize(error, UnknownError);
+      });
+
+      const parsedResponse = CreateCheckoutSchema.safeParse(response);
+
+      if (parsedResponse.error) {
+        throw CreateCheckoutParsingResponseError.normalize(
+          parsedResponse.error,
+        );
+      }
+
+      if (parsedResponse.data.checkoutCreate.errors.length > 0) {
+        throw new CreateCheckoutMutationError(
+          "Failed to create checkout - errors in createCheckout mutation.",
           {
-            variantId,
-            quantity: 1,
+            errors: parsedResponse.data.checkoutCreate.errors.map((e) =>
+              CreateCheckoutMutationError.normalize(e),
+            ),
           },
-        ],
+        );
+      }
+
+      return parsedResponse.data;
+    },
+    {
+      onSuccess: async ({ data, parsedInput }) => {
+        await redirectToCheckoutDetails({
+          envUrl: parsedInput.envUrl,
+          checkoutId: data?.checkoutCreate.checkout?.id,
+        });
       },
-    });
-
-    const parsedResponse = CreateCheckoutSchema.safeParse(response);
-
-    if (parsedResponse.error) {
-      logger.error("Failed to parse checkoutCreate response", {
-        error: parsedResponse.error,
-      });
-      return {
-        type: "error",
-        name: "ParsingCheckoutResponseError",
-        message: parsedResponse.error.errors
-          .map((error) => error.message)
-          .join(", "),
-      };
-    }
-
-    if (parsedResponse.data.checkoutCreate.errors.length > 0) {
-      logger.error("Failed to create checkout", {
-        errors: parsedResponse.data.checkoutCreate.errors,
-      });
-      return {
-        type: "error",
-        name: "CreateCheckoutError",
-        message:
-          "Failed to create checkout - errors in createCheckout mutation",
-      };
-    }
-
-    return { type: "success", value: parsedResponse.data };
-  } catch (error) {
-    logger.error("Failed to create checkout", { error });
-    return {
-      type: "error",
-      name: "CreateCheckoutError",
-      message: "Failed to create checkout",
-    };
-  }
-};
+    },
+  );
