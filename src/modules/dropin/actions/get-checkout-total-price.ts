@@ -1,12 +1,13 @@
 "use server";
-import { graphql, ResultOf } from "gql.tada";
+import { graphql } from "gql.tada";
 import request from "graphql-request";
+import { z } from "zod";
 
-import { createLogger } from "@/lib/logger";
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 
 import { TotalPriceFragment } from "../fragments";
-
-const logger = createLogger("getCheckoutTotalPrice");
 
 const GetCheckoutTotalPriceQuery = graphql(
   `
@@ -21,27 +22,20 @@ const GetCheckoutTotalPriceQuery = graphql(
   [TotalPriceFragment],
 );
 
-export const getCheckoutTotalPrice = async (props: {
-  envUrl: string;
-  checkoutId: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: ResultOf<typeof GetCheckoutTotalPriceQuery> }
-> => {
-  const { envUrl, checkoutId } = props;
-
-  try {
+export const getCheckoutTotalPrice = actionClient
+  .schema(
+    z.object({
+      checkoutId: z.string(),
+      envUrl: envUrlSchema,
+    }),
+  )
+  .metadata({ actionName: "getCheckoutTotalPrice" })
+  .action(async ({ parsedInput: { envUrl, checkoutId } }) => {
     const response = await request(envUrl, GetCheckoutTotalPriceQuery, {
       checkoutId,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
-    return { type: "success", value: response };
-  } catch (error) {
-    logger.error("Failed to get checkout total price", { error });
-    return {
-      type: "error",
-      name: "GetCheckoutTotalPriceError",
-      message: "Failed to get checkout total price",
-    };
-  }
-};
+    return response;
+  });

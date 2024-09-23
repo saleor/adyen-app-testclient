@@ -55,9 +55,15 @@ importers:
       modern-errors:
         specifier: ^7.0.1
         version: 7.0.1
+      modern-errors-serialize:
+        specifier: ^6.1.0
+        version: 6.1.0(modern-errors@7.0.1)
       next:
         specifier: 14.2.5
         version: 14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next-safe-action:
+        specifier: 7.9.3
+        version: 7.9.3(next@14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@3.23.8)
       react:
         specifier: ^18
         version: 18.3.1
@@ -1735,6 +1741,13 @@ packages:
       }
     engines: { node: ">=18.18.0" }
 
+  error-serializer@8.0.0:
+    resolution:
+      {
+        integrity: sha512-mh1xG0257SA4P0XfT8RHPyygomaFvVekLpJWvxvNdOnBWIaJLs9otIMCd75MNUbm3aEOCOZ1VkMxxQlmloq7NA==,
+      }
+    engines: { node: ">=18.18.0" }
+
   es-abstract@1.23.3:
     resolution:
       {
@@ -2937,6 +2950,15 @@ packages:
       }
     engines: { node: ">=16 || 14 >=14.17" }
 
+  modern-errors-serialize@6.1.0:
+    resolution:
+      {
+        integrity: sha512-Us+REHRbeOM9np4GzDiBtNd1JBHwg8BZrt2kIjAivCtl32635FlszrAwynYx8bGcyRDGM5jVeZJeY4HOMwgBzA==,
+      }
+    engines: { node: ">=18.18.0" }
+    peerDependencies:
+      modern-errors: ^7.0.1
+
   modern-errors@7.0.1:
     resolution:
       {
@@ -2981,6 +3003,30 @@ packages:
       {
         integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==,
       }
+
+  next-safe-action@7.9.3:
+    resolution:
+      {
+        integrity: sha512-2GH7/iRiM5R/y6sIQZsNHGeRr/iKQJsg8ejP63WhTS7fXS9KzxVbEKrWwLNNhL33V9cn0448cPSI/aiSK/PUbA==,
+      }
+    engines: { node: ">=18.17" }
+    peerDependencies:
+      "@sinclair/typebox": ">= 0.33.3"
+      next: ">= 14.0.0"
+      react: ">= 18.2.0"
+      react-dom: ">= 18.2.0"
+      valibot: ">= 0.36.0"
+      yup: ">= 1.0.0"
+      zod: ">= 3.0.0"
+    peerDependenciesMeta:
+      "@sinclair/typebox":
+        optional: true
+      valibot:
+        optional: true
+      yup:
+        optional: true
+      zod:
+        optional: true
 
   next@14.2.5:
     resolution:
@@ -3680,6 +3726,13 @@ packages:
         integrity: sha512-vj6RsCsWBCf19jIeHEfkRMw8DPiBb+DMXklQ/1SGDHOMlHdPUkZXFQ2YdplS23zESTijAcurb1aSgJA3AgMu1Q==,
       }
     engines: { node: ">=0.4" }
+
+  safe-json-value@3.0.0:
+    resolution:
+      {
+        integrity: sha512-d9NN/9QDNTfhHr3K1gGdDCn7K0OBvBHrNDwA4PqGPkn6nUmQL7GzMPBC+nmkY7G450B26wkfu7lZTVH7CJ+Jgw==,
+      }
+    engines: { node: ">=18.18.0" }
 
   safe-regex-test@1.0.3:
     resolution:
@@ -5327,6 +5380,14 @@ snapshots:
     dependencies:
       error-class-utils: 4.0.0
 
+  error-serializer@8.0.0:
+    dependencies:
+      is-error-instance: 3.0.0
+      is-plain-obj: 4.1.0
+      normalize-exception: 3.0.0
+      safe-json-value: 3.0.0
+      set-error-class: 3.0.0
+
   es-abstract@1.23.3:
     dependencies:
       array-buffer-byte-length: 1.0.1
@@ -6190,6 +6251,12 @@ snapshots:
 
   minipass@7.1.2: {}
 
+  modern-errors-serialize@6.1.0(modern-errors@7.0.1):
+    dependencies:
+      error-serializer: 8.0.0
+      is-plain-obj: 4.1.0
+      modern-errors: 7.0.1
+
   modern-errors@7.0.1:
     dependencies:
       error-class-utils: 4.0.0
@@ -6217,6 +6284,14 @@ snapshots:
   nanoid@3.3.7: {}
 
   natural-compare@1.4.0: {}
+
+  next-safe-action@7.9.3(next@14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@3.23.8):
+    dependencies:
+      next: 14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    optionalDependencies:
+      zod: 3.23.8
 
   next@14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -6592,6 +6667,11 @@ snapshots:
       get-intrinsic: 1.2.4
       has-symbols: 1.0.3
       isarray: 2.0.5
+
+  safe-json-value@3.0.0:
+    dependencies:
+      is-plain-obj: 4.1.0
+      normalize-exception: 3.0.0
 
   safe-regex-test@1.0.3:
     dependencies:

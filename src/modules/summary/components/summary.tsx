@@ -47,15 +47,15 @@ export const Summary = (props: {
         checkoutId: checkout.id,
       });
 
-      if (response.type === "error") {
+      if (response?.serverError) {
         toast({
-          title: response.name,
+          title: response.serverError.name,
           variant: "destructive",
-          description: response.message,
+          description: response.serverError.message,
         });
       }
 
-      if (response.type === "success") {
+      if (response?.data) {
         toast({
           title: "Successfully completed checkout",
           description: (
@@ -63,7 +63,7 @@ export const Summary = (props: {
               <Button
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    response.value?.checkoutComplete?.order?.id ?? "",
+                    response.data?.checkoutComplete?.order?.id ?? "",
                   );
                 }}
                 variant="secondary"
@@ -73,7 +73,7 @@ export const Summary = (props: {
               <Link
                 href={getDashboardUrl(
                   envUrl,
-                  response.value?.checkoutComplete?.order?.id ?? "",
+                  response.data?.checkoutComplete?.order?.id ?? "",
                 )}
                 target="_blank"
               >

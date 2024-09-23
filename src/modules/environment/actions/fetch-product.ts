@@ -1,13 +1,14 @@
 "use server";
 
-import { graphql, readFragment, ResultOf } from "gql.tada";
+import { graphql, readFragment } from "gql.tada";
 import request from "graphql-request";
+import { z } from "zod";
 
-import { createLogger } from "@/lib/logger";
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 
 import { ProductFragment } from "../fragments";
-
-const logger = createLogger("fetchProduct");
 
 const FetchProductQuery = graphql(
   `
@@ -33,18 +34,24 @@ const FetchProductQuery = graphql(
   [ProductFragment],
 );
 
-export const fetchProduct = async (props: {
-  channelSlug: string;
-  envUrl: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: ResultOf<typeof FetchProductQuery> }
-> => {
-  const { envUrl, channelSlug } = props;
+const NoProductsFoundError = BaseError.subclass("NoProductsFoundError");
+const DefaultVariantNotAvailableError = BaseError.subclass(
+  "DefaultVariantNotAvailableError",
+);
 
-  try {
+export const fetchProduct = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      channelSlug: z.string(),
+    }),
+  )
+  .metadata({ actionName: "fetchProduct" })
+  .action(async ({ parsedInput: { channelSlug, envUrl } }) => {
     const response = await request(envUrl, FetchProductQuery, {
       channelSlug,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
     const products = response.products?.edges.map((edge) =>
@@ -52,28 +59,14 @@ export const fetchProduct = async (props: {
     );
 
     if (products?.length === 0) {
-      return {
-        type: "error",
-        name: "FetchProductError",
-        message: "No products found for selected channel.",
-      };
+      throw new NoProductsFoundError("No products found for selected channel.");
     }
 
     if (products?.some((product) => product.defaultVariant?.pricing === null)) {
-      return {
-        type: "error",
-        name: "FetchProductError",
-        message: "Default variant not available for selected channel.",
-      };
+      throw new DefaultVariantNotAvailableError(
+        "Default variant not available for selected channel.",
+      );
     }
 
-    return { type: "success", value: response };
-  } catch (error) {
-    logger.error("Failed to fetch products", { error });
-    return {
-      type: "error",
-      name: "FetchProductError",
-      message: "Failed to fetch products",
-    };
-  }
-};
+    return response;
+  });

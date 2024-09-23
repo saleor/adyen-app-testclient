@@ -19,33 +19,35 @@ export default async function CheckoutDetailsPage(props: {
     checkoutId,
   });
 
-  if (checkoutDetailsResponse.type === "error") {
+  if (checkoutDetailsResponse?.serverError) {
     // Sends the error to the error boundary
-    throw new CheckoutDetailsPageError(checkoutDetailsResponse.message);
+    throw new CheckoutDetailsPageError(
+      checkoutDetailsResponse?.serverError.message,
+    );
   }
 
   const hasDeliveryMethodsToSelect =
-    checkoutDetailsResponse.value.checkout?.shippingMethods?.length ?? 0;
+    checkoutDetailsResponse?.data?.checkout?.shippingMethods?.length ?? 0;
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       <Billing
-        data={checkoutDetailsResponse.value.checkout?.billingAddress}
+        data={checkoutDetailsResponse?.data?.checkout?.billingAddress}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
       <Shipping
-        data={checkoutDetailsResponse.value.checkout?.shippingAddress}
+        data={checkoutDetailsResponse?.data?.checkout?.shippingAddress}
         envUrl={decodedEnvUrl}
         checkoutId={checkoutId}
       />
       {hasDeliveryMethodsToSelect ? (
         <DeliveryMethod
           deliveryMethodData={
-            checkoutDetailsResponse.value.checkout?.deliveryMethod
+            checkoutDetailsResponse?.data?.checkout?.deliveryMethod
           }
           shippingMethodData={
-            checkoutDetailsResponse.value.checkout?.shippingMethods
+            checkoutDetailsResponse?.data?.checkout?.shippingMethods
           }
           envUrl={decodedEnvUrl}
           checkoutId={checkoutId}

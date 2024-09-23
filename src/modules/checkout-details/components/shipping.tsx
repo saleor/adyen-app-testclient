@@ -17,20 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { updateShippingAddress } from "../actions/update-shipping-address";
+import { updateShippingAddress } from "../actions";
 import { getDefaultAddressByCountryCode } from "../address";
-import { convertStringToCountryCode, countryCodes } from "../countries";
+import { convertStringToCountryCode } from "../countries";
 import { ShippingAddressFragment } from "../fragments";
-
-const ShippingAddressSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  streetAddress1: z.string().min(1),
-  city: z.string().min(1),
-  countryArea: z.string().optional(),
-  country: z.enum(countryCodes),
-  postalCode: z.string().min(1),
-});
+import { ShippingAddressSchema } from "../schemas";
 
 export type ShippingAddressSchemaType = z.infer<typeof ShippingAddressSchema>;
 
@@ -66,15 +57,15 @@ export const Shipping = (props: {
       shippingAddress: data,
     });
 
-    if (response.type === "error") {
+    if (response?.serverError) {
       toast({
-        title: response.name,
+        title: response.serverError.name,
         variant: "destructive",
-        description: response.message,
+        description: response.serverError.message,
       });
     }
 
-    if (response.type === "success") {
+    if (response?.data) {
       toast({
         title: "Successfully updated shipping address",
       });

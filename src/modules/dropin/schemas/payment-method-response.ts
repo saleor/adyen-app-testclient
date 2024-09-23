@@ -12,6 +12,10 @@ export const PaymentMethodsResponseSchema = z.object({
         }),
       }),
       z.object({
+        type: z.literal("afterpaytouch"),
+        name: z.string(),
+      }),
+      z.object({
         type: z.literal("scheme"),
         name: z.string(),
         brands: z.array(z.string()),

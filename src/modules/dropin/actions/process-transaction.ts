@@ -4,7 +4,10 @@ import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { z } from "zod";
 
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
 import { createLogger } from "@/lib/logger";
+import { actionClient } from "@/lib/safe-action";
 
 import { TransactionProcessSchema } from "../schemas/transaction-process";
 
@@ -36,55 +39,48 @@ const processTransactionMutation = graphql(`
   }
 `);
 
-export const processTransaction = async (props: {
-  envUrl: string;
-  transactionId: string;
-  data: unknown;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: z.infer<typeof TransactionProcessSchema> }
-> => {
-  const { envUrl, transactionId, data } = props;
-  try {
+const ProcessTransactionParsingResponseError = BaseError.subclass(
+  "ProcessTransactionParsingResponseError",
+);
+const ProcessTransactionMutationError = BaseError.subclass(
+  "ProcessTransactionMutationError",
+);
+
+export const processTransaction = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      transactionId: z.string(),
+      data: z.unknown(),
+    }),
+  )
+  .metadata({ actionName: "processTransaction" })
+  .action(async ({ parsedInput: { envUrl, transactionId, data } }) => {
     const response = await request(envUrl, processTransactionMutation, {
       transactionId,
       data,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
     const parsedResponse = TransactionProcessSchema.safeParse(response);
 
     if (parsedResponse.error) {
-      logger.error("Failed to parse process transaction response", {
-        error: parsedResponse.error,
-      });
-      return {
-        type: "error",
-        name: "ParsingProcessTransactionResponseError",
-        message: parsedResponse.error.message,
-      };
+      throw ProcessTransactionParsingResponseError.normalize(
+        parsedResponse.error,
+      );
     }
 
     if (parsedResponse.data.transactionProcess.errors.length > 0) {
-      logger.error("Failed to process transaction - errors in mutation", {
-        errors: parsedResponse.data.transactionProcess.errors,
-      });
-      return {
-        type: "error",
-        name: "ProcessTransactionError",
-        message: "Failed to process transaction - errors in mutation",
-      };
+      throw new ProcessTransactionMutationError(
+        "Failed to process transaction - errors in processTransaction mutation",
+        {
+          errors: parsedResponse.data.transactionProcess.errors.map((e) =>
+            ProcessTransactionMutationError.normalize(e),
+          ),
+        },
+      );
     }
 
-    return {
-      type: "success",
-      value: parsedResponse.data,
-    };
-  } catch (error) {
-    logger.error("Failed to process transaction", { error });
-    return {
-      type: "error",
-      name: "ProcessTransactionError",
-      message: "Failed to process transaction",
-    };
-  }
-};
+    return parsedResponse.data;
+  });

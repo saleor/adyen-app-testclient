@@ -2,12 +2,11 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { vercel } from "@t3-oss/env-nextjs/presets";
 import { z } from "zod";
 
+import { envUrlSchema } from "./lib/env-url";
+
 export const env = createEnv({
   client: {
-    NEXT_PUBLIC_INITIAL_ENV_URL: z
-      .string()
-      .url()
-      .refine((v) => v.endsWith("/graphql/"), "Must end with /graphql/"),
+    NEXT_PUBLIC_INITIAL_ENV_URL: envUrlSchema,
     NEXT_PUBLIC_INITIAL_CHANNEL_SLUG: z.string(),
     NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE: z
       .enum(["PL", "SE", "US"])

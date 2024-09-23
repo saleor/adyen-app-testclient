@@ -77,19 +77,29 @@ export const getAdyenDropinConfig = (props: {
         data: state.data,
       });
 
-      if (transactionProcessResponse.type === "error") {
+      if (transactionProcessResponse?.serverError) {
         dropin?.setStatus("error");
         toast({
-          title: transactionProcessResponse.name,
+          title: transactionProcessResponse.serverError.name,
           variant: "destructive",
-          description: transactionProcessResponse.message,
+          description: transactionProcessResponse.serverError.message,
+        });
+        return;
+      }
+
+      if (!transactionProcessResponse?.data) {
+        dropin?.setStatus("error");
+        toast({
+          title: "Error while processing transaction",
+          description: "No data back from Adyen app",
+          variant: "destructive",
         });
         return;
       }
 
       const adyenPaymentDetailResponse =
         AdyenPaymentDetailResponse.createFromTransactionProcess(
-          transactionProcessResponse.value,
+          transactionProcessResponse.data,
         );
 
       if (adyenPaymentDetailResponse.isRefused()) {
@@ -123,11 +133,22 @@ export const getAdyenDropinConfig = (props: {
         idempotencyKey: window.crypto.randomUUID(),
       });
 
-      if (transactionInitializeResponse.type === "error") {
+      if (transactionInitializeResponse?.serverError) {
         toast({
-          title: transactionInitializeResponse.name,
+          title: transactionInitializeResponse?.serverError.name,
           variant: "destructive",
-          description: transactionInitializeResponse.message,
+          description: transactionInitializeResponse?.serverError.message,
+        });
+        dropin.setStatus("error");
+
+        return;
+      }
+
+      if (!transactionInitializeResponse?.data) {
+        toast({
+          title: "Error while initializing transaction",
+          description: "No data back from Adyen app",
+          variant: "destructive",
         });
         dropin.setStatus("error");
 
@@ -136,7 +157,7 @@ export const getAdyenDropinConfig = (props: {
 
       const adyenPaymentResponse =
         AdyenPaymentResponse.createFromTransactionInitalize(
-          transactionInitializeResponse.value,
+          transactionInitializeResponse?.data,
         );
 
       if (adyenPaymentResponse.isRedirectOrAdditionalActionFlow()) {
@@ -217,10 +238,21 @@ export const getAdyenDropinConfig = (props: {
         },
       );
 
-      if (initalizePaymentGatewayDataResponse.type === "error") {
+      if (initalizePaymentGatewayDataResponse?.serverError) {
         toast({
-          title: initalizePaymentGatewayDataResponse.name,
-          description: initalizePaymentGatewayDataResponse.message,
+          title: initalizePaymentGatewayDataResponse.serverError.name,
+          description: initalizePaymentGatewayDataResponse.serverError.message,
+          variant: "destructive",
+        });
+
+        return;
+      }
+
+      if (!initalizePaymentGatewayDataResponse?.data) {
+        toast({
+          title: "Error while checking balance",
+          description:
+            "Balance couldn't be checked - no data back from Adyen app",
           variant: "destructive",
         });
 
@@ -229,7 +261,7 @@ export const getAdyenDropinConfig = (props: {
 
       const adyenBallanceCheckResponse =
         AdyenGiftCardBalanceResponse.createFromInitializePaymentGateway(
-          initalizePaymentGatewayDataResponse.value,
+          initalizePaymentGatewayDataResponse?.data,
         );
 
       void resolve(adyenBallanceCheckResponse.getResponse());
@@ -245,10 +277,21 @@ export const getAdyenDropinConfig = (props: {
         },
       );
 
-      if (initalizePaymentGatewayDataResponse.type === "error") {
+      if (initalizePaymentGatewayDataResponse?.serverError) {
         toast({
-          title: initalizePaymentGatewayDataResponse.name,
-          description: initalizePaymentGatewayDataResponse.message,
+          title: initalizePaymentGatewayDataResponse.serverError.name,
+          description: initalizePaymentGatewayDataResponse.serverError.message,
+          variant: "destructive",
+        });
+
+        return;
+      }
+
+      if (!initalizePaymentGatewayDataResponse?.data) {
+        toast({
+          title: "Error while creating order",
+          description:
+            "Order couldn't be created - no data back from Adyen app",
           variant: "destructive",
         });
 
@@ -257,7 +300,7 @@ export const getAdyenDropinConfig = (props: {
 
       const adyenOrderCreateResponse =
         AdyenOrderCreateResponse.createFromInitializePaymentGateway(
-          initalizePaymentGatewayDataResponse.value,
+          initalizePaymentGatewayDataResponse?.data,
         );
 
       void resolve(adyenOrderCreateResponse.getResponse());
@@ -278,19 +321,29 @@ export const getAdyenDropinConfig = (props: {
         },
       );
 
-      if (initalizePaymentGatewayDataResponse.type === "error") {
+      if (initalizePaymentGatewayDataResponse?.serverError) {
         toast({
-          title: initalizePaymentGatewayDataResponse.name,
-          description: initalizePaymentGatewayDataResponse.message,
+          title: initalizePaymentGatewayDataResponse.serverError.name,
+          description: initalizePaymentGatewayDataResponse.serverError.message,
           variant: "destructive",
         });
 
         return;
       }
 
+      if (!initalizePaymentGatewayDataResponse?.data) {
+        toast({
+          title: "Error while cancelling order",
+          description:
+            "Order couldn't be cancelled - no data back from Adyen app",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const adyenOrderCancelledResponse =
         AdyenOrderCancelledResponse.createFromInitializePaymentGateway(
-          initalizePaymentGatewayDataResponse.value,
+          initalizePaymentGatewayDataResponse?.data,
         );
 
       if (adyenOrderCancelledResponse.isOrderNotCancelled()) {

@@ -21,21 +21,26 @@ export default async function CheckoutSummaryPage({
     checkoutId,
   });
 
-  if (checkoutSummaryDataResponse.type === "error") {
-    // Sends the error to the error boundary
-    throw new CheckoutSummaryPageError(checkoutSummaryDataResponse.message);
+  if (checkoutSummaryDataResponse?.serverError) {
+    throw new CheckoutSummaryPageError(
+      checkoutSummaryDataResponse.serverError.message,
+    );
+  }
+
+  if (!checkoutSummaryDataResponse?.data) {
+    throw new CheckoutSummaryPageError("No checkout data found");
   }
 
   const checkout = readFragment(
     CheckoutFragment,
-    checkoutSummaryDataResponse.value.checkout,
+    checkoutSummaryDataResponse.data.checkout,
   );
 
   return (
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       {checkout?.id ? (
         <Summary
-          data={checkoutSummaryDataResponse.value.checkout}
+          data={checkoutSummaryDataResponse.data.checkout}
           envUrl={decodedEnvUrl}
         />
       ) : (

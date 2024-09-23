@@ -4,12 +4,12 @@ import request from "graphql-request";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { createLogger } from "@/lib/logger";
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 import { createPath } from "@/lib/utils";
 
-import { ShippingAddressSchemaType } from "../components/shipping";
-
-const logger = createLogger("updateShippingAddress");
+import { ShippingAddressSchema } from "../schemas";
 
 const UpdateShippingAddressSchema = z.object({
   checkoutShippingAddressUpdate: z.object({
@@ -36,65 +36,52 @@ const UpdateShippingAddressMutation = graphql(`
   }
 `);
 
-export const updateShippingAddress = async (props: {
-  envUrl: string;
-  checkoutId: string;
-  shippingAddress: ShippingAddressSchemaType;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | {
-      type: "success";
-      value: z.infer<typeof UpdateShippingAddressSchema>;
-    }
-> => {
-  const { envUrl, checkoutId, shippingAddress } = props;
+const UpdateShippingAddressParsingResponseError = BaseError.subclass(
+  "UpdateShippingAddressParsingResponseError",
+);
+const UpdateShippingAddressMutationError = BaseError.subclass(
+  "UpdateShippingAddressMutationError",
+);
 
-  try {
+export const updateShippingAddress = actionClient
+  .schema(
+    z.object({
+      envUrl: envUrlSchema,
+      checkoutId: z.string(),
+      shippingAddress: ShippingAddressSchema,
+    }),
+  )
+  .metadata({ actionName: "updateShippingAddress" })
+  .action(async ({ parsedInput: { envUrl, checkoutId, shippingAddress } }) => {
     const response = await request(envUrl, UpdateShippingAddressMutation, {
       checkoutId,
       input: shippingAddress,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
     const parsedResponse = UpdateShippingAddressSchema.safeParse(response);
 
     if (parsedResponse.error) {
-      logger.error("Failed to parse updateShippingAddress response", {
-        error: parsedResponse.error,
-      });
-      return {
-        type: "error",
-        name: "ParsingUpdateShippingAddressError",
-        message: parsedResponse.error.message,
-      };
+      throw UpdateShippingAddressParsingResponseError.normalize(
+        parsedResponse.error,
+      );
     }
 
     if (parsedResponse.data.checkoutShippingAddressUpdate.errors.length > 0) {
-      logger.error("Failed to update shipping address of checkout", {
-        errors: parsedResponse.data.checkoutShippingAddressUpdate.errors,
-      });
-
-      return {
-        type: "error",
-        name: "UpdateShippingAddressError",
-        message:
-          "Failed to update billing address - errors in updateShippingAddress mutation",
-      };
+      throw new UpdateShippingAddressMutationError(
+        "Failed to create checkout - errors in createCheckout mutation.",
+        {
+          errors: parsedResponse.data.checkoutShippingAddressUpdate.errors.map(
+            (e) => UpdateShippingAddressMutationError.normalize(e),
+          ),
+        },
+      );
     }
 
     revalidatePath(
       createPath("env", encodeURIComponent(envUrl), "checkout", checkoutId),
     );
 
-    return {
-      type: "success",
-      value: parsedResponse.data,
-    };
-  } catch (error) {
-    logger.error("Failed to update shipping address", { error });
-    return {
-      type: "error",
-      name: "UpdateShippingAddressError",
-      message: "Failed to update shipping address",
-    };
-  }
-};
+    return parsedResponse.data;
+  });

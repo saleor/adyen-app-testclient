@@ -18,13 +18,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
+import { envUrlSchema } from "@/lib/env-url";
 
 import { fetchProduct } from "../actions";
 import { ProductFragment } from "../fragments";
 import { Cart } from "./cart";
 
 const EnvironmentConfigSchema = z.object({
-  url: z.string().url().min(1),
+  url: envUrlSchema,
   channelSlug: z.string().min(1),
 });
 
@@ -49,18 +50,18 @@ export const Environment = () => {
       envUrl: data.url,
     });
 
-    if (response.type === "success") {
-      setProducts(response.value.products?.edges.map((e) => e.node) ?? []);
+    if (response?.serverError) {
       toast({
-        title: "Successfully fetched products",
+        title: response.serverError.name,
+        variant: "destructive",
+        description: response.serverError.message,
       });
     }
 
-    if (response.type === "error") {
+    if (response?.data) {
+      setProducts(response?.data?.products?.edges.map((e) => e.node) ?? []);
       toast({
-        title: response.name,
-        variant: "destructive",
-        description: response.message,
+        title: "Successfully fetched products",
       });
     }
   };

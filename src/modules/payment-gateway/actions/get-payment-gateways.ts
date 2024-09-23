@@ -1,12 +1,13 @@
 "use server";
-import { graphql, ResultOf } from "gql.tada";
+import { graphql } from "gql.tada";
 import request from "graphql-request";
+import { z } from "zod";
 
-import { createLogger } from "@/lib/logger";
+import { envUrlSchema } from "@/lib/env-url";
+import { BaseError, UnknownError } from "@/lib/errors";
+import { actionClient } from "@/lib/safe-action";
 
 import { PaymentGatewayFragment, TotalPriceFragment } from "../fragments";
-
-const logger = createLogger("getPaymentGateways");
 
 const GetPaymentGatewaysQuery = graphql(
   `
@@ -24,27 +25,20 @@ const GetPaymentGatewaysQuery = graphql(
   [TotalPriceFragment, PaymentGatewayFragment],
 );
 
-export const getPaymentGateways = async (props: {
-  envUrl: string;
-  checkoutId: string;
-}): Promise<
-  | { type: "error"; name: string; message: string }
-  | { type: "success"; value: ResultOf<typeof GetPaymentGatewaysQuery> }
-> => {
-  const { envUrl, checkoutId } = props;
-
-  try {
+export const getPaymentGateways = actionClient
+  .schema(
+    z.object({
+      checkoutId: z.string(),
+      envUrl: envUrlSchema,
+    }),
+  )
+  .metadata({ actionName: "getPaymentGateways" })
+  .action(async ({ parsedInput: { envUrl, checkoutId } }) => {
     const response = await request(envUrl, GetPaymentGatewaysQuery, {
       checkoutId,
+    }).catch((error) => {
+      throw BaseError.normalize(error, UnknownError);
     });
 
-    return { type: "success", value: response };
-  } catch (error) {
-    logger.error("Failed to get payment gateways", { error });
-    return {
-      type: "error",
-      name: "GetPaymentGatewaysError",
-      message: "Failed to get payment gateways",
-    };
-  }
-};
+    return response;
+  });
