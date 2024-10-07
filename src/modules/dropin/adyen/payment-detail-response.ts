@@ -7,7 +7,9 @@ export class AdyenPaymentDetailResponse {
     private paymentDetailsResponse: z.infer<
       typeof TransactionProcessSchema
     >["transactionProcess"]["data"]["paymentDetailsResponse"],
-  ) {}
+  ) {
+    this.paymentDetailsResponse = paymentDetailsResponse;
+  }
 
   static createFromTransactionProcess(
     data: z.infer<typeof TransactionProcessSchema>,

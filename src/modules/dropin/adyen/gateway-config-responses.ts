@@ -14,7 +14,9 @@ const logger = createLogger("AdyenGatewayConfigResponse");
 export class AdyenGiftCardBalanceResponse {
   private constructor(
     private response: z.infer<typeof GiftCardBalanceResponseSchema>,
-  ) {}
+  ) {
+    this.response = response;
+  }
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
@@ -37,7 +39,9 @@ export class AdyenGiftCardBalanceResponse {
 export class AdyenOrderCreateResponse {
   private constructor(
     private response: z.infer<typeof OrderCreateResponseSchema>,
-  ) {}
+  ) {
+    this.response = response;
+  }
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
@@ -60,7 +64,9 @@ export class AdyenOrderCreateResponse {
 export class AdyenOrderCancelledResponse {
   private constructor(
     private response: z.infer<typeof OrderCancelResponseSchema>,
-  ) {}
+  ) {
+    this.response = response;
+  }
 
   static createFromInitializePaymentGateway(
     data: InitalizePaymentGatewaySchemaType,
