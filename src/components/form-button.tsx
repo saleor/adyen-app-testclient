@@ -1,7 +1,6 @@
 import { Loader2 } from "lucide-react";
-import React from "react";
 
-import { Button, ButtonProps } from "./ui/button";
+import { Button, type ButtonProps } from "./ui/button";
 
 interface FormButtonProps extends ButtonProps {
   loading?: boolean;

@@ -1,4 +1,4 @@
-import { type ILogObj, ILogObjMeta, Logger } from "tslog";
+import { type ILogObj, type ILogObjMeta, Logger } from "tslog";
 
 import { env } from "@/env";
 
@@ -46,18 +46,14 @@ export const logger = new Logger<ILogObj>({
 });
 
 logger.attachTransport((log) => {
-  const {
-    message,
-    attributes,
-    _meta: { name },
-  } = log as ILogObj &
+  const { message, attributes, meta } = log as ILogObj &
     ILogObjMeta & {
       message: string;
       attributes: Record<string, unknown>;
     };
 
   // eslint-disable-next-line no-console
-  console.log(`${name}: ${message}`, JSON.stringify(attributes, null, 2));
+  console.log(`${meta?.name}: ${message}`, JSON.stringify(attributes, null, 2));
 });
 
 export const createLogger = (name: string, params?: Record<string, unknown>) =>

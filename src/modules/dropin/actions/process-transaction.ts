@@ -6,12 +6,9 @@ import { z } from "zod";
 
 import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { createLogger } from "@/lib/logger";
 import { actionClient } from "@/lib/safe-action";
 
 import { TransactionProcessSchema } from "../schemas/transaction-process";
-
-const logger = createLogger("processTransaction");
 
 const processTransactionMutation = graphql(`
   mutation transactionProcess($transactionId: ID!, $data: JSON) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { FragmentOf, readFragment } from "gql.tada";
+import { type FragmentOf, readFragment } from "gql.tada";
 import Image from "next/image";
 import { useTransition } from "react";
 
@@ -27,7 +27,7 @@ export const Cart = (props: {
       const response = await createCheckout({
         envUrl,
         channelSlug,
-        variantId: products[0].defaultVariant?.id ?? "",
+        variantId: products[0]?.defaultVariant?.id ?? "",
       });
 
       if (response?.serverError) {

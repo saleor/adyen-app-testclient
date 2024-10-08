@@ -5,12 +5,9 @@ import { z } from "zod";
 
 import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { createLogger } from "@/lib/logger";
 import { actionClient } from "@/lib/safe-action";
 
 import { CheckoutFragment } from "../fragments";
-
-const logger = createLogger("getCheckoutSummary");
 
 const GetCheckoutSummaryQuery = graphql(
   `

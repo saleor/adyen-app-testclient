@@ -6,12 +6,9 @@ import { z } from "zod";
 
 import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { createLogger } from "@/lib/logger";
 import { actionClient } from "@/lib/safe-action";
 
 import { InitalizeTransactionSchema } from "../schemas";
-
-const logger = createLogger("initalizeTransaction");
 
 const initalizeTransactionMutation = graphql(`
   mutation InitalizeTransaction(
