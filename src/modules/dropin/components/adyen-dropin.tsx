@@ -2,12 +2,12 @@
 import "@adyen/adyen-web/dist/adyen.css";
 
 import AdyenCheckout from "@adyen/adyen-web";
-import { FragmentOf, readFragment } from "gql.tada";
+import { type FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
 import { getAdyenDropinConfig } from "../adyen";
 import { TotalPriceFragment } from "../fragments";
-import { InitalizePaymentGatewaySchemaType } from "../schemas";
+import { type InitalizePaymentGatewaySchemaType } from "../schemas";
 
 export const AdyenDropin = (props: {
   initalizePaymentGatewayData: InitalizePaymentGatewaySchemaType;
@@ -25,7 +25,8 @@ export const AdyenDropin = (props: {
     checkoutId,
     paymentGatewayId,
   } = props;
-  const gatewayConfig = gatewayConfigs[0];
+  // there are always going to be at least one gateway config
+  const gatewayConfig = gatewayConfigs[0]!;
   const { clientKey, environment, paymentMethodsResponse } = gatewayConfig.data;
   const totalPrice = readFragment(TotalPriceFragment, totalPriceData);
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);

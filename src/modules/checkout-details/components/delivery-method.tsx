@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FragmentOf, readFragment } from "gql.tada";
+import { type FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -68,7 +68,7 @@ export const DeliveryMethod = (props: {
     }
     // if there is only one shipping method, return its id
     if (shippingMethods.length === 1) {
-      return shippingMethods[0].id;
+      return shippingMethods[0]?.id;
     }
     // otherwise, return empty string
     return "";

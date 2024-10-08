@@ -10,10 +10,7 @@ export class AdyenPaymentResponse {
     private paymentResponse: z.infer<
       typeof InitalizeTransactionSchema
     >["transactionInitialize"]["data"]["paymentResponse"],
-  ) {
-    this.transaction = transaction;
-    this.paymentResponse = paymentResponse;
-  }
+  ) {}
 
   static createFromTransactionInitalize(
     data: z.infer<typeof InitalizeTransactionSchema>,

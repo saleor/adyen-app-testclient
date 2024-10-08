@@ -1,7 +1,7 @@
 "use client";
 
 import { lightFormat } from "date-fns";
-import { FragmentOf, readFragment } from "gql.tada";
+import { type FragmentOf, readFragment } from "gql.tada";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
