@@ -4,7 +4,7 @@ import { createLogger } from "@/lib/logger";
 
 import {
   GiftCardBalanceResponseSchema,
-  InitalizePaymentGatewaySchemaType,
+  type InitalizePaymentGatewaySchemaType,
   OrderCancelResponseSchema,
   OrderCreateResponseSchema,
 } from "../schemas";
@@ -25,7 +25,7 @@ export class AdyenGiftCardBalanceResponse {
       );
     }
     return new AdyenGiftCardBalanceResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0].data.giftCardBalanceResponse,
+      data.paymentGatewayInitialize.gatewayConfigs[0]?.data.giftCardBalanceResponse,
     );
   }
 
@@ -48,7 +48,7 @@ export class AdyenOrderCreateResponse {
       );
     }
     return new AdyenOrderCreateResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0].data.orderCreateResponse,
+      data.paymentGatewayInitialize.gatewayConfigs[0]?.data.orderCreateResponse,
     );
   }
 
@@ -71,7 +71,7 @@ export class AdyenOrderCancelledResponse {
       );
     }
     return new AdyenOrderCancelledResponse(
-      data.paymentGatewayInitialize.gatewayConfigs[0].data.orderCancelResponse,
+      data.paymentGatewayInitialize.gatewayConfigs[0]?.data.orderCancelResponse,
     );
   }
 

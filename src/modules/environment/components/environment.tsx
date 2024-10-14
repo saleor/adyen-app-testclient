@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FragmentOf } from "gql.tada";
+import { type FragmentOf } from "gql.tada";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

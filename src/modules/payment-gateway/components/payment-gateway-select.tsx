@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FragmentOf, readFragment } from "gql.tada";
+import { type FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -45,7 +45,7 @@ export const PaymentGatewaySelect = (props: {
   const getDefaultPaymentGatewayId = () => {
     // if there is only one available payment gateway, return its id
     if (availablePaymentGateways.length === 1) {
-      return availablePaymentGateways[0].id;
+      return availablePaymentGateways[0]?.id;
     }
     // otherwise, return empty string
     return "";
