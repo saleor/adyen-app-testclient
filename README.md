@@ -1,5 +1,8 @@
 # Adyen app testclient
 
+> [!TIP]
+> Questions or issues? Check our [discord](https://discord.gg/H52JTZAtSH) channel for help.
+
 This repository contains code for example testclient that should be used with [Adyen app](https://github.com/saleor/saleor-app-payment-adyen). It allows to create & complete checkout while paying with Adyen.
 
 ## How to get started
