@@ -10,11 +10,12 @@ export class SaleorPrice {
   static ArgsParseError = BaseError.subclass("ArgsParseError");
 
   private static ArgsSchema = z.object({
-    amount: z
+    floatAmount: z
       .number()
       .refine((value) => Number.isFinite(value) && value % 1 !== 0, {
         message: "Expected float, received integer",
       }),
+    currency: z.string(),
   });
 
   private constructor(
@@ -26,7 +27,7 @@ export class SaleorPrice {
     return this.currency;
   }
 
-  static create(args: { amount: number; currency: string }) {
+  static create(args: z.infer<typeof SaleorPrice.ArgsSchema>) {
     const parsedArgs = SaleorPrice.ArgsSchema.safeParse(args);
 
     if (parsedArgs.success === false) {
@@ -35,13 +36,16 @@ export class SaleorPrice {
       });
     }
 
-    return new SaleorPrice(new Decimal(args.amount), args.currency);
+    return new SaleorPrice(
+      new Decimal(parsedArgs.data.floatAmount),
+      parsedArgs.data.currency,
+    );
   }
 
   toAdyenPrice(): AdyenPrice {
     return AdyenPrice.create({
       currency: this.currency,
-      amount: this.amount.times(100).toNumber(),
+      integerAmount: this.amount.times(100).toNumber(),
     });
   }
 
@@ -57,7 +61,7 @@ export class AdyenPrice {
   static ArgsParseError = BaseError.subclass("ArgsParseError");
 
   private static ArgsSchema = z.object({
-    amount: z.number().int(),
+    integerAmount: z.number().int(),
     currency: z.string(),
   });
 
@@ -76,7 +80,7 @@ export class AdyenPrice {
     }
 
     return new AdyenPrice(
-      new Decimal(parsedArgs.data.amount),
+      new Decimal(parsedArgs.data.integerAmount),
       parsedArgs.data.currency,
     );
   }
@@ -84,7 +88,7 @@ export class AdyenPrice {
   toSaleorPrice(): SaleorPrice {
     return SaleorPrice.create({
       currency: this.currency,
-      amount: this.amount.dividedBy(100).toNumber(),
+      floatAmount: this.amount.dividedBy(100).toNumber(),
     });
   }
 

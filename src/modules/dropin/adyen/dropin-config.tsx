@@ -288,7 +288,7 @@ export const getAdyenDropinConfig = (props: {
       }
 
       const priceFromAdyenBalanceCheck = AdyenPrice.create({
-        amount: balanceCheckResponse.balance.value,
+        integerAmount: balanceCheckResponse.balance.value,
         currency: balanceCheckResponse.balance.currency,
       });
 

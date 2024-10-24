@@ -47,7 +47,7 @@ export const AdyenDropin = (props: {
     });
 
     const priceFromSaleorCheckout = SaleorPrice.create({
-      amount: totalPrice.gross.amount,
+      floatAmount: totalPrice.gross.amount,
       currency: totalPrice.gross.currency,
     });
 
