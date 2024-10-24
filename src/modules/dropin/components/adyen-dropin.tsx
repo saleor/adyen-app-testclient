@@ -6,6 +6,7 @@ import { type FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
 import { getAdyenDropinConfig } from "../adyen";
+import { SaleorPrice } from "../adyen/price";
 import { TotalPriceFragment } from "../fragments";
 import { type InitalizePaymentGatewaySchemaType } from "../schemas";
 
@@ -31,6 +32,10 @@ export const AdyenDropin = (props: {
   const totalPrice = readFragment(TotalPriceFragment, totalPriceData);
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);
 
+  if (!totalPrice) {
+    throw new Error("Total price is missing");
+  }
+
   const initDropin = async () => {
     // We first need to create the Checkout instance, to later pass it into the config
     // this is required for onOrderCancel handler
@@ -39,15 +44,19 @@ export const AdyenDropin = (props: {
       environment,
     });
 
+    const priceFromSaleorCheckout = SaleorPrice.create({
+      amount: totalPrice.gross.amount,
+      currency: totalPrice.gross.currency,
+    });
+
     await adyenCheckout.update(
       getAdyenDropinConfig({
         paymentMethodsResponse,
-        totalPriceAmount: totalPrice?.gross.amount,
-        totalPriceCurrency: totalPrice?.gross.currency,
         envUrl,
         checkoutId,
         paymentGatewayId,
         checkout: adyenCheckout,
+        priceFromSaleorCheckout,
       }),
     );
     if (dropinContainerRef.current) {

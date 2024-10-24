@@ -76,6 +76,7 @@ export const initalizeTransaction = actionClient
       }).catch((error) => {
         throw BaseError.normalize(error, UnknownError);
       });
+
       const parsedResponse = InitalizeTransactionSchema.safeParse(response);
 
       if (parsedResponse.error) {

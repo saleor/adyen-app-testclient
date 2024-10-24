@@ -18,6 +18,8 @@ import {
 } from "./gateway-config-responses";
 import { AdyenPaymentDetailResponse } from "./payment-detail-response";
 import { AdyenPaymentResponse } from "./payment-response";
+import { AdyenPrice, SaleorPrice } from "./price";
+import { SplitPaymentSaleorPriceResolver } from "./split-payment-saleor-price-resolver";
 
 const logger = createLogger("getAdyenDropinConfig");
 
@@ -29,26 +31,28 @@ export const getAdyenDropinConfig = (props: {
   paymentMethodsResponse:
     | z.infer<typeof PaymentMethodsResponseSchema>
     | undefined;
-  totalPriceAmount: number | undefined;
-  totalPriceCurrency: string | undefined;
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
   checkout: AdyenCheckout;
+  priceFromSaleorCheckout: SaleorPrice;
 }): CoreConfiguration => {
   const {
     paymentMethodsResponse,
-    totalPriceAmount = 0,
-    totalPriceCurrency = "",
     envUrl,
     checkoutId,
     paymentGatewayId,
     checkout,
+    priceFromSaleorCheckout,
   } = props;
+
+  const splitPaymentSaleorPriceResolver = new SplitPaymentSaleorPriceResolver();
 
   const paypalPaymentMethod = paymentMethodsResponse?.paymentMethods.find(
     (method) => method.type === "paypal",
   );
+
+  const adyenPrice = priceFromSaleorCheckout.toAdyenPrice();
 
   return {
     locale: "en-US",
@@ -57,8 +61,8 @@ export const getAdyenDropinConfig = (props: {
       paypal: paypalPaymentMethod?.configuration,
     },
     amount: {
-      value: totalPriceAmount * 100,
-      currency: totalPriceCurrency,
+      currency: adyenPrice.getCurrency(),
+      value: adyenPrice.getAmount(),
     },
     onError: (error) => {
       toast({
@@ -120,11 +124,16 @@ export const getAdyenDropinConfig = (props: {
     },
     onSubmit: async (state, dropin) => {
       dropin.setStatus("loading");
+
+      const saleorPrice =
+        splitPaymentSaleorPriceResolver.resolveToSaleorPrice() ||
+        priceFromSaleorCheckout;
+
       const transactionInitializeResponse = await initalizeTransaction({
         envUrl,
         checkoutId,
         paymentGatewayId,
-        amount: totalPriceAmount,
+        amount: saleorPrice.getAmount(),
         data: {
           ...state.data,
           returnUrl: window.location.href,
@@ -132,6 +141,8 @@ export const getAdyenDropinConfig = (props: {
         },
         idempotencyKey: window.crypto.randomUUID(),
       });
+
+      splitPaymentSaleorPriceResolver.resetAdyenSplitPaymentPrice();
 
       if (transactionInitializeResponse?.serverError) {
         toast({
@@ -265,7 +276,27 @@ export const getAdyenDropinConfig = (props: {
           initalizePaymentGatewayDataResponse?.data,
         );
 
-      void resolve(adyenBallanceCheckResponse.getResponse());
+      const balanceCheckResponse = adyenBallanceCheckResponse.getResponse();
+
+      if (!balanceCheckResponse?.balance) {
+        toast({
+          title: "Error while checking balance",
+          description: "No balance data back from Adyen app",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const priceFromAdyenBalanceCheck = AdyenPrice.create({
+        amount: balanceCheckResponse.balance.value,
+        currency: balanceCheckResponse.balance.currency,
+      });
+
+      splitPaymentSaleorPriceResolver.setAdyenSplitPaymentPrice(
+        priceFromAdyenBalanceCheck,
+      );
+
+      void resolve(balanceCheckResponse);
     },
     onOrderRequest: async (resolve) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onorderrequest
@@ -275,6 +306,7 @@ export const getAdyenDropinConfig = (props: {
           checkoutId,
           paymentGatewayId,
           data: { action: "createOrder" },
+          amount: priceFromSaleorCheckout.getAmount(),
         },
       );
 
@@ -307,13 +339,20 @@ export const getAdyenDropinConfig = (props: {
       void resolve(adyenOrderCreateResponse.getResponse());
     },
     // @ts-expect-error - onOrderCancel is not wrongly defined in the types
-    onOrderCancel: async ({ order }: { order: Order }) => {
+    onOrderCancel: async ({ order, _rest }: { order: Order }) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onordercancel
+      // TODO: add currency conversion lib here
+      // const amountToCancel =
+      //   (totalPriceAmount * 100 - order.remainingAmount?.value) / 100;
+      // console.log("onOrderCancel", { order, amountToCancel });
+
       const initalizePaymentGatewayDataResponse = await initalizePaymentGateway(
         {
           envUrl,
           checkoutId,
           paymentGatewayId,
+          // TODO: add amount here
+          // amount: amountToCancel,
           data: {
             action: "cancelOrder",
             pspReference: order.pspReference,

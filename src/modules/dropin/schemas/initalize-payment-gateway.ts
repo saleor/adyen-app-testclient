@@ -2,11 +2,18 @@ import { z } from "zod";
 
 import { PaymentMethodsResponseSchema } from "./payment-method-response";
 
-export const GiftCardBalanceResponseSchema = z.any({}).optional();
+export const GiftCardBalanceResponseSchema = z
+  .object({
+    balance: z.object({
+      value: z.number(),
+      currency: z.string(),
+    }),
+  })
+  .optional();
 export const OrderCreateResponseSchema = z.any({}).optional();
 export const OrderCancelResponseSchema = z
   .object({
-    resultCode: z.string(),
+    resultCode: z.string().optional(),
   })
   .optional();
 
