@@ -16,7 +16,8 @@
     "lint": "next lint",
     "prepare": "husky",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest --watch",
+    "test:ci": "vitest"
   },
   "dependencies": {
     "@adyen/adyen-web": "^5.66.1",

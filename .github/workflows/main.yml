@@ -29,4 +29,4 @@ jobs:
           pnpm gql-turbo
           git diff --name-status --exit-code .
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:ci

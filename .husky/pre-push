@@ -1,4 +1,4 @@
 pnpm check-types
 pnpm gql-generate
 pnpm gql-turbo
-pnpm test
+pnpm test:ci
