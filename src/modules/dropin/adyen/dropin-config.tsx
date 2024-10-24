@@ -184,6 +184,7 @@ export const getAdyenDropinConfig = (props: {
       if (adyenPaymentResponse.isSuccessful()) {
         dropin.setStatus("success");
         await redirectToCheckoutSummary({ paymentGatewayId });
+        return;
       }
 
       if (adyenPaymentResponse.isCancelled()) {

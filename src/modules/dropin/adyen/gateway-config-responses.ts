@@ -76,6 +76,6 @@ export class AdyenOrderCancelledResponse {
   }
 
   isOrderNotCancelled() {
-    return !this.response || this.response.resultCode !== "Cancelled";
+    return !this.response || this.response.resultCode !== "Received";
   }
 }
