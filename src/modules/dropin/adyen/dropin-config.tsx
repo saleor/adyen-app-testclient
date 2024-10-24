@@ -339,7 +339,7 @@ export const getAdyenDropinConfig = (props: {
       void resolve(adyenOrderCreateResponse.getResponse());
     },
     // @ts-expect-error - onOrderCancel is not wrongly defined in the types
-    onOrderCancel: async ({ order, _rest }: { order: Order }) => {
+    onOrderCancel: async ({ order }: { order: Order }) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onordercancel
       const initalizePaymentGatewayDataResponse = await initalizePaymentGateway(
         {
