@@ -5,6 +5,8 @@ import AdyenCheckout from "@adyen/adyen-web";
 import { type FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
+import { UnknownError } from "@/lib/errors";
+
 import { getAdyenDropinConfig } from "../adyen";
 import { SaleorPrice } from "../adyen/price";
 import { TotalPriceFragment } from "../fragments";
@@ -33,7 +35,7 @@ export const AdyenDropin = (props: {
   const dropinContainerRef = useRef<HTMLDivElement | null>(null);
 
   if (!totalPrice) {
-    throw new Error("Total price is missing");
+    throw new UnknownError("Total price is missing from Saleor response.");
   }
 
   const initDropin = async () => {

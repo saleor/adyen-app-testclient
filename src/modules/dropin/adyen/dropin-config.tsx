@@ -341,18 +341,11 @@ export const getAdyenDropinConfig = (props: {
     // @ts-expect-error - onOrderCancel is not wrongly defined in the types
     onOrderCancel: async ({ order, _rest }: { order: Order }) => {
       // https://docs.saleor.io/developer/app-store/apps/adyen/storefront#onordercancel
-      // TODO: add currency conversion lib here
-      // const amountToCancel =
-      //   (totalPriceAmount * 100 - order.remainingAmount?.value) / 100;
-      // console.log("onOrderCancel", { order, amountToCancel });
-
       const initalizePaymentGatewayDataResponse = await initalizePaymentGateway(
         {
           envUrl,
           checkoutId,
           paymentGatewayId,
-          // TODO: add amount here
-          // amount: amountToCancel,
           data: {
             action: "cancelOrder",
             pspReference: order.pspReference,
