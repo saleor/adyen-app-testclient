@@ -10,11 +10,7 @@ export class SaleorPrice {
   static ArgsParseError = BaseError.subclass("ArgsParseError");
 
   private static ArgsSchema = z.object({
-    floatAmount: z
-      .number()
-      .refine((value) => Number.isFinite(value) && value % 1 !== 0, {
-        message: "Expected float, received integer",
-      }),
+    floatAmount: z.number(),
     currency: z.string(),
   });
 

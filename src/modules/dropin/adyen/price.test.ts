@@ -12,22 +12,6 @@ describe("SaleorPrice", () => {
 
     expect(adyenPrice.getAmount()).toBe(10011);
   });
-
-  it("should throw an error when creating SaleorPrice with integer as amount", () => {
-    expect(() => SaleorPrice.create({ floatAmount: 10011, currency: "USD" }))
-      .toThrowErrorMatchingInlineSnapshot(`
-        [ArgsParseError: ZodError: [
-          {
-            "code": "custom",
-            "message": "Expected float, received integer",
-            "path": [
-              "floatAmount"
-            ]
-          }
-        ]
-        Invalid arguments]
-      `);
-  });
 });
 
 describe("AdyenPrice", () => {
