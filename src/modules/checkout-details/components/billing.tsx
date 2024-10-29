@@ -17,11 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { updateBillingAddress } from "../actions";
+import { updateBillingAddress } from "../actions/update-billing-address";
 import { getDefaultAddressByCountryCode } from "../address";
 import { convertStringToCountryCode } from "../countries";
-import { BillingAddressFragment } from "../fragments";
-import { BillingAddressSchema } from "../schemas";
+import { BillingAddressFragment } from "../fragments/billing-address";
+import { BillingAddressSchema } from "../schemas/billing-address";
 
 export type BillingAddressSchemaType = z.infer<typeof BillingAddressSchema>;
 

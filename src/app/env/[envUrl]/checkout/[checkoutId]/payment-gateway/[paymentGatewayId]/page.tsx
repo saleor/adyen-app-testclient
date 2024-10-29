@@ -1,12 +1,10 @@
 import { readFragment } from "gql.tada";
 
 import { BaseError } from "@/lib/errors";
-import {
-  AdyenDropin,
-  getCheckoutTotalPrice,
-  initalizePaymentGateway,
-  TotalPriceFragment,
-} from "@/modules/dropin";
+import { getCheckoutTotalPrice } from "@/modules/dropin/actions/get-checkout-total-price";
+import { initalizePaymentGateway } from "@/modules/dropin/actions/initalize-payment-gateway";
+import { AdyenDropin } from "@/modules/dropin/components/adyen-dropin";
+import { TotalPriceFragment } from "@/modules/dropin/fragments";
 
 const PaymentGatewayError = BaseError.subclass("PaymentGatewayError");
 

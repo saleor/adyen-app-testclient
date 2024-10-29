@@ -7,7 +7,7 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
-import { InitalizePaymentGatewaySchema } from "../schemas";
+import { InitalizePaymentGatewaySchema } from "../schemas/initalize-payment-gateway";
 
 const InitalizePaymentGatewayMutation = graphql(`
   mutation initalizePaymentGateway(

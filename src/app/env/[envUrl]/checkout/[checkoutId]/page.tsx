@@ -1,10 +1,8 @@
 import { BaseError } from "@/lib/errors";
-import {
-  Billing,
-  DeliveryMethod,
-  getCheckoutDetails,
-  Shipping,
-} from "@/modules/checkout-details";
+import { getCheckoutDetails } from "@/modules/checkout-details/actions/get-checkout-details";
+import { Billing } from "@/modules/checkout-details/components/billing";
+import { DeliveryMethod } from "@/modules/checkout-details/components/delivery-method";
+import { Shipping } from "@/modules/checkout-details/components/shipping";
 
 const CheckoutDetailsPageError = BaseError.subclass("CheckoutDetailsPageError");
 

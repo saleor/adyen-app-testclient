@@ -9,7 +9,7 @@ import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 import { createPath } from "@/lib/utils";
 
-import { BillingAddressSchema } from "../schemas";
+import { BillingAddressSchema } from "../schemas/billing-address";
 
 const UpdateBillingAddressSchema = z.object({
   checkoutBillingAddressUpdate: z.object({

@@ -7,7 +7,7 @@ import { useTransition } from "react";
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
 
-import { createCheckout } from "../actions";
+import { createCheckout } from "../actions/create-checkout";
 import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {

@@ -7,10 +7,10 @@ import { useEffect, useRef } from "react";
 
 import { UnknownError } from "@/lib/errors";
 
-import { getAdyenDropinConfig } from "../adyen";
+import { getAdyenDropinConfig } from "../adyen/dropin-config";
 import { SaleorPrice } from "../adyen/price";
 import { TotalPriceFragment } from "../fragments";
-import { type InitalizePaymentGatewaySchemaType } from "../schemas";
+import type { InitalizePaymentGatewaySchemaType } from "../schemas/initalize-payment-gateway";
 
 export const AdyenDropin = (props: {
   initalizePaymentGatewayData: InitalizePaymentGatewaySchemaType;

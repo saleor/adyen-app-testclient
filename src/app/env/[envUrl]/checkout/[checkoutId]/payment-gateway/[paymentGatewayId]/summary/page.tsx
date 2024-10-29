@@ -2,11 +2,9 @@ import { readFragment } from "gql.tada";
 import Link from "next/link";
 
 import { BaseError } from "@/lib/errors";
-import {
-  CheckoutFragment,
-  getCheckoutSummary,
-  Summary,
-} from "@/modules/summary";
+import { getCheckoutSummary } from "@/modules/summary/actions/get-checkout-summary";
+import { Summary } from "@/modules/summary/components/summary";
+import { CheckoutFragment } from "@/modules/summary/fragments";
 
 const CheckoutSummaryPageError = BaseError.subclass("CheckoutSummaryPageError");
 

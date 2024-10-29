@@ -1,4 +1,4 @@
-import { Environment } from "@/modules/environment";
+import { Environment } from "@/modules/environment/components/environment";
 
 export default function IndexPage() {
   return (

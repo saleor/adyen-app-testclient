@@ -8,7 +8,7 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
-import { InitalizeTransactionSchema } from "../schemas";
+import { InitalizeTransactionSchema } from "../schemas/initalize-transaction";
 
 const initalizeTransactionMutation = graphql(`
   mutation InitalizeTransaction(
