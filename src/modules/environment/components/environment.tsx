@@ -20,7 +20,7 @@ import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 import { envUrlSchema } from "@/lib/env-url";
 
-import { fetchProduct } from "../actions";
+import { fetchProduct } from "../actions/fetch-product";
 import { ProductFragment } from "../fragments";
 import { Cart } from "./cart";
 

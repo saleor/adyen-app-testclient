@@ -8,13 +8,13 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
+import { BillingAddressFragment } from "../fragments/billing-address";
 import {
-  BillingAddressFragment,
   CollectionPointFragment,
   DeliveryMethodFragment,
-  ShippingAddressFragment,
   ShippingMethodFragment,
-} from "../fragments";
+} from "../fragments/delivery-method";
+import { ShippingAddressFragment } from "../fragments/shipping";
 
 const GetCheckoutQuery = graphql(
   `

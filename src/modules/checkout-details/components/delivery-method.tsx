@@ -24,10 +24,10 @@ import { toast } from "@/components/ui/use-toast";
 
 import { updateDeliveryMethod } from "../actions/update-delivery-method";
 import {
-  CollectionPointFragment,
+  type CollectionPointFragment,
   DeliveryMethodFragment,
   ShippingMethodFragment,
-} from "../fragments";
+} from "../fragments/delivery-method";
 
 const DeliveryMethodSchema = z.object({
   deliveryMethodId: z.string(),

@@ -17,11 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 
-import { updateShippingAddress } from "../actions";
+import { updateShippingAddress } from "../actions/update-shipping-address";
 import { getDefaultAddressByCountryCode } from "../address";
 import { convertStringToCountryCode } from "../countries";
-import { ShippingAddressFragment } from "../fragments";
-import { ShippingAddressSchema } from "../schemas";
+import { ShippingAddressFragment } from "../fragments/shipping";
+import { ShippingAddressSchema } from "../schemas/shipping-address";
 
 export type ShippingAddressSchemaType = z.infer<typeof ShippingAddressSchema>;
 

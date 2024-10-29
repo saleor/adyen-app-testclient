@@ -1,8 +1,6 @@
 import { BaseError } from "@/lib/errors";
-import {
-  getPaymentGateways,
-  PaymentGatewaySelect,
-} from "@/modules/payment-gateway";
+import { getPaymentGateways } from "@/modules/payment-gateway/actions/get-payment-gateways";
+import { PaymentGatewaySelect } from "@/modules/payment-gateway/components/payment-gateway-select";
 
 const PaymentGatewaysError = BaseError.subclass("PaymentGatewaysError");
 

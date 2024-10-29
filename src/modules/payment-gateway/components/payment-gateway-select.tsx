@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 
-import { redirectToAdyenDropin } from "../actions";
+import { redirectToAdyenDropin } from "../actions/redirect-to-adyen-dropin";
 import { PaymentGatewayFragment } from "../fragments";
 
 const PaymentGatewaySchema = z.object({

@@ -2,12 +2,12 @@ import { z } from "zod";
 
 import { createLogger } from "@/lib/logger";
 
-import {
+import type {
   GiftCardBalanceResponseSchema,
-  type InitalizePaymentGatewaySchemaType,
+  InitalizePaymentGatewaySchemaType,
   OrderCancelResponseSchema,
   OrderCreateResponseSchema,
-} from "../schemas";
+} from "../schemas/initalize-payment-gateway";
 
 const logger = createLogger("AdyenGatewayConfigResponse");
 

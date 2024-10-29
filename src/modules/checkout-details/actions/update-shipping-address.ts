@@ -9,7 +9,7 @@ import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 import { createPath } from "@/lib/utils";
 
-import { ShippingAddressSchema } from "../schemas";
+import { ShippingAddressSchema } from "../schemas/shipping-address";
 
 const UpdateShippingAddressSchema = z.object({
   checkoutShippingAddressUpdate: z.object({
