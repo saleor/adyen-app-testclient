@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { FormButton } from "@/components/form-button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -102,7 +103,11 @@ export const Environment = () => {
                 )}
               />
             </div>
-            <div className="grid">
+            <div className="flex w-full items-center justify-between">
+              <Button variant="outline" type="reset">
+                Clear idempotency key
+              </Button>
+
               <FormButton
                 type="submit"
                 variant="secondary"

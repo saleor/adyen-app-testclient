@@ -2,6 +2,7 @@ import AdyenCheckout from "@adyen/adyen-web";
 import { z } from "zod";
 
 import { toast } from "@/components/ui/use-toast";
+import { clearIdempotencyKey, getIdempotencyKey } from "@/lib/idempotency-key";
 import { createLogger } from "@/lib/logger";
 
 import { initalizePaymentGateway } from "../actions/initalize-payment-gateway";
@@ -110,12 +111,16 @@ export const getAdyenDropinConfig = (props: {
           description: adyenPaymentDetailResponse.getRefusalReason(),
           variant: "destructive",
         });
+        dropin?.setStatus("ready");
+        return;
       }
 
       // @ts-expect-error - method is not defined in the types
       dropin?.handleResponse(adyenPaymentDetailResponse.getRawResponse());
 
       if (adyenPaymentDetailResponse.isSuccessful()) {
+        clearIdempotencyKey();
+
         dropin?.setStatus("success");
         await redirectToCheckoutSummary({ paymentGatewayId });
       }
@@ -137,7 +142,7 @@ export const getAdyenDropinConfig = (props: {
           returnUrl: window.location.href,
           origin: window.location.origin,
         },
-        idempotencyKey: window.crypto.randomUUID(),
+        idempotencyKey: getIdempotencyKey(),
       });
 
       splitPaymentSaleorPriceResolver.resetAdyenSplitPaymentPrice();
@@ -170,6 +175,8 @@ export const getAdyenDropinConfig = (props: {
         );
 
       if (adyenPaymentResponse.isRedirectOrAdditionalActionFlow()) {
+        clearIdempotencyKey();
+
         dropin.setState({
           saleorTransactionId: adyenPaymentResponse.getSaleorTransactionId(),
         });
@@ -184,6 +191,8 @@ export const getAdyenDropinConfig = (props: {
       }
 
       if (adyenPaymentResponse.hasOrderWithRemainingAmount()) {
+        clearIdempotencyKey();
+
         // @ts-expect-error Wrong types in Adyen Web SDK - handleOrder is defined
         dropin.handleOrder(adyenPaymentResponse.getPaymentResponse());
 
@@ -191,12 +200,15 @@ export const getAdyenDropinConfig = (props: {
       }
 
       if (adyenPaymentResponse.isSuccessful()) {
+        clearIdempotencyKey();
         dropin.setStatus("success");
         await redirectToCheckoutSummary({ paymentGatewayId });
         return;
       }
 
       if (adyenPaymentResponse.isCancelled()) {
+        clearIdempotencyKey();
+
         toast({
           title: "Payment cancelled",
           variant: "destructive",
@@ -218,11 +230,15 @@ export const getAdyenDropinConfig = (props: {
       }
 
       if (adyenPaymentResponse.isRefused()) {
+        clearIdempotencyKey();
+
         toast({
           title: "Payment refused",
           description: "Your payment has been refused.",
           variant: "destructive",
         });
+
+        dropin.setStatus("ready");
 
         return;
       }
