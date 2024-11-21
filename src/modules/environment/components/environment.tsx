@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 import { envUrlSchema } from "@/lib/env-url";
+import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
 import { fetchProduct } from "../actions/fetch-product";
 import { ProductFragment } from "../fragments";
@@ -104,7 +105,16 @@ export const Environment = () => {
               />
             </div>
             <div className="flex w-full items-center justify-between">
-              <Button variant="outline" type="reset">
+              <Button
+                variant="outline"
+                type="reset"
+                onClick={() => {
+                  clearIdempotencyKey();
+                  toast({
+                    title: "Successfully cleared idempotency key",
+                  });
+                }}
+              >
                 Clear idempotency key
               </Button>
 
