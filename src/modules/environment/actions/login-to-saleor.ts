@@ -6,7 +6,7 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
-const SignInMutation = graphql(`
+const LoginMutation = graphql(`
   mutation createToken($email: String!, $password: String!) {
     tokenCreate(email: $email, password: $password) {
       user {
@@ -23,7 +23,7 @@ const SignInMutation = graphql(`
   }
 `);
 
-export const sigInToSaleor = actionClient
+export const loginToSaleor = actionClient
   .schema(
     z.object({
       email: z.string(),
@@ -33,7 +33,7 @@ export const sigInToSaleor = actionClient
   )
   .metadata({ actionName: "signInToSaleor" })
   .action(async ({ parsedInput: { email, password, envUrl } }) => {
-    const response = await request(envUrl, SignInMutation, {
+    const response = await request(envUrl, LoginMutation, {
       email,
       password,
     }).catch((error) => {

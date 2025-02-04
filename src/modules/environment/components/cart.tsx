@@ -11,7 +11,7 @@ import { env } from "@/env";
 import { analytics } from "@/lib/segment";
 
 import { createCheckout } from "../actions/create-checkout";
-import { sigInToSaleor } from "../actions/sign-in";
+import { loginToSaleor } from "../actions/login-to-saleor";
 import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {
@@ -86,18 +86,39 @@ export const Cart = (props: {
           <Button
             variant="outline"
             onClick={async () => {
-              const response = await sigInToSaleor({
+              const response = await loginToSaleor({
                 envUrl,
                 email: env.NEXT_PUBLIC_STOREFRONT_USER_EMAIL,
                 password: env.NEXT_PUBLIC_STOREFRONT_USER_PASSWORD,
               });
 
+              if (response?.serverError) {
+                toast({
+                  title: response.serverError.name,
+                  variant: "destructive",
+                  description: response.serverError.message,
+                });
+              }
+
+              if (response?.data?.tokenCreate?.errors) {
+                toast({
+                  title: `${response.data.tokenCreate.errors.map((error) => error.code).join(", ")}`,
+                  variant: "destructive",
+                  description: response.data.tokenCreate.errors
+                    .map((error) => error.message)
+                    .join(", "),
+                });
+              }
+
               if (response?.data?.tokenCreate?.user) {
                 analytics.identify(response.data.tokenCreate.user.id, {
                   email: response.data.tokenCreate.user.email,
                 });
+
+                toast({
+                  title: "Successfully logged in",
+                });
               }
-              console.log(response);
             }}
           >
             Login user
