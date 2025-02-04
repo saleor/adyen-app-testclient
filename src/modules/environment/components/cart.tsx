@@ -5,9 +5,13 @@ import Image from "next/image";
 import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { env } from "@/env";
+import { analytics } from "@/lib/segment";
 
 import { createCheckout } from "../actions/create-checkout";
+import { sigInToSaleor } from "../actions/sign-in";
 import { ProductFragment } from "../fragments";
 
 export const Cart = (props: {
@@ -28,6 +32,7 @@ export const Cart = (props: {
         envUrl,
         channelSlug,
         variantId: products[0]?.defaultVariant?.id ?? "",
+        email: env.NEXT_PUBLIC_STOREFRONT_USER_EMAIL,
       });
 
       if (response?.serverError) {
@@ -77,7 +82,26 @@ export const Cart = (props: {
             </div>
           </div>
         ))}
-        <div className="grid">
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            onClick={async () => {
+              const response = await sigInToSaleor({
+                envUrl,
+                email: env.NEXT_PUBLIC_STOREFRONT_USER_EMAIL,
+                password: env.NEXT_PUBLIC_STOREFRONT_USER_PASSWORD,
+              });
+
+              if (response?.data?.tokenCreate?.user) {
+                analytics.identify(response.data.tokenCreate.user.id, {
+                  email: response.data.tokenCreate.user.email,
+                });
+              }
+              console.log(response);
+            }}
+          >
+            Login user
+          </Button>
           <FormButton
             type="submit"
             onClick={onClick}

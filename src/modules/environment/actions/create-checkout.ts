@@ -53,23 +53,34 @@ export const createCheckout = actionClient
       envUrl: envUrlSchema,
       channelSlug: z.string(),
       variantId: z.string(),
+      email: z.string(),
+      token: z.string().optional(),
     }),
   )
   .metadata({ actionName: "createCheckout" })
   .action(
-    async ({ parsedInput: { channelSlug, envUrl, variantId } }) => {
-      const response = await request(envUrl, CreateCheckoutMutation, {
-        input: {
-          channel: channelSlug,
-          email: "adyen-testclient@saleor.io",
-          lines: [
-            {
-              variantId,
-              quantity: 1,
-            },
-          ],
+    async ({
+      parsedInput: { channelSlug, email, variantId, envUrl, token },
+    }) => {
+      const response = await request(
+        envUrl,
+        CreateCheckoutMutation,
+        {
+          input: {
+            channel: channelSlug,
+            email,
+            lines: [
+              {
+                variantId,
+                quantity: 1,
+              },
+            ],
+          },
         },
-      }).catch((error) => {
+        {
+          Authorization: `Bearer ${token}`,
+        },
+      ).catch((error) => {
         throw BaseError.normalize(error, UnknownError);
       });
 
