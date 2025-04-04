@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
-import { type FragmentOf, readFragment } from "@/graphql/gql";
+import { type FragmentOf } from "@/graphql/gql";
 import { envUrlSchema } from "@/lib/env-url";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
