@@ -1,5 +1,5 @@
 import { TotalPriceFragment } from "@/graphql/fragments";
-import { type FragmentOf, readFragment } from "@/graphql/gql";
+import { readFragment } from "@/graphql/gql";
 import { getCheckoutTotalPrice } from "@/modules/stripe/actions/get-checkout-total-price";
 import { initializePaymentGateway } from "@/modules/stripe/actions/initalize-payment-gateway";
 import { StripeDropinWrapper } from "@/modules/stripe/components/stripe-dropin";
