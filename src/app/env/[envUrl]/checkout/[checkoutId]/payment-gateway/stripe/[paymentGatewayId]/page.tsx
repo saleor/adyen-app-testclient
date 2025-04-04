@@ -1,4 +1,5 @@
 import { initializePaymentGateway } from "@/modules/stripe/actions/initalize-payment-gateway";
+import { StripeDropinWrapper } from "@/modules/stripe/components/stripe-dropin";
 
 export default async function StripeDropinPage({
   params: { envUrl, checkoutId, paymentGatewayId },
@@ -17,5 +18,9 @@ export default async function StripeDropinPage({
   // @ts-ignore
   const publishableKey = initializedStripeData?.data.publishableKey as string;
 
-  return <div>{publishableKey}</div>;
+  return (
+    <div className="m-auto my-10 max-w-lg">
+      <StripeDropinWrapper pk={publishableKey} />
+    </div>
+  );
 }
