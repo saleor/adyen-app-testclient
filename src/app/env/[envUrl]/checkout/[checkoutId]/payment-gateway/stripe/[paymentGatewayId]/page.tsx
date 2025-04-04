@@ -1,3 +1,5 @@
+import { TotalPriceFragment } from "@/graphql/fragments";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { getCheckoutTotalPrice } from "@/modules/stripe/actions/get-checkout-total-price";
 import { initializePaymentGateway } from "@/modules/stripe/actions/initalize-payment-gateway";
 import { StripeDropinWrapper } from "@/modules/stripe/components/stripe-dropin";
@@ -24,7 +26,11 @@ export default async function StripeDropinPage({
   // @ts-ignore
   const publishableKey = initializedStripeData?.data.publishableKey as string;
 
-  const totalPrice = total?.data?.checkout?.totalPrice;
+  const totalPrice = total?.data?.checkout?.totalPrice as FragmentOf<
+    typeof TotalPriceFragment
+  >;
+
+  const amountInCents = totalPrice?.gross.amount * 100;
 
   return (
     <div className="m-auto my-10 max-w-lg">

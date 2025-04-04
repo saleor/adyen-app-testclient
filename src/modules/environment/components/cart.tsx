@@ -1,11 +1,11 @@
 "use client";
 
-import { type FragmentOf, readFragment } from "gql.tada";
 import Image from "next/image";
 import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 
 import { createCheckout } from "../actions/create-checkout";
 import { ProductFragment } from "../fragments";

@@ -1,6 +1,6 @@
-import { readFragment } from "gql.tada";
 import Link from "next/link";
 
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
 import { getCheckoutSummary } from "@/modules/summary/actions/get-checkout-summary";
 import { Summary } from "@/modules/summary/components/summary";

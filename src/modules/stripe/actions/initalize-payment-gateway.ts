@@ -1,8 +1,8 @@
 "use server";
-import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { z } from "zod";
 
+import { graphql } from "@/graphql/gql";
 import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";

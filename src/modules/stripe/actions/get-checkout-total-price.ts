@@ -1,25 +1,11 @@
 "use server";
-import { graphql } from "gql.tada";
 import request from "graphql-request";
 import { z } from "zod";
 
+import { GetCheckoutTotalPriceQuery } from "@/graphql/CheckoutTotalPrice";
 import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
-import { TotalPriceFragment } from "@/modules/dropin/fragments";
-
-const GetCheckoutTotalPriceQuery = graphql(
-  `
-    query GetCheckoutTotalPrice($checkoutId: ID!) {
-      checkout(id: $checkoutId) {
-        totalPrice {
-          ...TotalPrice
-        }
-      }
-    }
-  `,
-  [TotalPriceFragment],
-);
 
 export const getCheckoutTotalPrice = actionClient
   .schema(

@@ -50,8 +50,8 @@ importers:
         specifier: 2.5.1
         version: 2.5.1
       gql.tada:
-        specifier: ^1.8.2
-        version: 1.8.2(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)
+        specifier: ^1.8.10
+        version: 1.8.10(graphql@16.9.0)(typescript@5.5.3)
       graphql:
         specifier: ^16.9.0
         version: 16.9.0
@@ -168,10 +168,10 @@ packages:
       graphql:
         optional: true
 
-  "@0no-co/graphqlsp@1.12.11":
+  "@0no-co/graphqlsp@1.12.16":
     resolution:
       {
-        integrity: sha512-vLja9r7L6BBXwxW86Wyi5z5hjTHscH7qoQooy+MXHkM9srBB6ZuesYZq5DQ/+SErQrFyaxeY+hwv2qBAksxriw==,
+        integrity: sha512-B5pyYVH93Etv7xjT6IfB7QtMBdaaC07yjbhN6v8H7KgFStMkPvi+oWYBTibMFRMY89qwc9H8YixXg8SXDVgYWw==,
       }
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
@@ -651,20 +651,27 @@ packages:
         integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==,
       }
 
-  "@gql.tada/cli-utils@1.5.1":
+  "@gql.tada/cli-utils@1.6.3":
     resolution:
       {
-        integrity: sha512-JVLpoXLa4msrE7MHnmW/7fYnIl8dncLom8T/Ghsxu+Kz5iMGnzK2joJN5cZt4ewCAqfCV3HZZ0VH189OalGd9g==,
+        integrity: sha512-jFFSY8OxYeBxdKi58UzeMXG1tdm4FVjXa8WHIi66Gzu9JWtCE6mqom3a8xkmSw+mVaybFW5EN2WXf1WztJVNyQ==,
       }
     peerDependencies:
-      "@0no-co/graphqlsp": ^1.12.9
+      "@0no-co/graphqlsp": ^1.12.13
+      "@gql.tada/svelte-support": 1.0.1
+      "@gql.tada/vue-support": 1.0.1
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
+    peerDependenciesMeta:
+      "@gql.tada/svelte-support":
+        optional: true
+      "@gql.tada/vue-support":
+        optional: true
 
-  "@gql.tada/internal@1.0.4":
+  "@gql.tada/internal@1.0.8":
     resolution:
       {
-        integrity: sha512-tq0rgoqjhdVqKWEsbrkiX7Qpp5gA4/Br9r9TVBeh3WpJIcuGh5U48UjB4IOxtXBePZdX8E0oc07GjOid/P60Wg==,
+        integrity: sha512-XYdxJhtHC5WtZfdDqtKjcQ4d7R1s0d1rnlSs3OcBEUbYiPoJJfZU7tWsVXuv047Z6msvmr4ompJ7eLSK5Km57g==,
       }
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
@@ -1648,47 +1655,6 @@ packages:
         integrity: sha512-xpiVfDSg1RrYT0tX6czgerkpcKFmFOF/gCr30+Mve5V2kewCy4Prn1/NDMSRwaSmT7PRaOF83wu+bEtsY1wrvA==,
       }
 
-  "@volar/language-core@2.4.0-alpha.15":
-    resolution:
-      {
-        integrity: sha512-mt8z4Fm2WxfQYoQHPcKVjLQV6PgPqyKLbkCVY2cr5RSaamqCHjhKEpsFX66aL4D/7oYguuaUw9Bx03Vt0TpIIA==,
-      }
-
-  "@volar/source-map@2.4.0-alpha.15":
-    resolution:
-      {
-        integrity: sha512-8Htngw5TmBY4L3ClDqBGyfLhsB8EmoEXUH1xydyEtEoK0O6NX5ur4Jw8jgvscTlwzizyl/wsN1vn0cQXVbbXYg==,
-      }
-
-  "@vue/compiler-core@3.4.31":
-    resolution:
-      {
-        integrity: sha512-skOiodXWTV3DxfDhB4rOf3OGalpITLlgCeOwb+Y9GJpfQ8ErigdBUHomBzvG78JoVE8MJoQsb+qhZiHfKeNeEg==,
-      }
-
-  "@vue/compiler-dom@3.4.31":
-    resolution:
-      {
-        integrity: sha512-wK424WMXsG1IGMyDGyLqB+TbmEBFM78hIsOJ9QwUVLGrcSk0ak6zYty7Pj8ftm7nEtdU/DGQxAXp0/lM/2cEpQ==,
-      }
-
-  "@vue/language-core@2.0.26":
-    resolution:
-      {
-        integrity: sha512-/lt6SfQ3O1yDAhPsnLv9iSUgXd1dMHqUm/t3RctfqjuwQf1LnftZ414X3UBn6aXT4MiwXWtbNJ4Z0NZWwDWgJQ==,
-      }
-    peerDependencies:
-      typescript: "*"
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  "@vue/shared@3.4.31":
-    resolution:
-      {
-        integrity: sha512-Yp3wtJk//8cO4NItOPpi3QkLExAr/aLBGZMmTtW9WpdwBCJpRM6zj9WgWktXAl8IDIozwNMByT45JP3tO3ACWA==,
-      }
-
   acorn-jsx@5.3.2:
     resolution:
       {
@@ -1811,12 +1777,6 @@ packages:
         integrity: sha512-R5iJ5lkuHybztUfuOAznmboyjWq8O6sqNqtK7CLOqdydi54VNbORp49mb14KbWgG1QD3JFO9hJdZ+y4KutfdOQ==,
       }
 
-  aria-query@5.3.0:
-    resolution:
-      {
-        integrity: sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==,
-      }
-
   array-buffer-byte-length@1.0.1:
     resolution:
       {
@@ -1923,12 +1883,6 @@ packages:
     resolution:
       {
         integrity: sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==,
-      }
-
-  axobject-query@4.0.0:
-    resolution:
-      {
-        integrity: sha512-+60uv1hiVFhHZeO+Lz0RYzsVHy5Wr1ayX0mwda9KPDVLNJgZ1T9Ny7VmFbLDzxsH0D87I86vgj3gFrjTJUYznw==,
       }
 
   balanced-match@1.0.2:
@@ -2114,12 +2068,6 @@ packages:
       }
     engines: { node: ">=6" }
 
-  code-red@1.0.4:
-    resolution:
-      {
-        integrity: sha512-7qJWqItLA8/VPVlKJlFXU+NBlo/qyfs39aJcuMT/2ere32ZqvF5OSxgdM5xOfJJ7O429gg2HM47y8v9P+9wrNw==,
-      }
-
   color-convert@1.9.3:
     resolution:
       {
@@ -2172,12 +2120,6 @@ packages:
       }
     engines: { node: ">= 6" }
 
-  computeds@0.0.1:
-    resolution:
-      {
-        integrity: sha512-7CEBgcMjVmitjYo5q8JTJVra6X5mQ20uTThdK+0kR7UEaDrAWEQcRiBtWJzga4eRpP6afNwwLsX2SET2JhVB1Q==,
-      }
-
   concat-map@0.0.1:
     resolution:
       {
@@ -2202,13 +2144,6 @@ packages:
         integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==,
       }
     engines: { node: ">= 8" }
-
-  css-tree@2.3.1:
-    resolution:
-      {
-        integrity: sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==,
-      }
-    engines: { node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0 }
 
   cssesc@3.0.0:
     resolution:
@@ -2271,12 +2206,6 @@ packages:
         integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==,
       }
 
-  de-indent@1.0.2:
-    resolution:
-      {
-        integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==,
-      }
-
   debug@3.2.7:
     resolution:
       {
@@ -2322,12 +2251,6 @@ packages:
     resolution:
       {
         integrity: sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==,
-      }
-
-  dedent-js@1.0.1:
-    resolution:
-      {
-        integrity: sha512-OUepMozQULMLUmhxS95Vudo0jb0UchLimi3+pQ2plj61Fcy8axbP9hbiD4Sz6DPqn6XG3kfmziVfQ1rSys5AJQ==,
       }
 
   deep-eql@5.0.2:
@@ -2376,13 +2299,6 @@ packages:
         integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==,
       }
     engines: { node: ">=0.4.0" }
-
-  dequal@2.0.3:
-    resolution:
-      {
-        integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==,
-      }
-    engines: { node: ">=6" }
 
   detect-node-es@1.1.0:
     resolution:
@@ -2742,12 +2658,6 @@ packages:
       }
     engines: { node: ">=4.0" }
 
-  estree-walker@2.0.2:
-    resolution:
-      {
-        integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==,
-      }
-
   estree-walker@3.0.3:
     resolution:
       {
@@ -3017,10 +2927,10 @@ packages:
         integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==,
       }
 
-  gql.tada@1.8.2:
+  gql.tada@1.8.10:
     resolution:
       {
-        integrity: sha512-LLt+2RcLY6i+Rq+LQQwx3uiEAPfA+pmEaAo/bJjUdaV1CVJBy3Wowds6GHeerW5kvekRM/XdbPTJw5OvnLq/DQ==,
+        integrity: sha512-FrvSxgz838FYVPgZHGOSgbpOjhR+yq44rCzww3oOPJYi0OvBJjAgCiP6LEokZIYND2fUTXzQAyLgcvgw1yNP5A==,
       }
     hasBin: true
     peerDependencies:
@@ -3117,13 +3027,6 @@ packages:
         integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==,
       }
     engines: { node: ">= 0.4" }
-
-  he@1.2.0:
-    resolution:
-      {
-        integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==,
-      }
-    hasBin: true
 
   html-encoding-sniffer@4.0.0:
     resolution:
@@ -3401,12 +3304,6 @@ packages:
         integrity: sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ==,
       }
 
-  is-reference@3.0.2:
-    resolution:
-      {
-        integrity: sha512-v3rht/LgVcsdZa3O2Nqs+NMowLOxeOm7Ay9+/ARQ2F+qEoANRcqrjAZKGN0v8ymUetZGgkp26LTnGT7H0Qo9Pg==,
-      }
-
   is-regex@1.1.4:
     resolution:
       {
@@ -3659,12 +3556,6 @@ packages:
       }
     engines: { node: ">=18.0.0" }
 
-  locate-character@3.0.0:
-    resolution:
-      {
-        integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==,
-      }
-
   locate-path@6.0.0:
     resolution:
       {
@@ -3716,12 +3607,6 @@ packages:
         integrity: sha512-23I4pFZHmAemUnz8WZXbYRSKYj801VDaNv9ETuMh7IrMc7VuVVSo+Z9iLE3ni30+U48iDWfi30d3twAXBYmnCg==,
       }
 
-  lower-case@2.0.2:
-    resolution:
-      {
-        integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==,
-      }
-
   lru-cache@10.4.3:
     resolution:
       {
@@ -3746,12 +3631,6 @@ packages:
     resolution:
       {
         integrity: sha512-Ea8I3sQMVXr8JhN4z+H/d8zwo+tYDgHE9+5G4Wnrwhs0gaK9fXTKx0Tw5Xwsd/bCPTTZNRAdpyzvoeORe9LYpw==,
-      }
-
-  mdn-data@2.0.30:
-    resolution:
-      {
-        integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==,
       }
 
   merge-error-cause@5.0.0:
@@ -3870,12 +3749,6 @@ packages:
         integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==,
       }
 
-  muggle-string@0.4.1:
-    resolution:
-      {
-        integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==,
-      }
-
   mz@2.7.0:
     resolution:
       {
@@ -3940,12 +3813,6 @@ packages:
         optional: true
       sass:
         optional: true
-
-  no-case@3.0.4:
-    resolution:
-      {
-        integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==,
-      }
 
   node-releases@2.0.18:
     resolution:
@@ -4131,18 +3998,6 @@ packages:
         integrity: sha512-ZkDsAOcxsUMZ4Lz5fVciOehNcJ+Gb8gTzcA4yl3wnc273BAybYWrQ+Ks/OjCjSEpjvQkDSeZbybK9qj2VHHdGA==,
       }
 
-  pascal-case@3.1.2:
-    resolution:
-      {
-        integrity: sha512-uWlGT3YSnK9x3BQJaOdcZwrnV6hPpd8jFH1/ucpiLRPh/2zCVJKS19E4GvYHvaCcACn3foXZ0cLB9Wrx1KGe5g==,
-      }
-
-  path-browserify@1.0.1:
-    resolution:
-      {
-        integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==,
-      }
-
   path-exists@4.0.0:
     resolution:
       {
@@ -4203,12 +4058,6 @@ packages:
         integrity: sha512-vE7JKRyES09KiunauX7nd2Q9/L7lhok4smP9RZTDeD4MVs72Dp2qNFVz39Nz5a0FVEW0BJR6C0DYrq6unoziZA==,
       }
     engines: { node: ">= 14.16" }
-
-  periscopic@3.1.0:
-    resolution:
-      {
-        integrity: sha512-vKiQ8RRtkl9P+r/+oefh25C3fhybptkHKCZSPlcXiJux2tJF55GnEj3BVn4A5gKfq9NWWXXrxkHBwVPUfH0opw==,
-      }
 
   picocolors@1.0.1:
     resolution:
@@ -5037,22 +4886,6 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
-  svelte2tsx@0.7.13:
-    resolution:
-      {
-        integrity: sha512-aObZ93/kGAiLXA/I/kP+x9FriZM+GboB/ReOIGmLNbVGEd2xC+aTCppm3mk1cc9I/z60VQf7b2QDxC3jOXu3yw==,
-      }
-    peerDependencies:
-      svelte: ^3.55 || ^4.0.0-next.0 || ^4.0 || ^5.0.0-next.0
-      typescript: ^4.9.4 || ^5.0.0
-
-  svelte@4.2.18:
-    resolution:
-      {
-        integrity: sha512-d0FdzYIiAePqRJEb90WlJDkjUEx42xhivxN8muUBmfZnP+tzUgz12DJ2hRJi8sIHCME7jeK1PTMgKPSfTd8JrA==,
-      }
-    engines: { node: ">=16" }
-
   symbol-tree@3.2.4:
     resolution:
       {
@@ -5407,12 +5240,6 @@ packages:
       jsdom:
         optional: true
 
-  vue-template-compiler@2.7.16:
-    resolution:
-      {
-        integrity: sha512-AYbUWAJHLGGQM7+cNTELw+KsOG9nl2CnSv467WobS5Cv9uk3wFcnr1Etsz2sEIHEZvw1U+o9mRlEO6QbZvUPGQ==,
-      }
-
   w3c-xmlserializer@5.0.0:
     resolution:
       {
@@ -5607,9 +5434,9 @@ snapshots:
     optionalDependencies:
       graphql: 16.9.0
 
-  "@0no-co/graphqlsp@1.12.11(graphql@16.9.0)(typescript@5.5.3)":
+  "@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.3)":
     dependencies:
-      "@gql.tada/internal": 1.0.4(graphql@16.9.0)(typescript@5.5.3)
+      "@gql.tada/internal": 1.0.8(graphql@16.9.0)(typescript@5.5.3)
       graphql: 16.9.0
       typescript: 5.5.3
 
@@ -5885,19 +5712,14 @@ snapshots:
 
   "@floating-ui/utils@0.2.4": {}
 
-  "@gql.tada/cli-utils@1.5.1(@0no-co/graphqlsp@1.12.11(graphql@16.9.0)(typescript@5.5.3))(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)":
+  "@gql.tada/cli-utils@1.6.3(@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.3))(graphql@16.9.0)(typescript@5.5.3)":
     dependencies:
-      "@0no-co/graphqlsp": 1.12.11(graphql@16.9.0)(typescript@5.5.3)
-      "@gql.tada/internal": 1.0.4(graphql@16.9.0)(typescript@5.5.3)
-      "@vue/compiler-dom": 3.4.31
-      "@vue/language-core": 2.0.26(typescript@5.5.3)
+      "@0no-co/graphqlsp": 1.12.16(graphql@16.9.0)(typescript@5.5.3)
+      "@gql.tada/internal": 1.0.8(graphql@16.9.0)(typescript@5.5.3)
       graphql: 16.9.0
-      svelte2tsx: 0.7.13(svelte@4.2.18)(typescript@5.5.3)
       typescript: 5.5.3
-    transitivePeerDependencies:
-      - svelte
 
-  "@gql.tada/internal@1.0.4(graphql@16.9.0)(typescript@5.5.3)":
+  "@gql.tada/internal@1.0.8(graphql@16.9.0)(typescript@5.5.3)":
     dependencies:
       "@0no-co/graphql.web": 1.0.7(graphql@16.9.0)
       graphql: 16.9.0
@@ -6497,40 +6319,6 @@ snapshots:
       loupe: 3.1.2
       tinyrainbow: 1.2.0
 
-  "@volar/language-core@2.4.0-alpha.15":
-    dependencies:
-      "@volar/source-map": 2.4.0-alpha.15
-
-  "@volar/source-map@2.4.0-alpha.15": {}
-
-  "@vue/compiler-core@3.4.31":
-    dependencies:
-      "@babel/parser": 7.24.7
-      "@vue/shared": 3.4.31
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
-
-  "@vue/compiler-dom@3.4.31":
-    dependencies:
-      "@vue/compiler-core": 3.4.31
-      "@vue/shared": 3.4.31
-
-  "@vue/language-core@2.0.26(typescript@5.5.3)":
-    dependencies:
-      "@volar/language-core": 2.4.0-alpha.15
-      "@vue/compiler-dom": 3.4.31
-      "@vue/shared": 3.4.31
-      computeds: 0.0.1
-      minimatch: 9.0.5
-      muggle-string: 0.4.1
-      path-browserify: 1.0.1
-      vue-template-compiler: 2.7.16
-    optionalDependencies:
-      typescript: 5.5.3
-
-  "@vue/shared@3.4.31": {}
-
   acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
       acorn: 8.12.1
@@ -6598,10 +6386,6 @@ snapshots:
   aria-query@5.1.3:
     dependencies:
       deep-equal: 2.2.3
-
-  aria-query@5.3.0:
-    dependencies:
-      dequal: 2.0.3
 
   array-buffer-byte-length@1.0.1:
     dependencies:
@@ -6692,10 +6476,6 @@ snapshots:
   axobject-query@3.1.1:
     dependencies:
       deep-equal: 2.2.3
-
-  axobject-query@4.0.0:
-    dependencies:
-      dequal: 2.0.3
 
   balanced-match@1.0.2: {}
 
@@ -6802,14 +6582,6 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  code-red@1.0.4:
-    dependencies:
-      "@jridgewell/sourcemap-codec": 1.5.0
-      "@types/estree": 1.0.6
-      acorn: 8.12.1
-      estree-walker: 3.0.3
-      periscopic: 3.1.0
-
   color-convert@1.9.3:
     dependencies:
       color-name: 1.1.3
@@ -6832,8 +6604,6 @@ snapshots:
 
   commander@4.1.1: {}
 
-  computeds@0.0.1: {}
-
   concat-map@0.0.1: {}
 
   convert-source-map@2.0.0: {}
@@ -6845,11 +6615,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  css-tree@2.3.1:
-    dependencies:
-      mdn-data: 2.0.30
-      source-map-js: 1.2.1
 
   cssesc@3.0.0: {}
 
@@ -6886,8 +6651,6 @@ snapshots:
 
   date-fns@3.6.0: {}
 
-  de-indent@1.0.2: {}
-
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
@@ -6903,8 +6666,6 @@ snapshots:
   decimal.js-light@2.5.1: {}
 
   decimal.js@10.4.3: {}
-
-  dedent-js@1.0.1: {}
 
   deep-eql@5.0.2: {}
 
@@ -6949,8 +6710,6 @@ snapshots:
       object-keys: 1.1.1
 
   delayed-stream@1.0.0: {}
-
-  dequal@2.0.3: {}
 
   detect-node-es@1.1.0: {}
 
@@ -7342,8 +7101,6 @@ snapshots:
 
   estraverse@5.3.0: {}
 
-  estree-walker@2.0.2: {}
-
   estree-walker@3.0.3:
     dependencies:
       "@types/estree": 1.0.5
@@ -7520,16 +7277,17 @@ snapshots:
     dependencies:
       get-intrinsic: 1.2.4
 
-  gql.tada@1.8.2(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3):
+  gql.tada@1.8.10(graphql@16.9.0)(typescript@5.5.3):
     dependencies:
       "@0no-co/graphql.web": 1.0.7(graphql@16.9.0)
-      "@0no-co/graphqlsp": 1.12.11(graphql@16.9.0)(typescript@5.5.3)
-      "@gql.tada/cli-utils": 1.5.1(@0no-co/graphqlsp@1.12.11(graphql@16.9.0)(typescript@5.5.3))(graphql@16.9.0)(svelte@4.2.18)(typescript@5.5.3)
-      "@gql.tada/internal": 1.0.4(graphql@16.9.0)(typescript@5.5.3)
+      "@0no-co/graphqlsp": 1.12.16(graphql@16.9.0)(typescript@5.5.3)
+      "@gql.tada/cli-utils": 1.6.3(@0no-co/graphqlsp@1.12.16(graphql@16.9.0)(typescript@5.5.3))(graphql@16.9.0)(typescript@5.5.3)
+      "@gql.tada/internal": 1.0.8(graphql@16.9.0)(typescript@5.5.3)
       typescript: 5.5.3
     transitivePeerDependencies:
+      - "@gql.tada/svelte-support"
+      - "@gql.tada/vue-support"
       - graphql
-      - svelte
 
   graceful-fs@4.2.11: {}
 
@@ -7565,8 +7323,6 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
-
-  he@1.2.0: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
@@ -7704,10 +7460,6 @@ snapshots:
   is-plain-obj@4.1.0: {}
 
   is-potential-custom-element-name@1.0.1: {}
-
-  is-reference@3.0.2:
-    dependencies:
-      "@types/estree": 1.0.6
 
   is-regex@1.1.4:
     dependencies:
@@ -7892,8 +7644,6 @@ snapshots:
       rfdc: 1.4.1
       wrap-ansi: 9.0.0
 
-  locate-character@3.0.0: {}
-
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
@@ -7920,10 +7670,6 @@ snapshots:
 
   loupe@3.1.2: {}
 
-  lower-case@2.0.2:
-    dependencies:
-      tslib: 2.6.3
-
   lru-cache@10.4.3: {}
 
   lru-cache@5.1.1:
@@ -7937,8 +7683,6 @@ snapshots:
   magic-string@0.30.12:
     dependencies:
       "@jridgewell/sourcemap-codec": 1.5.0
-
-  mdn-data@2.0.30: {}
 
   merge-error-cause@5.0.0:
     dependencies:
@@ -8004,8 +7748,6 @@ snapshots:
 
   ms@2.1.3: {}
 
-  muggle-string@0.4.1: {}
-
   mz@2.7.0:
     dependencies:
       any-promise: 1.3.0
@@ -8048,11 +7790,6 @@ snapshots:
     transitivePeerDependencies:
       - "@babel/core"
       - babel-plugin-macros
-
-  no-case@3.0.4:
-    dependencies:
-      lower-case: 2.0.2
-      tslib: 2.6.3
 
   node-releases@2.0.18: {}
 
@@ -8165,13 +7902,6 @@ snapshots:
     dependencies:
       entities: 4.5.0
 
-  pascal-case@3.1.2:
-    dependencies:
-      no-case: 3.0.4
-      tslib: 2.6.3
-
-  path-browserify@1.0.1: {}
-
   path-exists@4.0.0: {}
 
   path-is-absolute@1.0.1: {}
@@ -8192,12 +7922,6 @@ snapshots:
   pathe@1.1.2: {}
 
   pathval@2.0.0: {}
-
-  periscopic@3.1.0:
-    dependencies:
-      "@types/estree": 1.0.6
-      estree-walker: 3.0.3
-      is-reference: 3.0.2
 
   picocolors@1.0.1: {}
 
@@ -8657,30 +8381,6 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte2tsx@0.7.13(svelte@4.2.18)(typescript@5.5.3):
-    dependencies:
-      dedent-js: 1.0.1
-      pascal-case: 3.1.2
-      svelte: 4.2.18
-      typescript: 5.5.3
-
-  svelte@4.2.18:
-    dependencies:
-      "@ampproject/remapping": 2.3.0
-      "@jridgewell/sourcemap-codec": 1.5.0
-      "@jridgewell/trace-mapping": 0.3.25
-      "@types/estree": 1.0.6
-      acorn: 8.12.1
-      aria-query: 5.3.0
-      axobject-query: 4.0.0
-      code-red: 1.0.4
-      css-tree: 2.3.1
-      estree-walker: 3.0.3
-      is-reference: 3.0.2
-      locate-character: 3.0.0
-      magic-string: 0.30.12
-      periscopic: 3.1.0
-
   symbol-tree@3.2.4: {}
 
   tailwind-merge@2.4.0: {}
@@ -8915,11 +8615,6 @@ snapshots:
       - sugarss
       - supports-color
       - terser
-
-  vue-template-compiler@2.7.16:
-    dependencies:
-      de-indent: 1.0.2
-      he: 1.2.0
 
   w3c-xmlserializer@5.0.0:
     dependencies:

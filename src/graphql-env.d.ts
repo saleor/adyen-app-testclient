@@ -1,20 +1,7 @@
 /* eslint-disable */
 /* prettier-ignore */
 
-/** An IntrospectionQuery representation of your schema.
- *
- * @remarks
- * This is an introspection of your schema saved as a file by GraphQLSP.
- * It will automatically be used by `gql.tada` to infer the types of your GraphQL documents.
- * If you need to reuse this data or update your `scalars`, update `tadaOutputLocation` to
- * instead save to a .ts instead of a .d.ts file.
- */
-export type introspection = {
-  name: never;
-  query: 'Query';
-  mutation: 'Mutation';
-  subscription: 'Subscription';
-  types: {
+export type introspection_types = {
     'AccountAddressCreate': { kind: 'OBJECT'; name: 'AccountAddressCreate'; fields: { 'accountErrors': { name: 'accountErrors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'address': { name: 'address'; type: { kind: 'OBJECT'; name: 'Address'; ofType: null; } }; 'errors': { name: 'errors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'user': { name: 'user'; type: { kind: 'OBJECT'; name: 'User'; ofType: null; } }; }; };
     'AccountAddressDelete': { kind: 'OBJECT'; name: 'AccountAddressDelete'; fields: { 'accountErrors': { name: 'accountErrors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'address': { name: 'address'; type: { kind: 'OBJECT'; name: 'Address'; ofType: null; } }; 'errors': { name: 'errors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'user': { name: 'user'; type: { kind: 'OBJECT'; name: 'User'; ofType: null; } }; }; };
     'AccountAddressUpdate': { kind: 'OBJECT'; name: 'AccountAddressUpdate'; fields: { 'accountErrors': { name: 'accountErrors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'address': { name: 'address'; type: { kind: 'OBJECT'; name: 'Address'; ofType: null; } }; 'errors': { name: 'errors'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'OBJECT'; name: 'AccountError'; ofType: null; }; }; }; } }; 'user': { name: 'user'; type: { kind: 'OBJECT'; name: 'User'; ofType: null; } }; }; };
@@ -1343,7 +1330,22 @@ export type introspection = {
     '_Any': unknown;
     '_Entity': { kind: 'UNION'; name: '_Entity'; fields: {}; possibleTypes: 'Address' | 'App' | 'Category' | 'Collection' | 'Group' | 'Order' | 'PageType' | 'Product' | 'ProductMedia' | 'ProductType' | 'ProductVariant' | 'User'; };
     '_Service': { kind: 'OBJECT'; name: '_Service'; fields: { 'sdl': { name: 'sdl'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; }; };
-  };
+};
+
+/** An IntrospectionQuery representation of your schema.
+ *
+ * @remarks
+ * This is an introspection of your schema saved as a file by GraphQLSP.
+ * It will automatically be used by `gql.tada` to infer the types of your GraphQL documents.
+ * If you need to reuse this data or update your `scalars`, update `tadaOutputLocation` to
+ * instead save to a .ts instead of a .d.ts file.
+ */
+export type introspection = {
+  name: never;
+  query: 'Query';
+  mutation: 'Mutation';
+  subscription: 'Subscription';
+  types: introspection_types;
 };
 
 import * as gqlTada from 'gql.tada';

@@ -1,4 +1,4 @@
-import { graphql } from "gql.tada";
+import { graphql } from "@/graphql/gql";
 
 export const ShippingAddressFragment = graphql(`
   fragment ShippingAddress on Address {

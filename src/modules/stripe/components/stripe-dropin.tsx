@@ -9,6 +9,11 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+
+/**
+ * Copies from stripe react package
+ */
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -63,15 +68,9 @@ const CheckoutForm = () => {
     <form onSubmit={handleSubmit}>
       <PaymentElement />
       <div className="flex justify-stretch">
-        <button
-          className={
-            "my-4 w-full rounded-md bg-black px-4 py-2 text-xl font-semibold text-white"
-          }
-          type="submit"
-          disabled={!stripe || !elements}
-        >
+        <Button type="submit" disabled={!stripe || !elements}>
           Pay
-        </button>
+        </Button>
       </div>
       {/* Show error message to your customers */}
       {errorMessage && <div>{errorMessage}</div>}
