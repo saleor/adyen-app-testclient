@@ -26,9 +26,14 @@ export default async function StripeDropinPage({
   // @ts-ignore
   const publishableKey = initializedStripeData?.data.publishableKey as string;
 
-  const totalPrice = total?.data?.checkout?.totalPrice as FragmentOf<
-    typeof TotalPriceFragment
-  >;
+  const totalPrice = readFragment(
+    TotalPriceFragment,
+    total?.data?.checkout?.totalPrice,
+  );
+
+  if (!totalPrice?.gross.amount) {
+    throw new Error("Amount empty");
+  }
 
   const amountInCents = totalPrice?.gross.amount * 100;
 
@@ -36,7 +41,7 @@ export default async function StripeDropinPage({
     <div className="m-auto my-10 max-w-lg">
       <StripeDropinWrapper
         pk={publishableKey}
-        amount={totalPrice?.gross.amount * 100}
+        amount={amountInCents}
         currency={totalPrice?.gross.currency.toLowerCase()}
       />
     </div>
