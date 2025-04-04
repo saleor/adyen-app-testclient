@@ -2,7 +2,6 @@
 
 import {
   Elements,
-  ElementsConsumer,
   PaymentElement,
   useElements,
   useStripe,
@@ -80,13 +79,21 @@ const CheckoutForm = () => {
   );
 };
 
-export const StripeDropinWrapper = ({ pk }: { pk: string }) => {
+export const StripeDropinWrapper = ({
+  pk,
+  amount,
+  currency,
+}: {
+  pk: string;
+  amount: number;
+  currency: string;
+}) => {
   return (
     <Elements
       stripe={loadStripe(pk)}
       options={{
-        amount: 100 * 100,
-        currency: "usd",
+        amount: amount,
+        currency: currency,
         mode: "payment",
       }}
     >
