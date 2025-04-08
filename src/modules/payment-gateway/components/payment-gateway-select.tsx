@@ -61,7 +61,8 @@ export const PaymentGatewaySelect = (props: {
 
   async function onSubmit(data: PaymentGatewaySchemaType) {
     switch (data.paymentGatewayId) {
-      case "app.saleor.stripe": {
+      case "app.saleor.stripe":
+      case "saleor.app.payment.stripe-v2": {
         toast({
           title: "Payment gateway selected",
           description: "Redirecting to Stripe",

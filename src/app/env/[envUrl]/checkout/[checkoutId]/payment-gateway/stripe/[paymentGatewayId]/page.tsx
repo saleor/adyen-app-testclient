@@ -24,7 +24,8 @@ export default async function StripeDropinPage({
   });
 
   // @ts-ignore
-  const publishableKey = initializedStripeData?.data.publishableKey as string;
+  const publishableKey = initializedStripeData?.data
+    .stripePublishableKey as string;
 
   const totalPrice = readFragment(
     TotalPriceFragment,

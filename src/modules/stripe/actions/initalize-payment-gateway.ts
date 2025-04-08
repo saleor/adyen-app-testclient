@@ -93,6 +93,8 @@ export const initializePaymentGateway = actionClient
         );
       }
 
-      return config.data;
+      return config.data as {
+        stripePublishableKey: string;
+      };
     },
   );
