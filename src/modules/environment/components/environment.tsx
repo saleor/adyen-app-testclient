@@ -53,11 +53,7 @@ export const Environment = () => {
     });
 
     if (response?.serverError) {
-      toast({
-        title: response.serverError.name,
-        variant: "destructive",
-        description: response.serverError.message,
-      });
+      throw response.serverError;
     }
 
     if (response?.data) {

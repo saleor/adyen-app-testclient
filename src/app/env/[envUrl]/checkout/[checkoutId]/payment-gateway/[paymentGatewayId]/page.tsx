@@ -21,10 +21,7 @@ export default async function PaymentGatewayPage({
   });
 
   if (checkoutTotalPriceDataResponse?.serverError) {
-    // Sends the error to the error boundary
-    throw new PaymentGatewayError(
-      checkoutTotalPriceDataResponse.serverError.message,
-    );
+    throw checkoutTotalPriceDataResponse.serverError;
   }
 
   const totalPrice = readFragment(
@@ -40,10 +37,7 @@ export default async function PaymentGatewayPage({
   });
 
   if (initalizePaymentGatewayDataResponse?.serverError) {
-    // Sends the error to the error boundary
-    throw new PaymentGatewayError(
-      initalizePaymentGatewayDataResponse.serverError.message,
-    );
+    throw initalizePaymentGatewayDataResponse.serverError;
   }
 
   if (!initalizePaymentGatewayDataResponse?.data) {

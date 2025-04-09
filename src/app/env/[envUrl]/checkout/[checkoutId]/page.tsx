@@ -1,10 +1,7 @@
-import { BaseError } from "@/lib/errors";
 import { getCheckoutDetails } from "@/modules/checkout-details/actions/get-checkout-details";
 import { Billing } from "@/modules/checkout-details/components/billing";
 import { DeliveryMethod } from "@/modules/checkout-details/components/delivery-method";
 import { Shipping } from "@/modules/checkout-details/components/shipping";
-
-const CheckoutDetailsPageError = BaseError.subclass("CheckoutDetailsPageError");
 
 export default async function CheckoutDetailsPage(props: {
   params: { envUrl: string; checkoutId: string };
@@ -18,10 +15,7 @@ export default async function CheckoutDetailsPage(props: {
   });
 
   if (checkoutDetailsResponse?.serverError) {
-    // Sends the error to the error boundary
-    throw new CheckoutDetailsPageError(
-      checkoutDetailsResponse?.serverError.message,
-    );
+    throw checkoutDetailsResponse?.serverError;
   }
 
   const hasDeliveryMethodsToSelect =

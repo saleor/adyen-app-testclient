@@ -7,8 +7,8 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
-const InitalizePaymentGatewayMutation = graphql(`
-  mutation initalizePaymentGateway(
+const InitializePaymentGatewayMutation = graphql(`
+  mutation InitializePaymentGateway(
     $checkoutId: ID!
     $paymentGatewayId: String!
     $amount: PositiveDecimal
@@ -37,12 +37,13 @@ const InitalizePaymentGatewayMutation = graphql(`
   }
 `);
 
-// const InitalizePaymentGatewayParsingResponseError = BaseError.subclass(
-//   "InitalizePaymentGatewayParsingResponseError",
-// );
-const InitalizePaymentGatewayMutationError = BaseError.subclass(
-  "InitalizePaymentGatewayMutationError",
+const InitializePaymentGatewayError = BaseError.subclass(
+  "InitializePaymentGatewayError",
 );
+
+const saleorDataSchema = z.object({
+  stripePublishableKey: z.string(),
+});
 
 export const initializePaymentGateway = actionClient
   .schema(
@@ -61,7 +62,7 @@ export const initializePaymentGateway = actionClient
     async ({
       parsedInput: { envUrl, checkoutId, paymentGatewayId, amount, data },
     }) => {
-      const response = await request(envUrl, InitalizePaymentGatewayMutation, {
+      const response = await request(envUrl, InitializePaymentGatewayMutation, {
         checkoutId,
         paymentGatewayId,
         amount,
@@ -70,31 +71,45 @@ export const initializePaymentGateway = actionClient
         throw BaseError.normalize(error, UnknownError);
       });
 
-      // todo maybe parse to validate response
+      if (response.paymentGatewayInitialize?.gatewayConfigs?.length !== 1) {
+        throw new InitializePaymentGatewayError(
+          "More than one gateway config found",
+        );
+      }
 
-      const config =
-        response.paymentGatewayInitialize?.gatewayConfigs &&
-        response.paymentGatewayInitialize?.gatewayConfigs[0];
+      const config = response.paymentGatewayInitialize?.gatewayConfigs[0];
 
       if (!config) {
-        throw new InitalizePaymentGatewayMutationError(
-          "Failed to initalize payment gateway - errors in initalizePaymentGateway mutation",
+        throw new InitializePaymentGatewayError(
+          "Gateway config is not defined",
         );
       }
 
       if ((config.errors ?? []).length > 0) {
-        throw new InitalizePaymentGatewayMutationError(
-          "Failed to initalize payment gateway - errors in initalizePaymentGateway mutation",
+        throw new InitializePaymentGatewayError(
+          "Errors in initializePaymentGateway mutation",
           {
             errors: config.errors?.map((e) =>
-              InitalizePaymentGatewayMutationError.normalize(e),
+              InitializePaymentGatewayError.normalize(e),
             ),
           },
         );
       }
 
-      return config.data as {
-        stripePublishableKey: string;
-      };
+      const parsedSaleorDataResult = saleorDataSchema.safeParse(config.data);
+
+      if (parsedSaleorDataResult.success) {
+        return {
+          ...config,
+          data: parsedSaleorDataResult.data,
+        };
+      }
+
+      throw new InitializePaymentGatewayError(
+        "Failed to parse initializePaymentGateway mutation response",
+        {
+          errors: parsedSaleorDataResult.error.errors,
+        },
+      );
     },
   );
