@@ -8,10 +8,8 @@ import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
 import { actionClient } from "@/lib/safe-action";
 
-import { InitalizeTransactionSchema } from "../schemas/initalize-transaction";
-
-const initalizeTransactionMutation = graphql(`
-  mutation InitalizeTransaction(
+const initializeTransactionMutation = graphql(`
+  mutation InitializeTransaction(
     $checkoutId: ID!
     $data: JSON
     $idempotencyKey: String
@@ -37,14 +35,15 @@ const initalizeTransactionMutation = graphql(`
   }
 `);
 
-const InitalizeTransactionParsingResponseError = BaseError.subclass(
-  "InitalizeTransactionParsingResponseError",
-);
-const InitalizeTransactionMutationError = BaseError.subclass(
-  "InitalizeTransactionMutationError",
+const InitializeTransactionError = BaseError.subclass(
+  "InitializeTransactionError",
 );
 
-export const initalizeTransaction = actionClient
+const saleorDataSchema = z.object({
+  stripeClientSecret: z.string(),
+});
+
+export const initializeTransaction = actionClient
   .schema(
     z.object({
       envUrl: envUrlSchema,
@@ -55,7 +54,7 @@ export const initalizeTransaction = actionClient
       idempotencyKey: z.string(),
     }),
   )
-  .metadata({ actionName: "initalizeTransaction" })
+  .metadata({ actionName: "initializeTransaction" })
   .action(
     async ({
       parsedInput: {
@@ -67,7 +66,7 @@ export const initalizeTransaction = actionClient
         idempotencyKey,
       },
     }) => {
-      const response = await request(envUrl, initalizeTransactionMutation, {
+      const response = await request(envUrl, initializeTransactionMutation, {
         checkoutId,
         data,
         amount,
@@ -76,25 +75,40 @@ export const initalizeTransaction = actionClient
       }).catch((error) => {
         throw BaseError.normalize(error, UnknownError);
       });
-      const parsedResponse = InitalizeTransactionSchema.safeParse(response);
 
-      if (parsedResponse.error) {
-        throw InitalizeTransactionParsingResponseError.normalize(
-          parsedResponse.error,
+      if (!response.transactionInitialize) {
+        throw new InitializeTransactionError(
+          "No response from initializeTransaction mutation.",
         );
       }
 
-      if (parsedResponse.data.transactionInitialize.errors.length > 0) {
-        throw new InitalizeTransactionMutationError(
-          "Failed to create checkout - errors in initalizeTransaction mutation.",
+      if (response.transactionInitialize.errors.length > 0) {
+        throw new InitializeTransactionError(
+          "Errors in initializeTransaction mutation.",
           {
-            errors: parsedResponse.data.transactionInitialize.errors.map((e) =>
-              InitalizeTransactionMutationError.normalize(e),
+            errors: response.transactionInitialize.errors.map((e) =>
+              InitializeTransactionError.normalize(e),
             ),
           },
         );
       }
 
-      return parsedResponse.data;
+      const parsedSaleorDataResult = saleorDataSchema.safeParse(
+        response.transactionInitialize.data,
+      );
+
+      if (!parsedSaleorDataResult.success) {
+        throw new InitializeTransactionError(
+          "Failed to parse Saleor data from initializeTransaction mutation.",
+          {
+            errors: parsedSaleorDataResult.error.errors,
+          },
+        );
+      }
+
+      return {
+        ...response.transactionInitialize,
+        data: parsedSaleorDataResult.data,
+      };
     },
   );

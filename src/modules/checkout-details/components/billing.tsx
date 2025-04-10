@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 
 import { updateBillingAddress } from "../actions/update-billing-address";
 import { getDefaultAddressByCountryCode } from "../address";
@@ -65,11 +65,7 @@ export const Billing = (props: {
     }
 
     if (response?.serverError) {
-      toast({
-        title: response.serverError.name,
-        variant: "destructive",
-        description: response.serverError.message,
-      });
+      throw response.serverError;
     }
 
     if (response?.data) {

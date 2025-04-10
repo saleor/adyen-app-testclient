@@ -1,11 +1,11 @@
 "use client";
 
-import { type FragmentOf, readFragment } from "gql.tada";
 import Image from "next/image";
 import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 
 import { createCheckout } from "../actions/create-checkout";
 import { ProductFragment } from "../fragments";
@@ -31,11 +31,7 @@ export const Cart = (props: {
       });
 
       if (response?.serverError) {
-        toast({
-          title: response.serverError.name,
-          variant: "destructive",
-          description: response.serverError.message,
-        });
+        throw response.serverError;
       }
 
       if (response?.data) {

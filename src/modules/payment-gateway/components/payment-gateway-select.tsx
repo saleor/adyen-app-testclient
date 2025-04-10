@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
+import { redirectToStripeDropin } from "@/modules/payment-gateway/actions/redirect-to-stripe-dropin";
 
 import { redirectToAdyenDropin } from "../actions/redirect-to-adyen-dropin";
 import { PaymentGatewayFragment } from "../fragments";
@@ -59,14 +60,36 @@ export const PaymentGatewaySelect = (props: {
   });
 
   async function onSubmit(data: PaymentGatewaySchemaType) {
-    toast({
-      title: "Payment gateway selected",
-      description: "Redirecting to dropin",
-    });
+    switch (data.paymentGatewayId) {
+      case "app.saleor.stripe":
+      case "saleor.app.payment.stripe-v2": {
+        toast({
+          title: "Payment gateway selected",
+          description: "Redirecting to Stripe",
+        });
 
-    await redirectToAdyenDropin({
-      paymentGatewayId: data.paymentGatewayId,
-    });
+        return await redirectToStripeDropin({
+          paymentGatewayId: data.paymentGatewayId,
+        });
+
+        break;
+      }
+      case "app.saleor.adyen": {
+        toast({
+          title: "Payment gateway selected",
+          description: "Redirecting to Adyen",
+        });
+
+        return await redirectToAdyenDropin({
+          paymentGatewayId: data.paymentGatewayId,
+        });
+      }
+      default: {
+        throw new Error(
+          "Payment method not supported. Check either app.saleor.stripe or app.saleor.adyen",
+        );
+      }
+    }
   }
 
   return (

@@ -5,6 +5,9 @@ import { z } from "zod";
 import { envUrlSchema } from "./lib/env-url";
 
 export const env = createEnv({
+  shared: {
+    PORT: z.coerce.number().optional().default(3001),
+  },
   client: {
     NEXT_PUBLIC_INITIAL_ENV_URL: envUrlSchema,
     NEXT_PUBLIC_INITIAL_CHANNEL_SLUG: z.string(),
@@ -24,6 +27,7 @@ export const env = createEnv({
     NEXT_PUBLIC_LOG_LEVEL: process.env.NEXT_PUBLIC_LOG_LEVEL,
     NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE:
       process.env.NEXT_PUBLIC_INITIAL_CHECKOUT_COUNTRY_CODE,
+    PORT: process.env.PORT,
   },
   extends: [vercel()],
   isServer: typeof window === "undefined",

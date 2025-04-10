@@ -2,14 +2,14 @@
 import "@adyen/adyen-web/dist/adyen.css";
 
 import AdyenCheckout from "@adyen/adyen-web";
-import { type FragmentOf, readFragment } from "gql.tada";
 import { useEffect, useRef } from "react";
 
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { UnknownError } from "@/lib/errors";
 
+import { TotalPriceFragment } from "../../../graphql/fragments";
 import { getAdyenDropinConfig } from "../adyen/dropin-config";
 import { SaleorPrice } from "../adyen/price";
-import { TotalPriceFragment } from "../fragments";
 import type { InitalizePaymentGatewaySchemaType } from "../schemas/initalize-payment-gateway";
 
 export const AdyenDropin = (props: {

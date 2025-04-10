@@ -1,10 +1,9 @@
-import { readFragment } from "gql.tada";
-
+import { TotalPriceFragment } from "@/graphql/fragments";
+import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
 import { getCheckoutTotalPrice } from "@/modules/dropin/actions/get-checkout-total-price";
 import { initalizePaymentGateway } from "@/modules/dropin/actions/initalize-payment-gateway";
 import { AdyenDropin } from "@/modules/dropin/components/adyen-dropin";
-import { TotalPriceFragment } from "@/modules/dropin/fragments";
 
 const PaymentGatewayError = BaseError.subclass("PaymentGatewayError");
 
@@ -22,10 +21,7 @@ export default async function PaymentGatewayPage({
   });
 
   if (checkoutTotalPriceDataResponse?.serverError) {
-    // Sends the error to the error boundary
-    throw new PaymentGatewayError(
-      checkoutTotalPriceDataResponse.serverError.message,
-    );
+    throw checkoutTotalPriceDataResponse.serverError;
   }
 
   const totalPrice = readFragment(
@@ -41,10 +37,7 @@ export default async function PaymentGatewayPage({
   });
 
   if (initalizePaymentGatewayDataResponse?.serverError) {
-    // Sends the error to the error boundary
-    throw new PaymentGatewayError(
-      initalizePaymentGatewayDataResponse.serverError.message,
-    );
+    throw initalizePaymentGatewayDataResponse.serverError;
   }
 
   if (!initalizePaymentGatewayDataResponse?.data) {

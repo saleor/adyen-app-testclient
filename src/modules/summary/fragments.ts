@@ -1,4 +1,4 @@
-import { graphql } from "gql.tada";
+import { graphql } from "@/graphql/gql";
 
 export const CheckoutFragment = graphql(`
   fragment Checkout on Checkout {

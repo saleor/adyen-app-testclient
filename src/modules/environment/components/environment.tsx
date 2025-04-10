@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FragmentOf } from "gql.tada";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
+import { type FragmentOf } from "@/graphql/gql";
 import { envUrlSchema } from "@/lib/env-url";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
@@ -53,11 +53,7 @@ export const Environment = () => {
     });
 
     if (response?.serverError) {
-      toast({
-        title: response.serverError.name,
-        variant: "destructive",
-        description: response.serverError.message,
-      });
+      throw response.serverError;
     }
 
     if (response?.data) {

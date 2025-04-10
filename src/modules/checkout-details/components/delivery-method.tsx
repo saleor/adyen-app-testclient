@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FragmentOf, readFragment } from "gql.tada";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -21,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 
 import { updateDeliveryMethod } from "../actions/update-delivery-method";
 import {
@@ -57,13 +57,13 @@ export const DeliveryMethod = (props: {
 
   const deliveryMethod = readFragment(
     DeliveryMethodFragment,
-    // @ts-expect-error - figure out how to handle ShippingMethods & CollectionPoint in the same fragment
     deliveryMethodData,
   );
 
   const getDefaultDeliveryMethodId = () => {
     // if deliveryMethod is already set, return its id
     if (deliveryMethod) {
+      // @ts-ignore
       return deliveryMethod.id;
     }
     // if there is only one shipping method, return its id
@@ -89,11 +89,7 @@ export const DeliveryMethod = (props: {
     });
 
     if (response?.serverError) {
-      toast({
-        title: response.serverError.name,
-        variant: "destructive",
-        description: response.serverError.message,
-      });
+      throw response.serverError;
     }
 
     if (response?.data) {

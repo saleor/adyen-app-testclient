@@ -1,7 +1,6 @@
 "use client";
 
 import { lightFormat } from "date-fns";
-import { type FragmentOf, readFragment } from "gql.tada";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
+import { type FragmentOf, readFragment } from "@/graphql/gql";
 
 import { completeCheckout } from "../actions/complete-checkout";
 import { CheckoutFragment } from "../fragments";
@@ -48,11 +48,7 @@ export const Summary = (props: {
       });
 
       if (response?.serverError) {
-        toast({
-          title: response.serverError.name,
-          variant: "destructive",
-          description: response.serverError.message,
-        });
+        throw response.serverError;
       }
 
       if (response?.data) {

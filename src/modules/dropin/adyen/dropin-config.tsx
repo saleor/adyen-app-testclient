@@ -82,12 +82,7 @@ export const getAdyenDropinConfig = (props: {
 
       if (transactionProcessResponse?.serverError) {
         dropin?.setStatus("error");
-        toast({
-          title: transactionProcessResponse.serverError.name,
-          variant: "destructive",
-          description: transactionProcessResponse.serverError.message,
-        });
-        return;
+        throw transactionProcessResponse.serverError;
       }
 
       if (!transactionProcessResponse?.data) {
@@ -148,14 +143,8 @@ export const getAdyenDropinConfig = (props: {
       splitPaymentSaleorPriceResolver.resetAdyenSplitPaymentPrice();
 
       if (transactionInitializeResponse?.serverError) {
-        toast({
-          title: transactionInitializeResponse?.serverError.name,
-          variant: "destructive",
-          description: transactionInitializeResponse?.serverError.message,
-        });
         dropin.setStatus("error");
-
-        return;
+        throw transactionInitializeResponse.serverError;
       }
 
       if (!transactionInitializeResponse?.data) {
@@ -265,13 +254,7 @@ export const getAdyenDropinConfig = (props: {
       );
 
       if (initalizePaymentGatewayDataResponse?.serverError) {
-        toast({
-          title: initalizePaymentGatewayDataResponse.serverError.name,
-          description: initalizePaymentGatewayDataResponse.serverError.message,
-          variant: "destructive",
-        });
-
-        return;
+        throw initalizePaymentGatewayDataResponse.serverError;
       }
 
       if (!initalizePaymentGatewayDataResponse?.data) {
@@ -325,13 +308,7 @@ export const getAdyenDropinConfig = (props: {
       );
 
       if (initalizePaymentGatewayDataResponse?.serverError) {
-        toast({
-          title: initalizePaymentGatewayDataResponse.serverError.name,
-          description: initalizePaymentGatewayDataResponse.serverError.message,
-          variant: "destructive",
-        });
-
-        return;
+        throw initalizePaymentGatewayDataResponse.serverError;
       }
 
       if (!initalizePaymentGatewayDataResponse?.data) {
@@ -369,13 +346,7 @@ export const getAdyenDropinConfig = (props: {
       );
 
       if (initalizePaymentGatewayDataResponse?.serverError) {
-        toast({
-          title: initalizePaymentGatewayDataResponse.serverError.name,
-          description: initalizePaymentGatewayDataResponse.serverError.message,
-          variant: "destructive",
-        });
-
-        return;
+        throw initalizePaymentGatewayDataResponse.serverError;
       }
 
       if (!initalizePaymentGatewayDataResponse?.data) {
