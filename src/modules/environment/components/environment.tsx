@@ -52,10 +52,6 @@ export const Environment = () => {
       envUrl: data.url,
     });
 
-    if (response?.serverError) {
-      throw response.serverError;
-    }
-
     if (response?.data) {
       setProducts(response?.data?.products?.edges.map((e) => e.node) ?? []);
       toast({

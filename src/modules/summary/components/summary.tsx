@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { type FragmentOf, readFragment } from "@/graphql/gql";
+import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
 import { completeCheckout } from "../actions/complete-checkout";
 import { CheckoutFragment } from "../fragments";
@@ -47,11 +48,8 @@ export const Summary = (props: {
         checkoutId: checkout.id,
       });
 
-      if (response?.serverError) {
-        throw response.serverError;
-      }
-
       if (response?.data) {
+        clearIdempotencyKey();
         toast({
           title: "Successfully completed checkout",
           description: (
@@ -205,7 +203,9 @@ export const Summary = (props: {
       </CardContent>
       <CardFooter className="flex flex-row items-center justify-between gap-3 border-t bg-muted/50 px-6 py-3">
         <Link href="/">
-          <Button variant="link">Go to home page</Button>
+          <Button variant="link" onClick={() => clearIdempotencyKey()}>
+            Go to home page
+          </Button>
         </Link>
         <FormButton onClick={onCompleteButtonClick} loading={isPending}>
           Complete checkout

@@ -88,10 +88,6 @@ export const DeliveryMethod = (props: {
       deliveryMethod: data.deliveryMethodId,
     });
 
-    if (response?.serverError) {
-      throw response.serverError;
-    }
-
     if (response?.data) {
       toast({
         title: "Successfully updated delivery method",

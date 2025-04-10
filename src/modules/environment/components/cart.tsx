@@ -30,10 +30,6 @@ export const Cart = (props: {
         variantId: products[0]?.defaultVariant?.id ?? "",
       });
 
-      if (response?.serverError) {
-        throw response.serverError;
-      }
-
       if (response?.data) {
         toast({
           title: "Successfully created checkout",
