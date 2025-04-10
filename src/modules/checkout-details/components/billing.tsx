@@ -64,10 +64,6 @@ export const Billing = (props: {
       });
     }
 
-    if (response?.serverError) {
-      throw response.serverError;
-    }
-
     if (response?.data) {
       toast({
         title: "Successfully updated billing address",

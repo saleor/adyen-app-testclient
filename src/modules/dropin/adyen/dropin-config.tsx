@@ -253,10 +253,6 @@ export const getAdyenDropinConfig = (props: {
         },
       );
 
-      if (initalizePaymentGatewayDataResponse?.serverError) {
-        throw initalizePaymentGatewayDataResponse.serverError;
-      }
-
       if (!initalizePaymentGatewayDataResponse?.data) {
         toast({
           title: "Error while checking balance",
@@ -307,10 +303,6 @@ export const getAdyenDropinConfig = (props: {
         },
       );
 
-      if (initalizePaymentGatewayDataResponse?.serverError) {
-        throw initalizePaymentGatewayDataResponse.serverError;
-      }
-
       if (!initalizePaymentGatewayDataResponse?.data) {
         toast({
           title: "Error while creating order",
@@ -344,10 +336,6 @@ export const getAdyenDropinConfig = (props: {
           },
         },
       );
-
-      if (initalizePaymentGatewayDataResponse?.serverError) {
-        throw initalizePaymentGatewayDataResponse.serverError;
-      }
 
       if (!initalizePaymentGatewayDataResponse?.data) {
         toast({

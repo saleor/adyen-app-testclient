@@ -57,10 +57,6 @@ export const Shipping = (props: {
       shippingAddress: data,
     });
 
-    if (response?.serverError) {
-      throw response.serverError;
-    }
-
     if (response?.data) {
       toast({
         title: "Successfully updated shipping address",

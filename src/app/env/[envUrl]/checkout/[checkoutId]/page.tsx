@@ -14,10 +14,6 @@ export default async function CheckoutDetailsPage(props: {
     checkoutId,
   });
 
-  if (checkoutDetailsResponse?.serverError) {
-    throw checkoutDetailsResponse?.serverError;
-  }
-
   const hasDeliveryMethodsToSelect =
     checkoutDetailsResponse?.data?.checkout?.shippingMethods?.length ?? 0;
 

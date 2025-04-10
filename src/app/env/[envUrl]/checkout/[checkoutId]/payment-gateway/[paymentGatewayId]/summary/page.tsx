@@ -19,10 +19,6 @@ export default async function CheckoutSummaryPage({
     checkoutId,
   });
 
-  if (checkoutSummaryDataResponse?.serverError) {
-    throw checkoutSummaryDataResponse.serverError;
-  }
-
   if (!checkoutSummaryDataResponse?.data) {
     throw new CheckoutSummaryPageError("No checkout data found");
   }

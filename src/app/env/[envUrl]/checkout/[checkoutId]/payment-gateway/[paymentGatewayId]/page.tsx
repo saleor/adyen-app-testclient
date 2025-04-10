@@ -20,10 +20,6 @@ export default async function PaymentGatewayPage({
     checkoutId,
   });
 
-  if (checkoutTotalPriceDataResponse?.serverError) {
-    throw checkoutTotalPriceDataResponse.serverError;
-  }
-
   const totalPrice = readFragment(
     TotalPriceFragment,
     checkoutTotalPriceDataResponse?.data?.checkout?.totalPrice,
@@ -35,10 +31,6 @@ export default async function PaymentGatewayPage({
     paymentGatewayId: decodedPaymentGatewayId,
     amount: totalPrice?.gross.amount,
   });
-
-  if (initalizePaymentGatewayDataResponse?.serverError) {
-    throw initalizePaymentGatewayDataResponse.serverError;
-  }
 
   if (!initalizePaymentGatewayDataResponse?.data) {
     // Sends the error to the error boundary

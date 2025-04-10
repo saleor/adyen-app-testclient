@@ -3,7 +3,7 @@ import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
 import { getCheckoutTotalPrice } from "@/modules/stripe/actions/get-checkout-total-price";
 import { initializePaymentGateway } from "@/modules/stripe/actions/initialize-payment-gateway";
-import { StripeCheckoutWrapper } from "@/modules/stripe/components/stripe-checkout-wrapper";
+import { StripeCheckoutForm } from "@/modules/stripe/components/stripe-checkout-form";
 
 export default async function StripeDropinPage({
   params: { envUrl, checkoutId, paymentGatewayId },
@@ -18,10 +18,6 @@ export default async function StripeDropinPage({
     envUrl: decodedEnvUrl,
     paymentGatewayId: decodedPaymentGatewayId,
   });
-
-  if (initializedStripeData?.serverError) {
-    throw initializedStripeData.serverError;
-  }
 
   if (!initializedStripeData?.data) {
     throw new BaseError("No data returned from the server");
@@ -49,7 +45,7 @@ export default async function StripeDropinPage({
 
   return (
     <div className="m-auto my-10 max-w-lg">
-      <StripeCheckoutWrapper
+      <StripeCheckoutForm
         pk={publishableKey}
         totalPrice={totalPrice}
         currency={totalPrice?.gross.currency.toLowerCase()}
