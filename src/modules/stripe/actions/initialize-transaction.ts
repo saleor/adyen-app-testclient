@@ -40,7 +40,17 @@ const InitializeTransactionError = BaseError.subclass(
 );
 
 const saleorDataSchema = z.object({
-  stripeClientSecret: z.string(),
+  paymentIntent: z.object({
+    stripeClientSecret: z.string().optional(),
+    errors: z
+      .array(
+        z.object({
+          code: z.string(),
+          message: z.string(),
+        }),
+      )
+      .optional(),
+  }),
 });
 
 export const initializeTransaction = actionClient
@@ -49,7 +59,11 @@ export const initializeTransaction = actionClient
       envUrl: envUrlSchema,
       checkoutId: z.string(),
       paymentGatewayId: z.string(),
-      data: z.unknown(),
+      data: z.object({
+        paymentIntent: z.object({
+          paymentMethod: z.string(),
+        }),
+      }),
       amount: z.number(),
       idempotencyKey: z.string(),
     }),
