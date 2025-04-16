@@ -217,7 +217,6 @@ export const StripeCheckoutForm = ({
         amount: stripeMoney.amount,
         currency: stripeMoney.currency,
         mode: "payment",
-        paymentMethodTypes: ["card"],
       }}
     >
       <StripeCheckoutFormWrapped
