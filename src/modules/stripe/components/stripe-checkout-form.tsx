@@ -53,6 +53,7 @@ export const StripeCheckoutFormWrapped = (props: {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
   const handleSubmit = async (event: any) => {
     if (!stripe) {
@@ -79,21 +80,49 @@ export const StripeCheckoutFormWrapped = (props: {
 
     setLoading(true);
 
-    const initializeTransactionData = await initializeTransaction({
+    if (!paymentMethod) {
+      setLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Error submitting checkout form",
+        description: "No payment method selected",
+      });
+      return;
+    }
+
+    const initializeTransactionResult = await initializeTransaction({
       checkoutId: props.checkoutId,
       amount: props.saleorAmount,
       envUrl: props.envUrl,
       paymentGatewayId: props.paymentGatewayId,
       idempotencyKey: getIdempotencyKey(),
+      data: {
+        paymentIntent: {
+          paymentMethod,
+        },
+      },
     });
 
-    if (!initializeTransactionData?.data) {
+    if (!initializeTransactionResult?.data) {
       setLoading(false);
       throw new BaseError("No data returned from the server");
     }
 
+    const dataErrors =
+      initializeTransactionResult?.data.data.paymentIntent?.errors ?? [];
+
+    if (dataErrors.length > 0) {
+      setLoading(false);
+      toast({
+        variant: "destructive",
+        title: dataErrors[0]?.code,
+        description: dataErrors[0]?.message,
+      });
+      return;
+    }
+
     const stripeClientSecret =
-      initializeTransactionData?.data?.data.stripeClientSecret;
+      initializeTransactionResult?.data?.data.paymentIntent.stripeClientSecret;
 
     if (!stripeClientSecret) {
       setLoading(false);
@@ -134,7 +163,11 @@ export const StripeCheckoutFormWrapped = (props: {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <PaymentElement />
+      <PaymentElement
+        onChange={(event) => {
+          setPaymentMethod(event.value.type);
+        }}
+      />
       <div className="flex justify-stretch">
         <Button
           type="submit"
