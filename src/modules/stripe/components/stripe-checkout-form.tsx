@@ -217,6 +217,8 @@ export const StripeCheckoutForm = ({
         amount: stripeMoney.amount,
         currency: stripeMoney.currency,
         mode: "payment",
+        // TODO: make this dynamic - and returned from app
+        capture_method: "manual",
       }}
     >
       <StripeCheckoutFormWrapped
