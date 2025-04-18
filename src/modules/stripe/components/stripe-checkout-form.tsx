@@ -53,7 +53,7 @@ export const StripeCheckoutFormWrapped = (props: {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | null>(null);
 
   const handleSubmit = async (event: any) => {
     if (!stripe) {
@@ -99,6 +99,7 @@ export const StripeCheckoutFormWrapped = (props: {
       data: {
         paymentIntent: {
           paymentMethod,
+          // requestThreeDSecure: "any",
         },
       },
     });
@@ -165,7 +166,7 @@ export const StripeCheckoutFormWrapped = (props: {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <PaymentElement
         onChange={(event) => {
-          setPaymentMethod(event.value.type);
+          setPaymentMethod(event.value.type as "card");
         }}
       />
       <div className="flex justify-stretch">
