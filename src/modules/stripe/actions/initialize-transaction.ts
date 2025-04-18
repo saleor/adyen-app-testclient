@@ -53,6 +53,14 @@ const saleorDataSchema = z.object({
   }),
 });
 
+const CardPaymentMethodSchema = z.object({
+  paymentMethod: z.literal("card"),
+  requestThreeDSecure: z
+    .enum(["any", "automatic", "challenge"])
+    .optional()
+    .default("automatic"),
+});
+
 export const initializeTransaction = actionClient
   .schema(
     z.object({
@@ -60,9 +68,9 @@ export const initializeTransaction = actionClient
       checkoutId: z.string(),
       paymentGatewayId: z.string(),
       data: z.object({
-        paymentIntent: z.object({
-          paymentMethod: z.string(),
-        }),
+        paymentIntent: z.discriminatedUnion("paymentMethod", [
+          CardPaymentMethodSchema,
+        ]),
       }),
       amount: z.number(),
       idempotencyKey: z.string(),
