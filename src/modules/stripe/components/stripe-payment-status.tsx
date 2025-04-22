@@ -50,6 +50,10 @@ const StripePaymentStatusWrapped = () => {
           setMessage("❌ Payment failed. Please try another payment method.");
           break;
 
+        case "requires_capture":
+          setMessage("💳 Payment requires capture.");
+          break;
+
         default:
           setMessage("⚠️ Something went wrong.");
           break;
