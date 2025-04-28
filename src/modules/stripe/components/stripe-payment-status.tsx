@@ -4,9 +4,13 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
 
-const StripePaymentStatusWrapped = () => {
+import { processTransaction } from "../actions/process-transaction";
+
+const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState<string>("⌛ Loading ...");
 
@@ -70,15 +74,55 @@ const StripePaymentStatusWrapped = () => {
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="p-6 text-sm">{message}</CardContent>
+      <CardContent className="flex items-center justify-between gap-4 p-6 text-sm">
+        <p>{message}</p>
+        <Button
+          variant="secondary"
+          onClick={async () => {
+            const transactionId = searchParams.get("saleorTransactionId");
+
+            if (!transactionId) {
+              return;
+            }
+
+            const response = await processTransaction({
+              transactionId,
+              envUrl: props.envUrl,
+            });
+
+            const processTransactionDataErrors =
+              response?.data?.data?.paymentIntent?.errors ?? [];
+
+            if (processTransactionDataErrors.length > 0) {
+              toast({
+                variant: "destructive",
+                title: processTransactionDataErrors[0]?.code,
+                description: processTransactionDataErrors[0]?.message,
+              });
+
+              return;
+            }
+
+            toast({
+              title: "Success",
+              description: "Session processed successfully",
+            });
+          }}
+        >
+          Force process session
+        </Button>
+      </CardContent>
     </Card>
   );
 };
 
-export const StripePaymentStatus = (props: { publishableKey: string }) => {
+export const StripePaymentStatus = (props: {
+  publishableKey: string;
+  envUrl: string;
+}) => {
   return (
     <Elements stripe={loadStripe(props.publishableKey)}>
-      <StripePaymentStatusWrapped />
+      <StripePaymentStatusWrapped envUrl={props.envUrl} />
     </Elements>
   );
 };
