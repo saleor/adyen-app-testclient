@@ -23,6 +23,7 @@ const createStripeReturnUrl = async (args: {
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
+  saleorTransactionId: string | undefined;
 }) => {
   const encodedEnvUrl = encodeURIComponent(args.envUrl);
   const encodedPaymentGatewayId = encodeURIComponent(args.paymentGatewayId);
@@ -37,7 +38,7 @@ const createStripeReturnUrl = async (args: {
       "payment-gateway",
       "stripe",
       encodedPaymentGatewayId,
-      "summary",
+      `summary?saleorTransactionId=${args.saleorTransactionId}`,
     ),
     baseUrl,
   ).href;
@@ -124,6 +125,9 @@ export const StripeCheckoutFormWrapped = (props: {
     const stripeClientSecret =
       initializeTransactionResult?.data?.data.paymentIntent.stripeClientSecret;
 
+    const saleorTransactionId =
+      initializeTransactionResult?.data?.transaction?.id;
+
     if (!stripeClientSecret) {
       setLoading(false);
       throw new BaseError("No stripeClientSecret returned from the server");
@@ -133,6 +137,7 @@ export const StripeCheckoutFormWrapped = (props: {
       envUrl: props.envUrl,
       checkoutId: props.checkoutId,
       paymentGatewayId: props.paymentGatewayId,
+      saleorTransactionId,
     });
 
     const { error } = await stripe.confirmPayment({

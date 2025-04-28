@@ -52,7 +52,10 @@ export default async function CheckoutSummaryPage({
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       {checkout?.id ? (
         <div className="flex flex-col gap-6">
-          <StripePaymentStatus publishableKey={publishableKey} />
+          <StripePaymentStatus
+            publishableKey={publishableKey}
+            envUrl={decodedEnvUrl}
+          />
           <Summary
             data={checkoutSummaryDataResponse.data.checkout}
             envUrl={decodedEnvUrl}
