@@ -33,6 +33,22 @@ const EnvironmentConfigSchema = z.object({
 
 type EnvironmentConfigSchemaType = z.infer<typeof EnvironmentConfigSchema>;
 
+const lsKey = "saleorApiUrl";
+
+const getEnvFromLs = () => {
+  try {
+    return localStorage.getItem(lsKey) ?? "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const saveEnvToLs = (env: string) => {
+  try {
+    localStorage.setItem(lsKey, env);
+  } catch (e) {}
+};
+
 export const Environment = () => {
   const [products, setProducts] = useState<
     FragmentOf<typeof ProductFragment>[]
@@ -41,12 +57,14 @@ export const Environment = () => {
   const form = useForm<EnvironmentConfigSchemaType>({
     resolver: zodResolver(EnvironmentConfigSchema),
     defaultValues: {
-      url: env.NEXT_PUBLIC_INITIAL_ENV_URL,
+      url: getEnvFromLs(),
       channelSlug: env.NEXT_PUBLIC_INITIAL_CHANNEL_SLUG,
     },
   });
 
   const onSubmit = async (data: EnvironmentConfigSchemaType) => {
+    saveEnvToLs(data.url);
+
     const response = await fetchProduct({
       channelSlug: data.channelSlug,
       envUrl: data.url,
@@ -72,7 +90,9 @@ export const Environment = () => {
                 name="url"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Environment URL</FormLabel>
+                    <FormLabel>
+                      Environment URL (ending with /graphql/)
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your env url" {...field} />
                     </FormControl>
