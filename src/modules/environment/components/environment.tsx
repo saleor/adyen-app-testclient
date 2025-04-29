@@ -90,7 +90,9 @@ export const Environment = () => {
                 name="url"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Environment URL</FormLabel>
+                    <FormLabel>
+                      Environment URL (ending with /graphql/)
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your env url" {...field} />
                     </FormControl>
