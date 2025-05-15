@@ -91,9 +91,6 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.log("Selected payment method", selectedPaymentMethod);
-
     const initializeTransactionResult = await initializeTransaction({
       checkoutId: props.checkoutId,
       amount: props.saleorAmount,
