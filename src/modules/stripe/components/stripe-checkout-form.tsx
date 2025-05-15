@@ -54,7 +54,6 @@ export const StripeCheckoutFormWrapped = (props: {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
   const handleSubmit = async (event: any) => {
     if (!stripe) {
@@ -68,7 +67,8 @@ export const StripeCheckoutFormWrapped = (props: {
     }
 
     // Trigger form validation and wallet collection
-    const { error: submitError } = await elements.submit();
+    const { error: submitError, selectedPaymentMethod } =
+      await elements.submit();
 
     if (submitError) {
       toast({
@@ -81,7 +81,7 @@ export const StripeCheckoutFormWrapped = (props: {
 
     setLoading(true);
 
-    if (!paymentMethod) {
+    if (!selectedPaymentMethod) {
       setLoading(false);
       toast({
         variant: "destructive",
@@ -99,7 +99,7 @@ export const StripeCheckoutFormWrapped = (props: {
       idempotencyKey: getIdempotencyKey(),
       data: {
         paymentIntent: {
-          paymentMethod,
+          paymentMethod: selectedPaymentMethod,
         },
       },
     });
@@ -168,11 +168,7 @@ export const StripeCheckoutFormWrapped = (props: {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <PaymentElement
-        onChange={(event) => {
-          setPaymentMethod(event.value.type);
-        }}
-      />
+      <PaymentElement />
       <div className="flex justify-stretch">
         <Button
           type="submit"

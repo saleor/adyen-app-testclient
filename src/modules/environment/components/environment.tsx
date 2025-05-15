@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { env } from "@/env";
 import { type FragmentOf } from "@/graphql/gql";
 import { envUrlSchema } from "@/lib/env-url";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
@@ -25,6 +24,12 @@ import { clearIdempotencyKey } from "@/lib/idempotency-key";
 import { fetchProduct } from "../actions/fetch-product";
 import { ProductFragment } from "../fragments";
 import { Cart } from "./cart";
+import {
+  resolveChannelSlug,
+  resolveEnvUrl,
+  saveChannelSlugToLocalStorage,
+  saveEnvUrlToLocalStorage,
+} from "./storage-helpers";
 
 const EnvironmentConfigSchema = z.object({
   url: envUrlSchema,
@@ -41,12 +46,14 @@ export const Environment = () => {
   const form = useForm<EnvironmentConfigSchemaType>({
     resolver: zodResolver(EnvironmentConfigSchema),
     defaultValues: {
-      url: env.NEXT_PUBLIC_INITIAL_ENV_URL,
-      channelSlug: env.NEXT_PUBLIC_INITIAL_CHANNEL_SLUG,
+      url: resolveEnvUrl(),
+      channelSlug: resolveChannelSlug(),
     },
   });
 
   const onSubmit = async (data: EnvironmentConfigSchemaType) => {
+    saveEnvUrlToLocalStorage(data.url);
+    saveChannelSlugToLocalStorage(data.channelSlug);
     const response = await fetchProduct({
       channelSlug: data.channelSlug,
       envUrl: data.url,
