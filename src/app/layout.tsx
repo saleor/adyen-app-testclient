@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Adyen app testclient",
+  title: "Payment apps testclient",
 };
 
 export default function RootLayout({
