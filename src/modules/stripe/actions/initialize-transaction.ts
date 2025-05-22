@@ -1,14 +1,10 @@
-"use server";
-
 import request from "graphql-request";
 import { z } from "zod";
 
 import { graphql } from "@/graphql/gql";
-import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { actionClient } from "@/lib/safe-action";
 
-const initializeTransactionMutation = graphql(`
+const InitializeTransactionMutation = graphql(`
   mutation InitializeTransaction(
     $checkoutId: ID!
     $data: JSON
@@ -53,76 +49,56 @@ const saleorDataSchema = z.object({
   }),
 });
 
-export const initializeTransaction = actionClient
-  .schema(
-    z.object({
-      envUrl: envUrlSchema,
-      checkoutId: z.string(),
-      paymentGatewayId: z.string(),
-      data: z.object({
-        paymentIntent: z.object({
-          paymentMethod: z.string(),
-        }),
-      }),
-      amount: z.number(),
-      idempotencyKey: z.string(),
-    }),
-  )
-  .metadata({ actionName: "initializeTransaction" })
-  .action(
-    async ({
-      parsedInput: {
-        envUrl,
-        checkoutId,
-        paymentGatewayId,
-        data,
-        amount,
-        idempotencyKey,
+export const getInitializeTransactionMutationFn = async (args: {
+  envUrl: string;
+  checkoutId: string;
+  paymentGatewayId: string;
+  data: any;
+  amount: number;
+  idempotencyKey: string;
+}) => {
+  const response = await request(args.envUrl, InitializeTransactionMutation, {
+    checkoutId: args.checkoutId,
+    data: args.data,
+    amount: args.amount,
+    idempotencyKey: args.idempotencyKey,
+    paymentGatewayId: args.paymentGatewayId,
+  }).catch((error) => {
+    throw BaseError.normalize(error, UnknownError);
+  });
+
+  if (!response.transactionInitialize) {
+    throw new InitializeTransactionError(
+      "No response from initializeTransaction mutation.",
+    );
+  }
+
+  if (response.transactionInitialize.errors.length > 0) {
+    throw new InitializeTransactionError(
+      "Errors in initializeTransaction mutation.",
+      {
+        errors: response.transactionInitialize.errors.map((e) =>
+          InitializeTransactionError.normalize(e),
+        ),
       },
-    }) => {
-      const response = await request(envUrl, initializeTransactionMutation, {
-        checkoutId,
-        data,
-        amount,
-        idempotencyKey,
-        paymentGatewayId,
-      }).catch((error) => {
-        throw BaseError.normalize(error, UnknownError);
-      });
+    );
+  }
 
-      if (!response.transactionInitialize) {
-        throw new InitializeTransactionError(
-          "No response from initializeTransaction mutation.",
-        );
-      }
-
-      if (response.transactionInitialize.errors.length > 0) {
-        throw new InitializeTransactionError(
-          "Errors in initializeTransaction mutation.",
-          {
-            errors: response.transactionInitialize.errors.map((e) =>
-              InitializeTransactionError.normalize(e),
-            ),
-          },
-        );
-      }
-
-      const parsedSaleorDataResult = saleorDataSchema.safeParse(
-        response.transactionInitialize.data,
-      );
-
-      if (!parsedSaleorDataResult.success) {
-        throw new InitializeTransactionError(
-          "Failed to parse Saleor data from initializeTransaction mutation.",
-          {
-            errors: parsedSaleorDataResult.error.errors,
-          },
-        );
-      }
-
-      return {
-        ...response.transactionInitialize,
-        data: parsedSaleorDataResult.data,
-      };
-    },
+  const parsedSaleorDataResult = saleorDataSchema.safeParse(
+    response.transactionInitialize.data,
   );
+
+  if (!parsedSaleorDataResult.success) {
+    throw new InitializeTransactionError(
+      "Failed to parse Saleor data from initializeTransaction mutation.",
+      {
+        errors: parsedSaleorDataResult.error.errors,
+      },
+    );
+  }
+
+  return {
+    ...response.transactionInitialize,
+    data: parsedSaleorDataResult.data,
+  };
+};

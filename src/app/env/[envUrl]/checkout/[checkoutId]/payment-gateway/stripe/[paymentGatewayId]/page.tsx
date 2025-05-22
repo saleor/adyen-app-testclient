@@ -1,11 +1,15 @@
+"use client";
+import { useQueries } from "@tanstack/react-query";
+import { readFragment } from "gql.tada";
+
+import { FullScreenLoader } from "@/components/full-screen-loader";
 import { TotalPriceFragment } from "@/graphql/fragments";
-import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
-import { getCheckoutTotalPrice } from "@/modules/stripe/actions/get-checkout-total-price";
-import { initializePaymentGateway } from "@/modules/stripe/actions/initialize-payment-gateway";
+import { getCheckoutTotalPriceOptions } from "@/modules/stripe/actions/get-checkout-total-price";
+import { getInitializePaymentGatewayOptions } from "@/modules/stripe/actions/initialize-payment-gateway";
 import { StripeCheckoutForm } from "@/modules/stripe/components/stripe-checkout-form";
 
-export default async function StripeDropinPage({
+export default function StripeDropinPage({
   params: { envUrl, checkoutId, paymentGatewayId },
 }: {
   params: { envUrl: string; checkoutId: string; paymentGatewayId: string };
@@ -13,30 +17,39 @@ export default async function StripeDropinPage({
   const decodedEnvUrl = decodeURIComponent(envUrl);
   const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
 
-  const initializedStripeData = await initializePaymentGateway({
-    checkoutId,
-    envUrl: decodedEnvUrl,
-    paymentGatewayId: decodedPaymentGatewayId,
+  const results = useQueries({
+    queries: [
+      getInitializePaymentGatewayOptions({
+        envUrl: decodedEnvUrl,
+        checkoutId,
+        paymentGatewayId: decodedPaymentGatewayId,
+      }),
+      getCheckoutTotalPriceOptions({
+        envUrl: decodedEnvUrl,
+        checkoutId,
+      }),
+    ],
   });
+
+  if (results.some((query) => query.isLoading)) {
+    return <FullScreenLoader />;
+  }
+
+  const [{ data: initializedStripeData }, { data: total }] = results;
 
   if (!initializedStripeData?.data) {
     throw new BaseError("No data returned from the server");
   }
 
-  const publishableKey = initializedStripeData?.data?.data.stripePublishableKey;
+  const publishableKey = initializedStripeData?.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
   }
 
-  const total = await getCheckoutTotalPrice({
-    envUrl: decodedEnvUrl,
-    checkoutId,
-  });
-
   const totalPrice = readFragment(
     TotalPriceFragment,
-    total?.data?.checkout?.totalPrice,
+    total?.checkout?.totalPrice,
   );
 
   if (!totalPrice?.gross.amount) {

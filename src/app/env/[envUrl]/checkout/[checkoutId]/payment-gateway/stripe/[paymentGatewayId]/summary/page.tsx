@@ -1,48 +1,63 @@
+"use client";
+import { useQueries } from "@tanstack/react-query";
 import Link from "next/link";
 
+import { FullScreenLoader } from "@/components/full-screen-loader";
 import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
-import { initializePaymentGateway } from "@/modules/stripe/actions/initialize-payment-gateway";
+import { getInitializePaymentGatewayOptions } from "@/modules/stripe/actions/initialize-payment-gateway";
 import { StripePaymentStatus } from "@/modules/stripe/components/stripe-payment-status";
-import { getCheckoutSummary } from "@/modules/summary/actions/get-checkout-summary";
+import { getCheckoutSummaryOptions } from "@/modules/summary/actions/get-checkout-summary-fn";
 import { Summary } from "@/modules/summary/components/summary";
 import { CheckoutFragment } from "@/modules/summary/fragments";
 
 const CheckoutSummaryPageError = BaseError.subclass("CheckoutSummaryPageError");
 
-export default async function CheckoutSummaryPage({
+export default function CheckoutSummaryPage({
   params: { envUrl, checkoutId, paymentGatewayId },
 }: {
   params: { envUrl: string; checkoutId: string; paymentGatewayId: string };
 }) {
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const checkoutSummaryDataResponse = await getCheckoutSummary({
-    envUrl: decodedEnvUrl,
-    checkoutId,
+  const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
+
+  const results = useQueries({
+    queries: [
+      getCheckoutSummaryOptions({
+        envUrl: decodedEnvUrl,
+        checkoutId,
+      }),
+      getInitializePaymentGatewayOptions({
+        envUrl: decodedEnvUrl,
+        checkoutId,
+        paymentGatewayId: decodedPaymentGatewayId,
+      }),
+    ],
   });
 
-  if (!checkoutSummaryDataResponse?.data) {
+  if (results.some((query) => query.isLoading)) {
+    return <FullScreenLoader />;
+  }
+
+  const [
+    { data: checkoutSummaryDataResponse },
+    { data: initializedStripeData },
+  ] = results;
+
+  if (!checkoutSummaryDataResponse) {
     throw new CheckoutSummaryPageError("No checkout data found");
   }
 
   const checkout = readFragment(
     CheckoutFragment,
-    checkoutSummaryDataResponse.data.checkout,
+    checkoutSummaryDataResponse.checkout,
   );
-
-  const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
-
-  const initializedStripeData = await initializePaymentGateway({
-    checkoutId,
-    envUrl: decodedEnvUrl,
-    paymentGatewayId: decodedPaymentGatewayId,
-  });
 
   if (!initializedStripeData?.data) {
     throw new BaseError("No data returned from the server");
   }
 
-  const publishableKey = initializedStripeData?.data?.data.stripePublishableKey;
+  const publishableKey = initializedStripeData.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
@@ -57,7 +72,7 @@ export default async function CheckoutSummaryPage({
             envUrl={decodedEnvUrl}
           />
           <Summary
-            data={checkoutSummaryDataResponse.data.checkout}
+            data={checkoutSummaryDataResponse.checkout}
             envUrl={decodedEnvUrl}
           />
         </div>

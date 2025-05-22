@@ -1,11 +1,9 @@
-"use server";
+import { queryOptions } from "@tanstack/react-query";
 import request from "graphql-request";
 import { z } from "zod";
 
 import { graphql } from "@/graphql/gql";
-import { envUrlSchema } from "@/lib/env-url";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { actionClient } from "@/lib/safe-action";
 
 const InitializePaymentGatewayMutation = graphql(`
   mutation InitializePaymentGateway(
@@ -45,29 +43,26 @@ const saleorDataSchema = z.object({
   stripePublishableKey: z.string(),
 });
 
-export const initializePaymentGateway = actionClient
-  .schema(
-    z.object({
-      checkoutId: z.string(),
-      envUrl: envUrlSchema,
-      paymentGatewayId: z.string(),
-      amount: z.number().optional(), // todo check if this is required for stripe?
-      data: z.any(), // todo
-    }),
-  )
-  .metadata({
-    actionName: "initializePaymentGateway",
-  })
-  .action(
-    async ({
-      parsedInput: { envUrl, checkoutId, paymentGatewayId, amount, data },
-    }) => {
-      const response = await request(envUrl, InitializePaymentGatewayMutation, {
-        checkoutId,
-        paymentGatewayId,
-        amount,
-        data,
-      }).catch((error) => {
+export const getInitializePaymentGatewayOptions = (args: {
+  envUrl: string;
+  checkoutId: string;
+  paymentGatewayId: string;
+  amount?: number;
+  data?: any;
+}) =>
+  queryOptions({
+    queryKey: ["stripeInitializePaymentGateway"],
+    queryFn: async () => {
+      const response = await request(
+        args.envUrl,
+        InitializePaymentGatewayMutation,
+        {
+          checkoutId: args.checkoutId,
+          paymentGatewayId: args.paymentGatewayId,
+          amount: args.amount,
+          data: args.data,
+        },
+      ).catch((error) => {
         throw BaseError.normalize(error, UnknownError);
       });
 
@@ -112,4 +107,4 @@ export const initializePaymentGateway = actionClient
         },
       );
     },
-  );
+  });

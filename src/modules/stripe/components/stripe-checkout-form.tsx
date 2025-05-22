@@ -7,6 +7,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import { getIdempotencyKey } from "@/lib/idempotency-key";
 import { createPath } from "@/lib/utils";
 
 import { getBaseUrl } from "../actions/get-base-url";
-import { initializeTransaction } from "../actions/initialize-transaction";
+import { getInitializeTransactionMutationFn } from "../actions/initialize-transaction";
 import { StripeMoney } from "../stripe-money";
 
 const createStripeReturnUrl = async (args: {
@@ -55,6 +56,26 @@ export const StripeCheckoutFormWrapped = (props: {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
 
+  const initializeTransactionMutation = useMutation({
+    mutationFn: (data: any) =>
+      getInitializeTransactionMutationFn({
+        envUrl: props.envUrl,
+        checkoutId: props.checkoutId,
+        paymentGatewayId: props.paymentGatewayId,
+        amount: props.saleorAmount,
+        idempotencyKey: getIdempotencyKey(),
+        data,
+      }),
+    onError: (error) => {
+      setLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Error initializing transaction",
+        description: error.message,
+      });
+    },
+  });
+
   const handleSubmit = async (event: any) => {
     if (!stripe) {
       return null;
@@ -66,7 +87,6 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    // Trigger form validation and wallet collection
     const { error: submitError, selectedPaymentMethod } =
       await elements.submit();
 
@@ -91,18 +111,12 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    const initializeTransactionResult = await initializeTransaction({
-      checkoutId: props.checkoutId,
-      amount: props.saleorAmount,
-      envUrl: props.envUrl,
-      paymentGatewayId: props.paymentGatewayId,
-      idempotencyKey: getIdempotencyKey(),
-      data: {
+    const initializeTransactionResult =
+      await initializeTransactionMutation.mutateAsync({
         paymentIntent: {
           paymentMethod: selectedPaymentMethod,
         },
-      },
-    });
+      });
 
     if (!initializeTransactionResult?.data) {
       setLoading(false);
@@ -110,7 +124,7 @@ export const StripeCheckoutFormWrapped = (props: {
     }
 
     const dataErrors =
-      initializeTransactionResult?.data.data.paymentIntent?.errors ?? [];
+      initializeTransactionResult.data.paymentIntent?.errors ?? [];
 
     if (dataErrors.length > 0) {
       setLoading(false);
@@ -123,10 +137,9 @@ export const StripeCheckoutFormWrapped = (props: {
     }
 
     const stripeClientSecret =
-      initializeTransactionResult?.data?.data.paymentIntent.stripeClientSecret;
+      initializeTransactionResult.data.paymentIntent.stripeClientSecret;
 
-    const saleorTransactionId =
-      initializeTransactionResult?.data?.transaction?.id;
+    const saleorTransactionId = initializeTransactionResult.transaction?.id;
 
     if (!stripeClientSecret) {
       setLoading(false);
