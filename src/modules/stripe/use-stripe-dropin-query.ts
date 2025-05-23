@@ -12,7 +12,7 @@ const getCheckoutTotalPriceQuery = (args: {
   checkoutId: string;
 }) =>
   queryOptions({
-    queryKey: ["stripeCheckoutTotalPrice"],
+    queryKey: ["stripeCheckoutTotalPrice", args.envUrl, args.checkoutId],
     throwOnError: true,
     queryFn: async () => {
       const response = await request(args.envUrl, GetCheckoutTotalPriceQuery, {

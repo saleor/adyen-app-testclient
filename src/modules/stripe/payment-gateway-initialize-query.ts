@@ -51,7 +51,14 @@ export const createPaymentGatewayInitializeQuery = (args: {
   data?: any;
 }) =>
   queryOptions({
-    queryKey: ["stripePaymentGatewayInitialize"],
+    queryKey: [
+      "stripePaymentGatewayInitialize",
+      args.envUrl,
+      args.checkoutId,
+      args.paymentGatewayId,
+      args.amount,
+      args.data,
+    ],
     throwOnError: true,
     queryFn: async () => {
       const response = await request(

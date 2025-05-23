@@ -24,7 +24,7 @@ const createGetCheckoutSummaryQuery = (args: {
   checkoutId: string;
 }) =>
   queryOptions({
-    queryKey: ["checkoutSummary"],
+    queryKey: ["checkoutSummary", args.envUrl, args.checkoutId],
     throwOnError: true,
     queryFn: async () => {
       const response = await request(args.envUrl, GetCheckoutSummaryQuery, {
