@@ -3,7 +3,6 @@
 import { lightFormat } from "date-fns";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
-import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
 import { Button } from "@/components/ui/button";
@@ -20,8 +19,8 @@ import { toast } from "@/components/ui/use-toast";
 import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
-import { completeCheckout } from "../actions/complete-checkout";
 import { CheckoutFragment } from "../fragments";
+import { useCompleteCheckoutMutation } from "../use-complete-checkout-mutation";
 
 const getDashboardUrl = (envUrl: string, orderId: string) => {
   const dashboardUrl = envUrl.replace("/graphql/", "/dashboard");
@@ -32,7 +31,7 @@ export const Summary = (props: {
   data: FragmentOf<typeof CheckoutFragment> | null;
   envUrl: string;
 }) => {
-  const [isPending, startTransition] = useTransition();
+  const { mutateAsync: completeCheckout } = useCompleteCheckoutMutation();
 
   const { data, envUrl } = props;
   const checkout = readFragment(CheckoutFragment, data);
@@ -42,45 +41,40 @@ export const Summary = (props: {
   }
 
   const onCompleteButtonClick = async () => {
-    startTransition(async () => {
-      const response = await completeCheckout({
-        envUrl,
-        checkoutId: checkout.id,
-      });
+    const response = await completeCheckout();
 
-      if (response?.data) {
-        clearIdempotencyKey();
-        toast({
-          title: "Successfully completed checkout",
-          description: (
-            <div className="flex items-center justify-around gap-3">
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    response.data?.checkoutComplete?.order?.id ?? "",
-                  );
-                }}
-                variant="secondary"
-              >
-                Copy order id
+    if (response) {
+      clearIdempotencyKey();
+      toast({
+        title: "Successfully completed checkout",
+        description: (
+          <div className="flex items-center justify-around gap-3">
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  response.checkoutComplete?.order?.id ?? "",
+                );
+              }}
+              variant="secondary"
+            >
+              Copy order id
+            </Button>
+            <Link
+              href={getDashboardUrl(
+                envUrl,
+                response.checkoutComplete?.order?.id ?? "",
+              )}
+              target="_blank"
+            >
+              <Button variant="link" className="flex gap-1">
+                <span>Go to order page</span>
+                <SquareArrowOutUpRight className="h-5 w-5" />
               </Button>
-              <Link
-                href={getDashboardUrl(
-                  envUrl,
-                  response.data?.checkoutComplete?.order?.id ?? "",
-                )}
-                target="_blank"
-              >
-                <Button variant="link" className="flex gap-1">
-                  <span>Go to order page</span>
-                  <SquareArrowOutUpRight className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
-          ),
-        });
-      }
-    });
+            </Link>
+          </div>
+        ),
+      });
+    }
   };
 
   return (
@@ -207,7 +201,7 @@ export const Summary = (props: {
             Go to home page
           </Button>
         </Link>
-        <FormButton onClick={onCompleteButtonClick} loading={isPending}>
+        <FormButton onClick={onCompleteButtonClick}>
           Complete checkout
         </FormButton>
       </CardFooter>

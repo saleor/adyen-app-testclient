@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 
-import { processTransaction } from "../actions/process-transaction";
+import { useTransactionProcessMutation } from "../use-transaction-process-mutation";
 
-const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
+const StripePaymentStatusWrapped = () => {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState<string>("⌛ Loading ...");
 
   const stripe = useStripe();
+
+  const { mutateAsync: transactionProcess } = useTransactionProcessMutation();
 
   useEffect(() => {
     if (!stripe) {
@@ -85,13 +87,12 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
               return;
             }
 
-            const response = await processTransaction({
+            const response = await transactionProcess({
               transactionId,
-              envUrl: props.envUrl,
             });
 
             const processTransactionDataErrors =
-              response?.data?.data?.paymentIntent?.errors ?? [];
+              response.data?.paymentIntent.errors ?? [];
 
             if (processTransactionDataErrors.length > 0) {
               toast({
@@ -116,13 +117,10 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
   );
 };
 
-export const StripePaymentStatus = (props: {
-  publishableKey: string;
-  envUrl: string;
-}) => {
+export const StripePaymentStatus = (props: { publishableKey: string }) => {
   return (
     <Elements stripe={loadStripe(props.publishableKey)}>
-      <StripePaymentStatusWrapped envUrl={props.envUrl} />
+      <StripePaymentStatusWrapped />
     </Elements>
   );
 };

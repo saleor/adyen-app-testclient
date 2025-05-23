@@ -1,11 +1,13 @@
-import { TotalPriceFragment } from "@/graphql/fragments";
-import { readFragment } from "@/graphql/gql";
-import { BaseError } from "@/lib/errors";
-import { getCheckoutTotalPrice } from "@/modules/stripe/actions/get-checkout-total-price";
-import { initializePaymentGateway } from "@/modules/stripe/actions/initialize-payment-gateway";
-import { StripeCheckoutForm } from "@/modules/stripe/components/stripe-checkout-form";
+"use client";
+import { readFragment } from "gql.tada";
 
-export default async function StripeDropinPage({
+import { FullScreenLoader } from "@/components/full-screen-loader";
+import { TotalPriceFragment } from "@/graphql/fragments";
+import { BaseError } from "@/lib/errors";
+import { StripeCheckoutForm } from "@/modules/stripe/components/stripe-checkout-form";
+import { useStripeDropinQuery } from "@/modules/stripe/use-stripe-dropin-query";
+
+export default function StripeDropinPage({
   params: { envUrl, checkoutId, paymentGatewayId },
 }: {
   params: { envUrl: string; checkoutId: string; paymentGatewayId: string };
@@ -13,30 +15,23 @@ export default async function StripeDropinPage({
   const decodedEnvUrl = decodeURIComponent(envUrl);
   const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
 
-  const initializedStripeData = await initializePaymentGateway({
-    checkoutId,
-    envUrl: decodedEnvUrl,
-    paymentGatewayId: decodedPaymentGatewayId,
-  });
+  const { isLoading, checkoutTotalResponse, paymentGatewayInitializeResponse } =
+    useStripeDropinQuery();
 
-  if (!initializedStripeData?.data) {
-    throw new BaseError("No data returned from the server");
+  if (isLoading) {
+    return <FullScreenLoader />;
   }
 
-  const publishableKey = initializedStripeData?.data?.data.stripePublishableKey;
+  const publishableKey =
+    paymentGatewayInitializeResponse?.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
   }
 
-  const total = await getCheckoutTotalPrice({
-    envUrl: decodedEnvUrl,
-    checkoutId,
-  });
-
   const totalPrice = readFragment(
     TotalPriceFragment,
-    total?.data?.checkout?.totalPrice,
+    checkoutTotalResponse?.checkout?.totalPrice,
   );
 
   if (!totalPrice?.gross.amount) {

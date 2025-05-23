@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Elements,
   PaymentElement,
@@ -12,12 +11,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { BaseError } from "@/lib/errors";
-import { getIdempotencyKey } from "@/lib/idempotency-key";
 import { createPath } from "@/lib/utils";
 
-import { getBaseUrl } from "../actions/get-base-url";
-import { initializeTransaction } from "../actions/initialize-transaction";
+import { getBaseUrl } from "../get-base-url";
 import { StripeMoney } from "../stripe-money";
+import { useTransactionInitializeMutation } from "../use-transaction-initialize-mutation";
 
 const createStripeReturnUrl = async (args: {
   envUrl: string;
@@ -55,6 +53,9 @@ export const StripeCheckoutFormWrapped = (props: {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
 
+  const { mutateAsync: transactionInitialize } =
+    useTransactionInitializeMutation();
+
   const handleSubmit = async (event: any) => {
     if (!stripe) {
       return null;
@@ -66,7 +67,6 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    // Trigger form validation and wallet collection
     const { error: submitError, selectedPaymentMethod } =
       await elements.submit();
 
@@ -91,26 +91,22 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    const initializeTransactionResult = await initializeTransaction({
-      checkoutId: props.checkoutId,
-      amount: props.saleorAmount,
-      envUrl: props.envUrl,
-      paymentGatewayId: props.paymentGatewayId,
-      idempotencyKey: getIdempotencyKey(),
+    const transactionInitializeResult = await transactionInitialize({
       data: {
         paymentIntent: {
           paymentMethod: selectedPaymentMethod,
         },
       },
+      saleorAmount: props.saleorAmount,
     });
 
-    if (!initializeTransactionResult?.data) {
+    if (!transactionInitializeResult?.data) {
       setLoading(false);
       throw new BaseError("No data returned from the server");
     }
 
     const dataErrors =
-      initializeTransactionResult?.data.data.paymentIntent?.errors ?? [];
+      transactionInitializeResult.data.paymentIntent?.errors ?? [];
 
     if (dataErrors.length > 0) {
       setLoading(false);
@@ -123,10 +119,9 @@ export const StripeCheckoutFormWrapped = (props: {
     }
 
     const stripeClientSecret =
-      initializeTransactionResult?.data?.data.paymentIntent.stripeClientSecret;
+      transactionInitializeResult.data.paymentIntent.stripeClientSecret;
 
-    const saleorTransactionId =
-      initializeTransactionResult?.data?.transaction?.id;
+    const saleorTransactionId = transactionInitializeResult.transaction?.id;
 
     if (!stripeClientSecret) {
       setLoading(false);

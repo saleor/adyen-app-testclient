@@ -1,48 +1,48 @@
+"use client";
 import Link from "next/link";
 
+import { FullScreenLoader } from "@/components/full-screen-loader";
 import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
-import { initializePaymentGateway } from "@/modules/stripe/actions/initialize-payment-gateway";
 import { StripePaymentStatus } from "@/modules/stripe/components/stripe-payment-status";
-import { getCheckoutSummary } from "@/modules/summary/actions/get-checkout-summary";
+import { useCheckoutSummaryQuery } from "@/modules/stripe/use-checkout-summary-query";
 import { Summary } from "@/modules/summary/components/summary";
 import { CheckoutFragment } from "@/modules/summary/fragments";
 
 const CheckoutSummaryPageError = BaseError.subclass("CheckoutSummaryPageError");
 
-export default async function CheckoutSummaryPage({
-  params: { envUrl, checkoutId, paymentGatewayId },
+export default function CheckoutSummaryPage({
+  params: { envUrl },
 }: {
   params: { envUrl: string; checkoutId: string; paymentGatewayId: string };
 }) {
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const checkoutSummaryDataResponse = await getCheckoutSummary({
-    envUrl: decodedEnvUrl,
-    checkoutId,
-  });
 
-  if (!checkoutSummaryDataResponse?.data) {
+  const {
+    isLoading,
+    checkoutSummaryResponse,
+    paymentGatewayInitializeResponse,
+  } = useCheckoutSummaryQuery();
+
+  if (isLoading) {
+    return <FullScreenLoader />;
+  }
+
+  if (!checkoutSummaryResponse) {
     throw new CheckoutSummaryPageError("No checkout data found");
   }
 
   const checkout = readFragment(
     CheckoutFragment,
-    checkoutSummaryDataResponse.data.checkout,
+    checkoutSummaryResponse?.checkout,
   );
 
-  const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
-
-  const initializedStripeData = await initializePaymentGateway({
-    checkoutId,
-    envUrl: decodedEnvUrl,
-    paymentGatewayId: decodedPaymentGatewayId,
-  });
-
-  if (!initializedStripeData?.data) {
+  if (!paymentGatewayInitializeResponse) {
     throw new BaseError("No data returned from the server");
   }
 
-  const publishableKey = initializedStripeData?.data?.data.stripePublishableKey;
+  const publishableKey =
+    paymentGatewayInitializeResponse.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
@@ -52,12 +52,9 @@ export default async function CheckoutSummaryPage({
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       {checkout?.id ? (
         <div className="flex flex-col gap-6">
-          <StripePaymentStatus
-            publishableKey={publishableKey}
-            envUrl={decodedEnvUrl}
-          />
+          <StripePaymentStatus publishableKey={publishableKey} />
           <Summary
-            data={checkoutSummaryDataResponse.data.checkout}
+            data={checkoutSummaryResponse.checkout}
             envUrl={decodedEnvUrl}
           />
         </div>
