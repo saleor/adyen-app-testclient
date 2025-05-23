@@ -1,5 +1,3 @@
-"use server";
-
 import request from "graphql-request";
 import { z } from "zod";
 

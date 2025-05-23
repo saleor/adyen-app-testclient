@@ -18,11 +18,7 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
   const stripe = useStripe();
 
   const processSessionMutation = useMutation({
-    mutationFn: (data: any) =>
-      processTransactionFn({
-        transactionId: data.transactionId,
-        envUrl: props.envUrl,
-      }),
+    mutationFn: processTransactionFn,
   });
 
   useEffect(() => {

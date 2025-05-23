@@ -4,7 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { lightFormat } from "date-fns";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
-import { useTransition } from "react";
 
 import { FormButton } from "@/components/form-button";
 import { Button } from "@/components/ui/button";
@@ -33,8 +32,6 @@ export const Summary = (props: {
   data: FragmentOf<typeof CheckoutFragment> | null;
   envUrl: string;
 }) => {
-  const [isPending, startTransition] = useTransition();
-
   const completeCheckoutMutation = useMutation({
     mutationFn: completeMutationFn,
   });
@@ -47,45 +44,43 @@ export const Summary = (props: {
   }
 
   const onCompleteButtonClick = async () => {
-    startTransition(async () => {
-      const response = await completeCheckoutMutation.mutateAsync({
-        envUrl,
-        checkoutId: checkout.id,
-      });
-
-      if (response) {
-        clearIdempotencyKey();
-        toast({
-          title: "Successfully completed checkout",
-          description: (
-            <div className="flex items-center justify-around gap-3">
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    response.checkoutComplete?.order?.id ?? "",
-                  );
-                }}
-                variant="secondary"
-              >
-                Copy order id
-              </Button>
-              <Link
-                href={getDashboardUrl(
-                  envUrl,
-                  response.checkoutComplete?.order?.id ?? "",
-                )}
-                target="_blank"
-              >
-                <Button variant="link" className="flex gap-1">
-                  <span>Go to order page</span>
-                  <SquareArrowOutUpRight className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
-          ),
-        });
-      }
+    const response = await completeCheckoutMutation.mutateAsync({
+      envUrl,
+      checkoutId: checkout.id,
     });
+
+    if (response) {
+      clearIdempotencyKey();
+      toast({
+        title: "Successfully completed checkout",
+        description: (
+          <div className="flex items-center justify-around gap-3">
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  response.checkoutComplete?.order?.id ?? "",
+                );
+              }}
+              variant="secondary"
+            >
+              Copy order id
+            </Button>
+            <Link
+              href={getDashboardUrl(
+                envUrl,
+                response.checkoutComplete?.order?.id ?? "",
+              )}
+              target="_blank"
+            >
+              <Button variant="link" className="flex gap-1">
+                <span>Go to order page</span>
+                <SquareArrowOutUpRight className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        ),
+      });
+    }
   };
 
   return (
@@ -212,7 +207,7 @@ export const Summary = (props: {
             Go to home page
           </Button>
         </Link>
-        <FormButton onClick={onCompleteButtonClick} loading={isPending}>
+        <FormButton onClick={onCompleteButtonClick}>
           Complete checkout
         </FormButton>
       </CardFooter>

@@ -1,4 +1,3 @@
-"use server";
 import request from "graphql-request";
 
 import { graphql } from "@/graphql/gql";
