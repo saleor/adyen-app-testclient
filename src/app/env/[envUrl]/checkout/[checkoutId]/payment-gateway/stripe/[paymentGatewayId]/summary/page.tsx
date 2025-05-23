@@ -53,7 +53,7 @@ export default function CheckoutSummaryPage({
     checkoutSummaryDataResponse.checkout,
   );
 
-  if (!initializedStripeData?.data) {
+  if (!initializedStripeData) {
     throw new BaseError("No data returned from the server");
   }
 

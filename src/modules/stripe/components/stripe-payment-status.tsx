@@ -1,6 +1,7 @@
 "use client";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -8,13 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 
-import { processTransaction } from "../actions/process-transaction";
+import { processTransactionFn } from "../actions/process-transaction";
 
 const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState<string>("⌛ Loading ...");
 
   const stripe = useStripe();
+
+  const processSessionMutation = useMutation({
+    mutationFn: (data: any) =>
+      processTransactionFn({
+        transactionId: data.transactionId,
+        envUrl: props.envUrl,
+      }),
+  });
 
   useEffect(() => {
     if (!stripe) {
@@ -85,13 +94,13 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
               return;
             }
 
-            const response = await processTransaction({
+            const response = await processSessionMutation.mutateAsync({
               transactionId,
               envUrl: props.envUrl,
             });
 
             const processTransactionDataErrors =
-              response?.data?.data?.paymentIntent?.errors ?? [];
+              response.data?.paymentIntent.errors ?? [];
 
             if (processTransactionDataErrors.length > 0) {
               toast({

@@ -37,10 +37,6 @@ export default function StripeDropinPage({
 
   const [{ data: initializedStripeData }, { data: total }] = results;
 
-  if (!initializedStripeData?.data) {
-    throw new BaseError("No data returned from the server");
-  }
-
   const publishableKey = initializedStripeData?.data.stripePublishableKey;
 
   if (!publishableKey) {

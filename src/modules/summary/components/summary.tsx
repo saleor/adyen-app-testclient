@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { lightFormat } from "date-fns";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ import { toast } from "@/components/ui/use-toast";
 import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
-import { completeCheckout } from "../actions/complete-checkout";
+import { completeMutationFn } from "../actions/complete-checkout-fn";
 import { CheckoutFragment } from "../fragments";
 
 const getDashboardUrl = (envUrl: string, orderId: string) => {
@@ -34,6 +35,10 @@ export const Summary = (props: {
 }) => {
   const [isPending, startTransition] = useTransition();
 
+  const completeCheckoutMutation = useMutation({
+    mutationFn: completeMutationFn,
+  });
+
   const { data, envUrl } = props;
   const checkout = readFragment(CheckoutFragment, data);
 
@@ -43,12 +48,12 @@ export const Summary = (props: {
 
   const onCompleteButtonClick = async () => {
     startTransition(async () => {
-      const response = await completeCheckout({
+      const response = await completeCheckoutMutation.mutateAsync({
         envUrl,
         checkoutId: checkout.id,
       });
 
-      if (response?.data) {
+      if (response) {
         clearIdempotencyKey();
         toast({
           title: "Successfully completed checkout",
@@ -57,7 +62,7 @@ export const Summary = (props: {
               <Button
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    response.data?.checkoutComplete?.order?.id ?? "",
+                    response.checkoutComplete?.order?.id ?? "",
                   );
                 }}
                 variant="secondary"
@@ -67,7 +72,7 @@ export const Summary = (props: {
               <Link
                 href={getDashboardUrl(
                   envUrl,
-                  response.data?.checkoutComplete?.order?.id ?? "",
+                  response.checkoutComplete?.order?.id ?? "",
                 )}
                 target="_blank"
               >
