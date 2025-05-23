@@ -8,7 +8,7 @@ import { CheckoutFragment } from "../fragments";
 
 const GetCheckoutSummaryQuery = graphql(
   `
-    query getCheckoutSummary($checkoutId: ID!) {
+    query GetCheckoutSummary($checkoutId: ID!) {
       checkout(id: $checkoutId) {
         ...Checkout
       }
