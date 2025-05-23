@@ -1,11 +1,14 @@
+import { useMutation } from "@tanstack/react-query";
 import request from "graphql-request";
+import { useParams } from "next/navigation";
 import { z } from "zod";
 
 import { graphql } from "@/graphql/gql";
 import { BaseError, UnknownError } from "@/lib/errors";
+import { getIdempotencyKey } from "@/lib/idempotency-key";
 
-const InitializeTransactionMutation = graphql(`
-  mutation InitializeTransaction(
+const TransactionInitializeMutation = graphql(`
+  mutation TransactionInitialize(
     $checkoutId: ID!
     $data: JSON
     $idempotencyKey: String
@@ -31,8 +34,8 @@ const InitializeTransactionMutation = graphql(`
   }
 `);
 
-const InitializeTransactionError = BaseError.subclass(
-  "InitializeTransactionError",
+const TransactionInitializeError = BaseError.subclass(
+  "TransactionInitializeError",
 );
 
 const saleorDataSchema = z.object({
@@ -49,7 +52,7 @@ const saleorDataSchema = z.object({
   }),
 });
 
-export const getInitializeTransactionMutationFn = async (args: {
+const createTransactionInitializeMutationFn = async (args: {
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
@@ -57,7 +60,7 @@ export const getInitializeTransactionMutationFn = async (args: {
   amount: number;
   idempotencyKey: string;
 }) => {
-  const response = await request(args.envUrl, InitializeTransactionMutation, {
+  const response = await request(args.envUrl, TransactionInitializeMutation, {
     checkoutId: args.checkoutId,
     data: args.data,
     amount: args.amount,
@@ -68,17 +71,17 @@ export const getInitializeTransactionMutationFn = async (args: {
   });
 
   if (!response.transactionInitialize) {
-    throw new InitializeTransactionError(
+    throw new TransactionInitializeError(
       "No response from initializeTransaction mutation.",
     );
   }
 
   if (response.transactionInitialize.errors.length > 0) {
-    throw new InitializeTransactionError(
+    throw new TransactionInitializeError(
       "Errors in initializeTransaction mutation.",
       {
         errors: response.transactionInitialize.errors.map((e) =>
-          InitializeTransactionError.normalize(e),
+          TransactionInitializeError.normalize(e),
         ),
       },
     );
@@ -89,7 +92,7 @@ export const getInitializeTransactionMutationFn = async (args: {
   );
 
   if (!parsedSaleorDataResult.success) {
-    throw new InitializeTransactionError(
+    throw new TransactionInitializeError(
       "Failed to parse Saleor data from initializeTransaction mutation.",
       {
         errors: parsedSaleorDataResult.error.errors,
@@ -101,4 +104,32 @@ export const getInitializeTransactionMutationFn = async (args: {
     ...response.transactionInitialize,
     data: parsedSaleorDataResult.data,
   };
+};
+
+export const useTransactionInitializeMutation = () => {
+  const params = useParams<{
+    envUrl: string;
+    checkoutId: string;
+    paymentGatewayId: string;
+  }>();
+
+  const envUrl = decodeURIComponent(params.envUrl);
+  const checkoutId = decodeURIComponent(params.checkoutId);
+  const paymentGatewayId = decodeURIComponent(params.paymentGatewayId);
+
+  const transactionInitializeMutation = useMutation({
+    mutationFn: (args: { data: any; saleorAmount: number }) =>
+      createTransactionInitializeMutationFn({
+        envUrl,
+        checkoutId,
+        paymentGatewayId,
+        amount: args.saleorAmount,
+        idempotencyKey: getIdempotencyKey(),
+        data: args.data,
+      }),
+    throwOnError: true,
+    mutationKey: ["stripeTransactionInitialize"],
+  });
+
+  return transactionInitializeMutation;
 };

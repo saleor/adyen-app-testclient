@@ -1,7 +1,6 @@
 "use client";
 import { Elements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -9,17 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 
-import { processTransactionFn } from "../actions/process-transaction";
+import { useTransactionProcessMutation } from "../use-transaction-process-mutation";
 
-const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
+const StripePaymentStatusWrapped = () => {
   const searchParams = useSearchParams();
   const [message, setMessage] = useState<string>("⌛ Loading ...");
 
   const stripe = useStripe();
 
-  const processSessionMutation = useMutation({
-    mutationFn: processTransactionFn,
-  });
+  const { mutateAsync: transactionProcess } = useTransactionProcessMutation();
 
   useEffect(() => {
     if (!stripe) {
@@ -90,9 +87,8 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
               return;
             }
 
-            const response = await processSessionMutation.mutateAsync({
+            const response = await transactionProcess({
               transactionId,
-              envUrl: props.envUrl,
             });
 
             const processTransactionDataErrors =
@@ -121,13 +117,10 @@ const StripePaymentStatusWrapped = (props: { envUrl: string }) => {
   );
 };
 
-export const StripePaymentStatus = (props: {
-  publishableKey: string;
-  envUrl: string;
-}) => {
+export const StripePaymentStatus = (props: { publishableKey: string }) => {
   return (
     <Elements stripe={loadStripe(props.publishableKey)}>
-      <StripePaymentStatusWrapped envUrl={props.envUrl} />
+      <StripePaymentStatusWrapped />
     </Elements>
   );
 };

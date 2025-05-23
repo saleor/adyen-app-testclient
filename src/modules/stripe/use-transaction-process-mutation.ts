@@ -1,11 +1,13 @@
+import { useMutation } from "@tanstack/react-query";
 import request from "graphql-request";
+import { useParams } from "next/navigation";
 import { z } from "zod";
 
 import { graphql } from "@/graphql/gql";
 import { BaseError, UnknownError } from "@/lib/errors";
 
-const ProcessTransactionMutation = graphql(`
-  mutation ProcessTransaction($transactionId: ID!, $data: JSON) {
+const TransactionProcessMutation = graphql(`
+  mutation TransactionProcess($transactionId: ID!, $data: JSON) {
     transactionProcess(id: $transactionId, data: $data) {
       transaction {
         id
@@ -37,12 +39,12 @@ const saleorDataSchema = z
   })
   .nullable();
 
-export const processTransactionFn = async (args: {
+const createTransactionProcessMutationFn = async (args: {
   envUrl: string;
   transactionId: string;
   data?: any;
 }) => {
-  const response = await request(args.envUrl, ProcessTransactionMutation, {
+  const response = await request(args.envUrl, TransactionProcessMutation, {
     transactionId: args.transactionId,
     data: args.data,
   }).catch((error) => {
@@ -83,4 +85,23 @@ export const processTransactionFn = async (args: {
     ...response.transactionProcess,
     data: parsedSaleorDataResult.data,
   };
+};
+
+export const useTransactionProcessMutation = () => {
+  const params = useParams<{
+    envUrl: string;
+  }>();
+  const envUrl = decodeURIComponent(params.envUrl);
+
+  const transactionProcessMutation = useMutation({
+    mutationFn: (args: { transactionId: string }) =>
+      createTransactionProcessMutationFn({
+        envUrl,
+        transactionId: args.transactionId,
+      }),
+    throwOnError: true,
+    mutationKey: ["stripeTransactionProcess"],
+  });
+
+  return transactionProcessMutation;
 };

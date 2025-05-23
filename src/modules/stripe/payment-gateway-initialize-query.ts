@@ -43,7 +43,7 @@ const saleorDataSchema = z.object({
   stripePublishableKey: z.string(),
 });
 
-export const getInitializePaymentGatewayOptions = (args: {
+export const createPaymentGatewayInitializeQuery = (args: {
   envUrl: string;
   checkoutId: string;
   paymentGatewayId: string;
@@ -51,7 +51,8 @@ export const getInitializePaymentGatewayOptions = (args: {
   data?: any;
 }) =>
   queryOptions({
-    queryKey: ["stripeInitializePaymentGateway"],
+    queryKey: ["stripePaymentGatewayInitialize"],
+    throwOnError: true,
     queryFn: async () => {
       const response = await request(
         args.envUrl,

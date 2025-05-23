@@ -1,6 +1,5 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
 import { lightFormat } from "date-fns";
 import { Copy, SquareArrowOutUpRight } from "lucide-react";
 import Link from "next/link";
@@ -20,8 +19,8 @@ import { toast } from "@/components/ui/use-toast";
 import { type FragmentOf, readFragment } from "@/graphql/gql";
 import { clearIdempotencyKey } from "@/lib/idempotency-key";
 
-import { completeMutationFn } from "../actions/complete-checkout-fn";
 import { CheckoutFragment } from "../fragments";
+import { useCompleteCheckoutMutation } from "../use-complete-checkout-mutation";
 
 const getDashboardUrl = (envUrl: string, orderId: string) => {
   const dashboardUrl = envUrl.replace("/graphql/", "/dashboard");
@@ -32,9 +31,7 @@ export const Summary = (props: {
   data: FragmentOf<typeof CheckoutFragment> | null;
   envUrl: string;
 }) => {
-  const completeCheckoutMutation = useMutation({
-    mutationFn: completeMutationFn,
-  });
+  const { mutateAsync: completeCheckout } = useCompleteCheckoutMutation();
 
   const { data, envUrl } = props;
   const checkout = readFragment(CheckoutFragment, data);
@@ -44,10 +41,7 @@ export const Summary = (props: {
   }
 
   const onCompleteButtonClick = async () => {
-    const response = await completeCheckoutMutation.mutateAsync({
-      envUrl,
-      checkoutId: checkout.id,
-    });
+    const response = await completeCheckout();
 
     if (response) {
       clearIdempotencyKey();

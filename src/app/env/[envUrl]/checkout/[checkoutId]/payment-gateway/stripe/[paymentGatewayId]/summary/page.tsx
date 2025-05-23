@@ -1,63 +1,48 @@
 "use client";
-import { useQueries } from "@tanstack/react-query";
 import Link from "next/link";
 
 import { FullScreenLoader } from "@/components/full-screen-loader";
 import { readFragment } from "@/graphql/gql";
 import { BaseError } from "@/lib/errors";
-import { getInitializePaymentGatewayOptions } from "@/modules/stripe/actions/initialize-payment-gateway";
 import { StripePaymentStatus } from "@/modules/stripe/components/stripe-payment-status";
-import { getCheckoutSummaryOptions } from "@/modules/summary/actions/get-checkout-summary-fn";
+import { useCheckoutSummaryQuery } from "@/modules/stripe/use-checkout-summary-query";
 import { Summary } from "@/modules/summary/components/summary";
 import { CheckoutFragment } from "@/modules/summary/fragments";
 
 const CheckoutSummaryPageError = BaseError.subclass("CheckoutSummaryPageError");
 
 export default function CheckoutSummaryPage({
-  params: { envUrl, checkoutId, paymentGatewayId },
+  params: { envUrl },
 }: {
   params: { envUrl: string; checkoutId: string; paymentGatewayId: string };
 }) {
   const decodedEnvUrl = decodeURIComponent(envUrl);
-  const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
 
-  const results = useQueries({
-    queries: [
-      getCheckoutSummaryOptions({
-        envUrl: decodedEnvUrl,
-        checkoutId,
-      }),
-      getInitializePaymentGatewayOptions({
-        envUrl: decodedEnvUrl,
-        checkoutId,
-        paymentGatewayId: decodedPaymentGatewayId,
-      }),
-    ],
-  });
+  const {
+    isLoading,
+    checkoutSummaryResponse,
+    paymentGatewayInitializeResponse,
+  } = useCheckoutSummaryQuery();
 
-  if (results.some((query) => query.isLoading)) {
+  if (isLoading) {
     return <FullScreenLoader />;
   }
 
-  const [
-    { data: checkoutSummaryDataResponse },
-    { data: initializedStripeData },
-  ] = results;
-
-  if (!checkoutSummaryDataResponse) {
+  if (!checkoutSummaryResponse) {
     throw new CheckoutSummaryPageError("No checkout data found");
   }
 
   const checkout = readFragment(
     CheckoutFragment,
-    checkoutSummaryDataResponse.checkout,
+    checkoutSummaryResponse?.checkout,
   );
 
-  if (!initializedStripeData) {
+  if (!paymentGatewayInitializeResponse) {
     throw new BaseError("No data returned from the server");
   }
 
-  const publishableKey = initializedStripeData.data.stripePublishableKey;
+  const publishableKey =
+    paymentGatewayInitializeResponse.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
@@ -67,12 +52,9 @@ export default function CheckoutSummaryPage({
     <main className="mx-auto grid max-w-6xl items-start gap-6 px-4 py-6 md:grid-cols-2 lg:gap-12">
       {checkout?.id ? (
         <div className="flex flex-col gap-6">
-          <StripePaymentStatus
-            publishableKey={publishableKey}
-            envUrl={decodedEnvUrl}
-          />
+          <StripePaymentStatus publishableKey={publishableKey} />
           <Summary
-            data={checkoutSummaryDataResponse.checkout}
+            data={checkoutSummaryResponse.checkout}
             envUrl={decodedEnvUrl}
           />
         </div>

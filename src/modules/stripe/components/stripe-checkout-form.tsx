@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Elements,
   PaymentElement,
@@ -7,18 +6,16 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { BaseError } from "@/lib/errors";
-import { getIdempotencyKey } from "@/lib/idempotency-key";
 import { createPath } from "@/lib/utils";
 
-import { getBaseUrl } from "../actions/get-base-url";
-import { getInitializeTransactionMutationFn } from "../actions/initialize-transaction";
+import { getBaseUrl } from "../get-base-url";
 import { StripeMoney } from "../stripe-money";
+import { useTransactionInitializeMutation } from "../use-transaction-initialize-mutation";
 
 const createStripeReturnUrl = async (args: {
   envUrl: string;
@@ -56,25 +53,8 @@ export const StripeCheckoutFormWrapped = (props: {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
 
-  const initializeTransactionMutation = useMutation({
-    mutationFn: (data: any) =>
-      getInitializeTransactionMutationFn({
-        envUrl: props.envUrl,
-        checkoutId: props.checkoutId,
-        paymentGatewayId: props.paymentGatewayId,
-        amount: props.saleorAmount,
-        idempotencyKey: getIdempotencyKey(),
-        data,
-      }),
-    onError: (error) => {
-      setLoading(false);
-      toast({
-        variant: "destructive",
-        title: "Error initializing transaction",
-        description: error.message,
-      });
-    },
-  });
+  const { mutateAsync: transactionInitialize } =
+    useTransactionInitializeMutation();
 
   const handleSubmit = async (event: any) => {
     if (!stripe) {
@@ -111,20 +91,22 @@ export const StripeCheckoutFormWrapped = (props: {
       return;
     }
 
-    const initializeTransactionResult =
-      await initializeTransactionMutation.mutateAsync({
+    const transactionInitializeResult = await transactionInitialize({
+      data: {
         paymentIntent: {
           paymentMethod: selectedPaymentMethod,
         },
-      });
+      },
+      saleorAmount: props.saleorAmount,
+    });
 
-    if (!initializeTransactionResult?.data) {
+    if (!transactionInitializeResult?.data) {
       setLoading(false);
       throw new BaseError("No data returned from the server");
     }
 
     const dataErrors =
-      initializeTransactionResult.data.paymentIntent?.errors ?? [];
+      transactionInitializeResult.data.paymentIntent?.errors ?? [];
 
     if (dataErrors.length > 0) {
       setLoading(false);
@@ -137,9 +119,9 @@ export const StripeCheckoutFormWrapped = (props: {
     }
 
     const stripeClientSecret =
-      initializeTransactionResult.data.paymentIntent.stripeClientSecret;
+      transactionInitializeResult.data.paymentIntent.stripeClientSecret;
 
-    const saleorTransactionId = initializeTransactionResult.transaction?.id;
+    const saleorTransactionId = transactionInitializeResult.transaction?.id;
 
     if (!stripeClientSecret) {
       setLoading(false);

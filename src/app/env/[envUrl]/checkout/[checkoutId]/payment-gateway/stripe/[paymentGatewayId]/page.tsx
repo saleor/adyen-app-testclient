@@ -1,13 +1,11 @@
 "use client";
-import { useQueries } from "@tanstack/react-query";
 import { readFragment } from "gql.tada";
 
 import { FullScreenLoader } from "@/components/full-screen-loader";
 import { TotalPriceFragment } from "@/graphql/fragments";
 import { BaseError } from "@/lib/errors";
-import { getCheckoutTotalPriceOptions } from "@/modules/stripe/actions/get-checkout-total-price";
-import { getInitializePaymentGatewayOptions } from "@/modules/stripe/actions/initialize-payment-gateway";
 import { StripeCheckoutForm } from "@/modules/stripe/components/stripe-checkout-form";
+import { useStripeDropinQuery } from "@/modules/stripe/use-stripe-dropin-query";
 
 export default function StripeDropinPage({
   params: { envUrl, checkoutId, paymentGatewayId },
@@ -17,27 +15,15 @@ export default function StripeDropinPage({
   const decodedEnvUrl = decodeURIComponent(envUrl);
   const decodedPaymentGatewayId = decodeURIComponent(paymentGatewayId);
 
-  const results = useQueries({
-    queries: [
-      getInitializePaymentGatewayOptions({
-        envUrl: decodedEnvUrl,
-        checkoutId,
-        paymentGatewayId: decodedPaymentGatewayId,
-      }),
-      getCheckoutTotalPriceOptions({
-        envUrl: decodedEnvUrl,
-        checkoutId,
-      }),
-    ],
-  });
+  const { isLoading, checkoutTotalResponse, paymentGatewayInitializeResponse } =
+    useStripeDropinQuery();
 
-  if (results.some((query) => query.isLoading)) {
+  if (isLoading) {
     return <FullScreenLoader />;
   }
 
-  const [{ data: initializedStripeData }, { data: total }] = results;
-
-  const publishableKey = initializedStripeData?.data.stripePublishableKey;
+  const publishableKey =
+    paymentGatewayInitializeResponse?.data.stripePublishableKey;
 
   if (!publishableKey) {
     throw new BaseError("No publishable key returned from the server");
@@ -45,7 +31,7 @@ export default function StripeDropinPage({
 
   const totalPrice = readFragment(
     TotalPriceFragment,
-    total?.checkout?.totalPrice,
+    checkoutTotalResponse?.checkout?.totalPrice,
   );
 
   if (!totalPrice?.gross.amount) {
