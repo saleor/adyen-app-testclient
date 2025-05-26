@@ -5,13 +5,11 @@ import { z } from "zod";
 
 import { graphql } from "@/graphql/gql";
 import { BaseError, UnknownError } from "@/lib/errors";
-import { getIdempotencyKey } from "@/lib/idempotency-key";
 
 const TransactionInitializeMutation = graphql(`
   mutation TransactionInitialize(
     $checkoutId: ID!
     $data: JSON
-    $idempotencyKey: String
     $paymentGatewayId: String!
     $amount: PositiveDecimal!
   ) {
@@ -19,7 +17,6 @@ const TransactionInitializeMutation = graphql(`
       id: $checkoutId
       paymentGateway: { id: $paymentGatewayId, data: $data }
       amount: $amount
-      idempotencyKey: $idempotencyKey
     ) {
       transaction {
         id
@@ -58,13 +55,11 @@ const createTransactionInitializeMutationFn = async (args: {
   paymentGatewayId: string;
   data: any;
   amount: number;
-  idempotencyKey: string;
 }) => {
   const response = await request(args.envUrl, TransactionInitializeMutation, {
     checkoutId: args.checkoutId,
     data: args.data,
     amount: args.amount,
-    idempotencyKey: args.idempotencyKey,
     paymentGatewayId: args.paymentGatewayId,
   }).catch((error) => {
     throw BaseError.normalize(error, UnknownError);
@@ -124,7 +119,6 @@ export const useTransactionInitializeMutation = () => {
         checkoutId,
         paymentGatewayId,
         amount: args.saleorAmount,
-        idempotencyKey: getIdempotencyKey(),
         data: args.data,
       }),
     throwOnError: true,
