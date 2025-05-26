@@ -169,6 +169,7 @@ export const StripeCheckoutFormWrapped = (props: {
           type="submit"
           className="w-full"
           disabled={!stripe || !elements}
+          data-testid="button-pay"
         >
           {loading ? (
             <>Loading...</>

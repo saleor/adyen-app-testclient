@@ -80,6 +80,7 @@ const StripePaymentStatusWrapped = () => {
         <p>{message}</p>
         <Button
           variant="secondary"
+          data-testid="button-force-process-session"
           onClick={async () => {
             const transactionId = searchParams.get("saleorTransactionId");
 
