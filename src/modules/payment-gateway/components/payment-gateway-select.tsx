@@ -62,7 +62,7 @@ export const PaymentGatewaySelect = (props: {
   async function onSubmit(data: PaymentGatewaySchemaType) {
     switch (data.paymentGatewayId) {
       case "app.saleor.stripe":
-      case "saleor.app.payment.stripe-v2": {
+      case "saleor.app.payment.stripe": {
         toast({
           title: "Payment gateway selected",
           description: "Redirecting to Stripe",
@@ -86,7 +86,7 @@ export const PaymentGatewaySelect = (props: {
       }
       default: {
         throw new Error(
-          "Payment method not supported. Check either app.saleor.stripe or app.saleor.adyen",
+          "Payment gateway is not supported. Check either app.saleor.stripe or app.saleor.adyen",
         );
       }
     }
