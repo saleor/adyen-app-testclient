@@ -201,7 +201,10 @@ export const Summary = (props: {
             Go to home page
           </Button>
         </Link>
-        <FormButton onClick={onCompleteButtonClick}>
+        <FormButton
+          onClick={onCompleteButtonClick}
+          data-testid="button-complete-checkout"
+        >
           Complete checkout
         </FormButton>
       </CardFooter>
