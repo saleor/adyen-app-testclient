@@ -8,7 +8,7 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { FormButton } from "@/components/form-button";
 import { toast } from "@/components/ui/use-toast";
 import { BaseError } from "@/lib/errors";
 import { createPath } from "@/lib/utils";
@@ -165,20 +165,15 @@ export const StripeCheckoutFormWrapped = (props: {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <PaymentElement />
       <div className="flex justify-stretch">
-        <Button
+        <FormButton
           type="submit"
           className="w-full"
           disabled={!stripe || !elements}
           data-testid="button-pay"
+          loading={loading}
         >
-          {loading ? (
-            <>Loading...</>
-          ) : (
-            <>
-              Pay {props.saleorAmount} {props.currency}
-            </>
-          )}
-        </Button>
+          Pay {props.saleorAmount} {props.currency}
+        </FormButton>
       </div>
     </form>
   );

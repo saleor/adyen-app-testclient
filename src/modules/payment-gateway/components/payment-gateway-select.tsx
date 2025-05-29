@@ -71,9 +71,8 @@ export const PaymentGatewaySelect = (props: {
         return await redirectToStripeDropin({
           paymentGatewayId: data.paymentGatewayId,
         });
-
-        break;
       }
+      case "app.saleor.adyen_staging":
       case "app.saleor.adyen": {
         toast({
           title: "Payment gateway selected",
@@ -85,6 +84,12 @@ export const PaymentGatewaySelect = (props: {
         });
       }
       default: {
+        toast({
+          title: "Not supported payment gateway",
+          description: `The payment gateway ${data.paymentGatewayId} is not supported.`,
+          variant: "destructive",
+        });
+
         throw new Error(
           "Payment gateway is not supported. Check either app.saleor.stripe or app.saleor.adyen",
         );
